@@ -20,4 +20,4 @@ vignettes/*.pdf
 .Rproj.user
 
 # Slides
-*/*.html
+session_1/session_1.html
