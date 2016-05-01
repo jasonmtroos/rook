@@ -40,8 +40,29 @@ source = function(x,options){
 )
 ```
 
+Learning by doing
+==================================
+* Coding is not as difficult as people think
+* My approach to teaching people to code is to force them to type (and click on) things they don't fully understand
+* If they are curious enough, they will then ask "Hmm...why did that work?"
+* Usually I have an answer ready (but if I don't, then their question becomes mine and I start Googling...)
+
+Doing before understanding
+===========================
+* You will now
+    + Set up a local workspace
+    + Configure your source control software
+    + Create an online repository for your work
+    + Set up your local project files
+    + Track them using version control
+    + Push your changes to the online repository
+    + Et cetera
+* Later, I will explain what all this means
+
 Setup your local working directory
 ==================================
+*Do this once for each computer you work on*
+
 * Create a top-level directory where all of your code will go
 * Each project will have in its own directory underneath this one
 * I call mine `git_workspace` -- I will use this name as a placeholder throughout these slides
@@ -63,15 +84,29 @@ git config --global user.email "johndoe@example.com"
 ```
 
 * OS X users might need to issue the following commands as well
+
 ```{r engine='bash', eval=FALSE, highlight=TRUE}
 git credential-osxkeychain
 git config --global credential.helper osxkeychain
 ```
 
+Configure RStudio
+=================================
+*	Open **RStudio**
+*	Select the menu item **Tools > Global Options...**
+* Click on the **Git/SVN** button
+* Check the box that enables version control
+* Quit **RStudio**
 
+***
+<div class='center'>
+![](RStudio_global_opts.png)
+</div>
 
 Create a new repository on GitHub
 ==================================
+*Do this once for each project you work on*
+
 * Log into **GitHub** (https://github.com)
 * Click on **New repository** 
 * Enter the name `session_1` and click **Create repository**
@@ -92,21 +127,11 @@ Get the URL for your new repository
 ![](repository_uri.png)
 </div>
 
-Configure RStudio
-=================================
-*	Open **RStudio**
-*	Select the menu item **Tools > Global Options...**
-* Click on the **Git/SVN** button
-* Check the box that enables version control
-* Quite and restart **RStudio**
 
-***
-<div class='center'>
-![](RStudio_global_opts.png)
-</div>
 
 Create a new RStudio project
 =================================
+* Open **RStudio**
 * Select **File > New Project...**
 * Click on **Version Control** and then on **Git**
 * Paste the URL you copied from Github into the **Repository URL** field
@@ -120,7 +145,7 @@ Create a new RStudio project
 
 Create a new R Markdown file
 ================================
-
+* You do this one or more times for each project you work on
 * Select **File > New File > R Markdown...**
 * Set the **Title** to `My First Markdown`
 * Enter your name as the **Author** and click **OK**
@@ -170,13 +195,13 @@ Push your changes to GitHub
 ==============================
 
 * Click on the **Push** button in the top right corner
-
 * If you receive the following error...
 
 ```
 error: unable to read askpass response from 'rpostback-askpass'
 fatal: could not read Username for 'https://github.com': Device not configured
 ```
+
 * ...click on the **Gear icon > Shell...** and type
 
 ```{r, engine='bash', eval=FALSE}
@@ -190,18 +215,68 @@ To https://github.com/jasonmtroos/session_1
    f5d8fc0..dbea7bb  master -> master
 ```
 
+Compile your R Markdown file
+===============================
+* Click on the **Knit** button
+* Your file will be used to generate a new HTML document, which will be displayed in a special document viewer window
 
 Make a change to your R Markdown file
 =======================================
 
-* Change the boilerplate text in the R Markdown file you just created by inserting `# My markdown file` above `## R Markdown`
+* Change the boilerplate text in the R Markdown file you just created by inserting `This is my first markdown file.` above `## R Markdown`
 
 ```{r echo=FALSE, comment=''}
-cat( '```{r setup, include=FALSE}\nknitr::opts_chunk$set(echo = TRUE)\n```\n\n# My markdown file\n\n## R Markdown\n\nThis is an R Markdown document. Markdown...\n')
+cat( '```{r setup, include=FALSE}\nknitr::opts_chunk$set(echo = TRUE)\n```\n\nThis is my first markdown file.\n\n## R Markdown\n\nThis is an R Markdown document. Markdown...\n')
 ```
 * Save your changes by selecting **File > Save**
+* Click on **Knit** again to see how your file has changed
+
+Commit your changes and push them to GitHub
+=========================================
+*Do this whenever you make changes to your file you want to keep*
+
+* Click on the **Git** tab
+* Check the box next to `my_first_markdown.Rmd` (ignore the file ending in `.html` for now)
+* Click on **Commit**
+* Enter the commit message `Added line to introduction`
+* Click on **Commit** (*NB: not the same button as in the previous step*)
+* Click on **Push**
+* Close the dialog showing the output from **git**
+
+View your file's history
+========================
+*Do this when trying to figure out where and when you introduced a mistake into your file*
+
+* Highlight `my_first_markdown.Rmd` and then click on the **History** button
+* You will see a summary of all versions of this file that you have previously committed to your local **git** repository
+
+***
+![](RStudio_git_history.png)
+
+View your remote repository
+===========================
+
+* Go to (https://github.com/jasonmtroos/session_1) substituting your **GitHub username** for mine
+* Here you will see the current state of your repository after your last **Push**
+* If you click on `my_first_markdown.Rmd` and then the **History** button you will see a similar summary to the one provided by **RStudio**
 
 
-o.	Git tab add, commit, “edit comment”, push
+What you've done so far
+=======================
+1. Set up your workspace
+2. Created a git repository on GitHub and cloned it into your local workspace
+3. Created an RStudio project and added an R Markdown file to it
+4. Compiled your R Markdown file into an HTML document
+5. Committed your edits to git and pushed them to GitHub
+6. Viewed your commit history
+
+What's next
+===========
+* Edit your R Markdown file so that it does something useful
+* Get used to keeping track of files using git
+* Understand how git, R, RStudio, and R Markdown can help you become a more organized and efficient researcher
+
+
+
 
 
