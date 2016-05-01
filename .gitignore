@@ -19,5 +19,3 @@ vignettes/*.pdf
 .httr-oauth
 .Rproj.user
 
-# Slides
-session_1/session_1.html
