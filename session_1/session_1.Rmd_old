@@ -1,0 +1,32 @@
+---
+title: "Untitled"
+output:
+  ioslides_presentation:
+    self_contained: TRUE
+    theme: default
+    highlight: default
+    css: session_1.css
+---
+
+```{r setup, include=FALSE}
+knitr::opts_knit$set(highr.opts = list(prompt=TRUE))
+knitr::opts_chunk$set(echo = TRUE, highlight = TRUE, tidy = TRUE )
+```
+
+## Setting up git and RStudio
+
+This is some stuff.
+
+```{r}
+this_fun <- function(x,y) {
+  for (i in 1:2) {
+    x <- i
+    y <- i + 2
+  }
+  x + y
+}
+this_fun( 5, 7 )
+```
+
+
+

@@ -1,0 +1,207 @@
+---
+title: Setting up git and RStudio
+author: J.M.T. Roos
+date: Last updated 1 May 2016
+autosize: false
+css: session_1.css
+output: 
+  revealjs::revealjs_presentation:
+    theme: simple
+    highlight: NULL
+    transition: slide
+    slide_level: 1
+    reveal_options:
+      controls: false
+      margin: .05
+---
+
+
+
+```{r echo=FALSE, include=FALSE, eval=FALSE}
+cat(knitr::knit_theme$get('solarized-light')$highlight)
+```
+```{r echo=FALSE, include=FALSE}
+knitr::opts_chunk$set(tidy = TRUE)
+knitr::knit_hooks$set(
+source = function(x,options){
+  if( options$engine == 'R' ) {
+    # format R code
+    x = highr::hilight( x, format = 'html' )
+  } else if( options$engine == 'bash' ) {
+    # format bash code
+    x = paste0( '<span class="hl std">$</span> ', unlist( stringr::str_split( x, '\\n' ) ), '\n', collapse = '' )
+  }
+  # for (i in names(options)) {
+  #   message( paste( i, options[[i]] ) )
+  # }
+  x = paste(x, collapse = "\n")
+  sprintf("<div class=\"%s\"><pre class=\"%s %s\"><code class=\"%s %s\">%s</code></pre></div>\n", 'sourceCode', 'sourceCode', tolower(options$engine), 'sourceCode', tolower(options$engine), x)
+}
+)
+```
+
+Setup your local working directory
+==================================
+* Create a top-level directory where all of your code will go
+* Each project will have in its own directory underneath this one
+* I call mine `git_workspace` -- I will use this name as a placeholder throughout these slides
+
+***
+<div class='center'>
+![](git_workspace.png)
+</div>
+
+Tell git who you are
+==================================
+* Start a new **terminal** (OS X) or **bash** (Linux) or **git-bash** (Windows) session
+* Execute the following commands, substituting your information
+* **Note:** Use the email address associated with your **GitHub** account
+
+```{r engine='bash', eval=FALSE, highlight=TRUE}
+git config --global user.name "John Doe"
+git config --global user.email "johndoe@example.com"
+```
+
+* OS X users might need to issue the following commands as well
+```{r engine='bash', eval=FALSE, highlight=TRUE}
+git credential-osxkeychain
+git config --global credential.helper osxkeychain
+```
+
+
+
+Create a new repository on GitHub
+==================================
+* Log into **GitHub** (https://github.com)
+* Click on **New repository** 
+* Enter the name `session_1` and click **Create repository**
+
+***
+<div class='center'>
+![](github_new_repo.png)
+</div>
+
+Get the URL for your new repository
+=====================================
+* Click on the **HTTPS** button under **Quick Setup** and copy the URL to your computer's clipboard
+* I use `https://github.com/jasonmtroos/session_1.git` in subsequent examples
+* **Note:** Your repository is *empty* in the sense that you have not added any files to it yet
+
+***
+<div class='center'>
+![](repository_uri.png)
+</div>
+
+Configure RStudio
+=================================
+*	Open **RStudio**
+*	Select the menu item **Tools > Global Options...**
+* Click on the **Git/SVN** button
+* Check the box that enables version control
+* Quite and restart **RStudio**
+
+***
+<div class='center'>
+![](RStudio_global_opts.png)
+</div>
+
+Create a new RStudio project
+=================================
+* Select **File > New Project...**
+* Click on **Version Control** and then on **Git**
+* Paste the URL you copied from Github into the **Repository URL** field
+* Hit tab, then ensure **Project directory name** is set to `session_1`
+* Under **Create project as subdirectory of:** click **Browse...** and then navigate to your `git_workspace` directory
+
+***
+<div class='center'>
+![](RStudio_new_from_git.png)
+</div>
+
+Create a new R Markdown file
+================================
+
+* Select **File > New File > R Markdown...**
+* Set the **Title** to `My First Markdown`
+* Enter your name as the **Author** and click **OK**
+
+***
+<div class='center'>
+![](RStudio_new_markdown.png)
+</div>
+
+Save your new R Markdown file
+===============================
+* Select **File > Save**
+* Name the file `my_first_markdown.Rmd` and make sure it gets saved into `git_workspace/session_1` (this should be the default)
+
+***
+<div class='center'>
+![](RStudio_after_new_markdown.png)
+</div>
+
+Tell git to keep track of your new file(s)
+===========================================
+* Click on the **Git** tab in the upper right panel
+* Check each of the boxes next to the three files listed
+* Click on the **Commit** button
+* In the window that pops up, type `Initial add` in the **Commit message** window
+
+***
+<div class='center'>
+![](RStudio_git_commit.png)
+</div>
+
+Commit your changes
+==========================
+* Click **Commit**
+* **RStudio** will now interact with **git** behind the scenes
+* When they are done, **RStudio** will open a small window showing what **git** had to say
+
+```
+[master (root-commit) 2757d93] Initial add
+ 3 files changed, 47 insertions(+)
+ create mode 100644 .gitignore
+ create mode 100644 my_first_markdown.Rmd
+ create mode 100644 session_1.Rproj
+```
+
+Push your changes to GitHub
+==============================
+
+* Click on the **Push** button in the top right corner
+
+* If you receive the following error...
+
+```
+error: unable to read askpass response from 'rpostback-askpass'
+fatal: could not read Username for 'https://github.com': Device not configured
+```
+* ...click on the **Gear icon > Shell...** and type
+
+```{r, engine='bash', eval=FALSE}
+git push
+```
+
+* ...then enter your **GitHub username** and **password** when prompted
+
+```
+To https://github.com/jasonmtroos/session_1
+   f5d8fc0..dbea7bb  master -> master
+```
+
+
+Make a change to your R Markdown file
+=======================================
+
+* Change the boilerplate text in the R Markdown file you just created by inserting `# My markdown file` above `## R Markdown`
+
+```{r echo=FALSE, comment=''}
+cat( '```{r setup, include=FALSE}\nknitr::opts_chunk$set(echo = TRUE)\n```\n\n# My markdown file\n\n## R Markdown\n\nThis is an R Markdown document. Markdown...\n')
+```
+* Save your changes by selecting **File > Save**
+
+
+o.	Git tab add, commit, “edit comment”, push
+
+

@@ -1,0 +1,148 @@
+html * {
+  color-profile: sRGB;
+  rendering-intent: auto; 
+}
+  
+.reveal {
+  font-family: "Avenir Next", "sans-serif";
+  font-size: 28px;
+}
+
+.reveal .slides {
+  text-align: left;
+}
+
+.reveal strong {
+  font-weight: 500;
+  color: #EB3454;
+}
+
+.reveal li {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+.reveal p {
+  font-weight: 400;
+  text-shadow: none;
+}
+.reveal h1 {
+  font-family: "Avenir Next", "sans-serif";
+  font-weight: 500;
+  text-transform: none;
+  text-shadow: none; 
+  font-size: 1.7em;
+  color: #EB3454;
+}
+.reveal h2 {
+  font-family: "Avenir Next", "sans-serif";
+  text-transform: none;
+  text-shadow: none; 
+  font-size: 1.4em;
+  color: #1B789E;
+}
+.reveal h3 {
+  font-family: "Avenir Next", "sans-serif";
+  text-transform: none;
+  text-shadow: none; 
+  font-size: 1.2em;
+  color: #857F03;
+}
+.reveal h4 {
+  font-family: "Avenir Next", "sans-serif";
+  text-transform: none;
+  text-shadow: none; 
+  font-size: 1em;
+}
+.reveal h5 {
+  font-family: "Avenir Next", "sans-serif";
+  text-transform: none;
+  text-shadow: none; 
+}
+.reveal h6 {
+  font-family: "Avenir Next", "sans-serif";
+  text-transform: none;
+  text-shadow: none; 
+}
+
+.reveal section img {
+  margin: 0px 0px;
+  background: rgba(255, 255, 255, 0.12);
+  border: none;
+  box-shadow: none;
+}
+
+.center {
+  text-align: center;
+}
+
+.reveal pre {
+    display: block;
+    position: relative;
+    width: 95%;
+    margin: 10px auto;
+    text-align: left;
+    font-size: .9em;
+    font-family: 'Hack';
+    line-height: 1.2em;
+    word-wrap: break-word;
+    box-shadow: 0px 0px 6px rgba(0, 0, 0, 0.3);
+}
+
+.reveal code {
+  font-family: 'Hack';
+  font-size: .9em;
+  background-color: #fdf6e3;
+  border:solid 1px #B0B0B0;
+}
+
+.reveal pre code {
+  display: block;
+  padding: 5px;
+  overflow: auto;
+  max-height: 400px;
+  word-wrap: normal;
+  font-family: 'Hack';
+  color: #222222;
+  background-color: #F9F9F9; 
+}
+
+.reveal pre code.sourceCode.r  { 
+  background-color: #fdf6e3;
+}
+.reveal pre code.sourceCode.bash  { 
+  background-color: #002b36;
+  color: #eeee22;
+}
+
+
+.hl.num {
+  color: #dc322f;
+}
+.hl.str {
+  color: #dc322f;
+}
+.hl.com {
+  color: #93a1a1;
+}
+.hl.opt {
+  color: #586e75;
+}
+.hl.std {
+  color: #657b83;
+}
+.hl.kwa {
+  color: #cb4b16;
+}
+.hl.kwb {
+  color: #859900;
+}
+.hl.kwc {
+  color: #cb4b16;
+}
+.hl.kwd {
+  color: #586e75;
+}
+
+
+

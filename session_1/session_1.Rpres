@@ -1,0 +1,58 @@
+Setting up git and RStudio
+========================================================
+author: J.M.T. Roos
+date: Last updated 30 April 2016
+autosize: false
+css: session_1.css
+output: 
+  revealjs::revealjs_presentation:
+    theme: simple
+    highlight: NULL
+    transition: slide
+    slide_level: 1
+    reveal_options:
+      controls: false
+      margin: .05
+
+```{r echo=FALSE, include=FALSE}
+knitr::opts_chunk$set(tidy = TRUE)
+knitr::knit_hooks$set(
+source = function(x,options){
+  if( options$engine == 'R' ) {
+    # format R code
+    x = highr::hilight( x, format = 'html' )
+  } else if( options$engine == 'bash' ) {
+    # format bash code
+    x = paste0( '<span class="hl num">$></span> ', unlist( stringr::str_split( x, '\\n' ) ), '\n', collapse = '' )
+  }
+  # for (i in names(options)) {
+  #   message( paste( i, options[[i]] ) )
+  # }
+  x = paste(x, collapse = "\n")
+  sprintf("<div class=\"%s\"><pre class=\"%s %s\"><code class=\"%s %s\">%s</code></pre></div>\n", 'sourceCode', 'sourceCode', tolower(options$engine), 'sourceCode', tolower(options$engine), x)
+}
+)
+```
+
+First Slide
+========================================================
+
+For more details on authoring R presentations please visit <https://support.rstudio.com/hc/en-us/articles/200486468>.
+
+- Bullet 1
+- Bullet 2
+- Bullet 3
+
+Slide With Code
+========================================================
+
+```{r}
+summary(cars)
+```
+
+Slide With Plot
+========================================================
+
+```{r, echo=FALSE}
+plot(cars)
+```
