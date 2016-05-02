@@ -16,6 +16,10 @@ html * {
   font-weight: 500;
   color: #EB3454;
 }
+.reveal em {
+  font-style: italic;
+  color: #1B789E;
+}
 
 .reveal li {
   padding-top: 4px;
