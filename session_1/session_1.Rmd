@@ -1,7 +1,7 @@
 ---
 title: Setting up git and RStudio
 author: J.M.T. Roos
-date: Last updated 1 May 2016
+date: Last updated 2 May 2016
 autosize: false
 css: session_1.css
 output: 
@@ -13,6 +13,12 @@ output:
     reveal_options:
       controls: false
       margin: .05
+    pandoc_args:
+      [
+      "--variable", "slideNumber='c/t'",
+      "--variable", "transitionSpeed=slow",
+      "--variable", "viewDistance=5"
+      ]
 ---
 
 
@@ -40,23 +46,24 @@ source = function(x,options){
 )
 ```
 
+
 Learning by doing
 ==================================
 * Coding is not as difficult as people think
-* My approach to teaching people to code is to force them to type (and click on) things they don't fully understand
-* If they are curious enough, they will then ask "Hmm...why did that work?"
-* Usually I have an answer ready (but if I don't, then their question becomes mine and I start Googling...)
+* My approach to teaching people to code is to have them type (and click on) things they don't fully understand
+* Because they are curious, they will then ask "Hmm...why did that work?"
+* I then explain what's going on
+* That's the approach we'll take today
 
 Doing before understanding
 ===========================
-* You will now
+* First, you will
     + Set up a local workspace
     + Configure your source control software
     + Create an online repository for your work
     + Set up your local project files
     + Track them using version control
-    + Push your changes to the online repository
-    + Et cetera
+    + Make edits, commit changed, push changes to the online repository, etc.
 * Later, I will explain what all this means
 
 Setup your local working directory
@@ -251,7 +258,9 @@ View your file's history
 * You will see a summary of all versions of this file that you have previously committed to your local **git** repository
 
 ***
+<div class='center'>
 ![](RStudio_git_history.png)
+</div>
 
 View your remote repository
 ===========================
@@ -271,12 +280,133 @@ What you've done so far
 6. Viewed your commit history
 
 What's next
-===========
+======================================
+* Install a few packages in R
 * Edit your R Markdown file so that it does something useful
 * Get used to keeping track of files using git
 * Understand how git, R, RStudio, and R Markdown can help you become a more organized and efficient researcher
 
+Installing packages
+====================
+* Install the `readr` package by typing the following command in the **Console** window
 
+```{r eval=FALSE}
+install.packages('readr', dependencies=TRUE)
+```
+
+* If the package has been loaded sucessfully, you should be able to execute the following command without producing an error
+
+```{r}
+library(readr)
+```
+
+A few more packages
+===================
+* Install the following packages
+
+```{r eval=FALSE, echo=FALSE}
+#packages_to_load <- c('devtools', 'dplyr', 'foreign', 'ggplot2', 'Hmisc', 'httr', 'jsonlite', 'lubridate', 'magrittr', 'plyr', 'RColorBrewer', 'RCurl', 'readxl', 'reshape2', 'rvest', 'scales', 'stringr', 'tidyr', 'tm', 'twitteR', 'xml2')
+```
+
+```{r eval=FALSE}
+packages_to_install <- c('ggplot2', 'RColorBrewer','Hmisc')
+install.packages( packages_to_install, dependencies = TRUE )
+```
+
+* If any of these fail to install, make a note of which ones and let me know
+
+Edit your R Markdown file
+=========================
+
+* Delete everything that comes *after* the following lines of code
+
+```{r echo=FALSE, comment=''}
+cat( '```{r setup, include=FALSE}\nknitr::opts_chunk$set(echo = TRUE)\n```\n\n[Deleted from this point forward]\n')
+```
+
+* We will now do something useful with this file...
+* Edit your file to include the code in the following slides
+
+Download data
+========================
+
+* Add this code to your R Markdown file
+
+```{r echo=FALSE, comment=''}
+cat( 'Download sleep study data\n```{r}\nlibrary(readr)\nsleep <- read_csv("https://vincentarelbundock.github.io/\n    Rdatasets/csv/lme4/sleepstudy.csv") # no spaces\nhead(sleep)\n```' )
+```
+
+* Click on **Knit**
+
+Commit your changes
+===================
+
+* Click on the **Git** tab
+* Check the box next to `my_first_markdown.Rmd` (ignore the file ending in `.html` for now)
+* Click on **Commit**
+* Enter the commit message `Replaced boilerplate with code to download sleep study data`
+* Click on **Commit**
+* **Do no** click on **Push**
+
+Committing and pushing
+======================
+* The change you just committed is reflected in your *local* git repository and its history (viewable via RStudio)
+* This change will not be reflected on GitHub until you *push* those changes
+* In general, you make many changes locally (committing them as you go) and then push them to GitHub less frequently
+
+Plot the data
+===============
+
+* Add this code to your R Markdown file
+
+```{r echo=FALSE, comment=''}
+cat( "Plot the data by subject\n```{r}\nlibrary(ggplot2)\nggplot( sleep, aes( x = Days, y = Reaction ) ) +\n  geom_point() +\n  geom_smooth() +\n  scale_x_continuous( breaks = seq(0,8,by=2) ) +\n  facet_wrap( ~Subject )\n```" )
+```
+
+* Click on **Knit**
+
+***
+<div class='center'>
+![](sleep_study_2.png)
+</div>
+
+Commit your changes and push them to GitHub
+=========================================
+
+* Click on the **Git** tab
+* Check the box next to `my_first_markdown.Rmd` (ignore the file ending in `.html` for now)
+* Click on **Commit**
+* Enter the commit message `Added code to create plot by individual`
+* Click on **Commit** 
+* Click on **Push**
+* Close the dialog showing the output from **git**
+
+Why
+===
+
+1. Workspace setup
+2. ...
+
+
+
+Workspace ideas
+===============
+* Each project has its own folder under `git_workspace`
+* There are files you are allowed to change, and files you can never change
+    + *Raw* (i.e., original) data files can never be changed
+    + If a file can be changed, it must live under `git_workspace/project` with changes tracked by **git** or some other *version control* software
+    + Data files can also live under `git_workspace/project/data-raw` provided you never alter them
+    + Altered data files should be placed in a different directory from the originals (e.g., in `git_workspace/project/data`)
+
+Reproducibility and automation ideas
+====================================
+
+* Your data management code and analysis should be transparently documented and controlled by a repeatable, automated process (e.g., by knitting an R Markdown file)
+* You (or someone else) should be able to reproduce your analysis exactly by 
+    + Cloning the git repository
+    + Opening RStudio
+    + Knitting your R Markdown file
+* ...or... by reading the HTML output of your R Markdown file and entering commands directly into R exactly as they appear in the HTML file
 
 
 
