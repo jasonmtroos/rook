@@ -152,7 +152,8 @@ Create a new RStudio project
 
 Create a new R Markdown file
 ================================
-* You do this one or more times for each project you work on
+*Do this one or more times for each project you work on*
+
 * Select **File > New File > R Markdown...**
 * Set the **Title** to `My First Markdown`
 * Enter your name as the **Author** and click **OK**
@@ -360,7 +361,7 @@ Plot the data
 * Add this code to your R Markdown file
 
 ```{r echo=FALSE, comment=''}
-cat( "Plot the data by subject\n```{r}\nlibrary(ggplot2)\nggplot( sleep, aes( x = Days, y = Reaction ) ) +\n  geom_point() +\n  geom_smooth() +\n  scale_x_continuous( breaks = seq(0,8,by=2) ) +\n  facet_wrap( ~Subject )\n```" )
+cat( "Plot the data by subject\n```{r}\nlibrary(ggplot2)\nggplot(sleep, aes(x = Days, y = Reaction)) +\n  geom_point() +\n  geom_smooth() +\n  scale_x_continuous(breaks = seq(0,8,by=2)) +\n  facet_wrap(~Subject)\n```" )
 ```
 
 * Click on **Knit**
@@ -369,6 +370,27 @@ cat( "Plot the data by subject\n```{r}\nlibrary(ggplot2)\nggplot( sleep, aes( x 
 <div class='center'>
 ![](sleep_study_2.png)
 </div>
+
+Group and summarise
+===========================
+* First, install the `dplyr` package
+
+```{r eval=FALSE}
+install.packages('dplyr',dependencies=TRUE)
+```
+
+* Next, add this code to your R Markdown file
+
+```{r echo=FALSE, comment=''}
+cat( "Summary statistics by subject\n```{r}\nlibrary(dplyr)\nsleep %>%\n  group_by(Subject) %>%\n  summarise(mean(Reaction))\n```" )
+```
+
+***
+
+```{r echo=FALSE, comment=''}
+cat( "Mean-center reaction times and plot on a single axis\n```{r}\nsleep %>%\n  group_by(Subject) %>%\n  mutate(mean_centered_reaction = Reaction - mean(Reaction)) %>%\n  ggplot(aes(x = Days, y = mean_centered_reaction,\n      colour = factor(Subject))) + \n    geom_smooth(show.legend = FALSE, se = FALSE) +\n    scale_x_continuous(breaks = seq(0, 8, by = 2))\n```" )
+```
+
 
 Commit your changes and push them to GitHub
 =========================================
@@ -381,11 +403,16 @@ Commit your changes and push them to GitHub
 * Click on **Push**
 * Close the dialog showing the output from **git**
 
-Why
-===
 
-1. Workspace setup
-2. ...
+
+Why are we doing all of this?
+=============================
+
+1. Workspace organization and git
+2. Automation and reproducibility via R Markdown
+
+Because without these practices, you cannot expect to successfully manage work that involves large and/or disparate data sets
+
 
 
 
@@ -400,13 +427,84 @@ Workspace ideas
 
 Reproducibility and automation ideas
 ====================================
-
 * Your data management code and analysis should be transparently documented and controlled by a repeatable, automated process (e.g., by knitting an R Markdown file)
 * You (or someone else) should be able to reproduce your analysis exactly by 
     + Cloning the git repository
     + Opening RStudio
     + Knitting your R Markdown file
 * ...or... by reading the HTML output of your R Markdown file and entering commands directly into R exactly as they appear in the HTML file
+
+More about git
+==========================
+* git is a command-line tool, but RStudio (and a few other tools) offer GUI's for performing simple tasks
+* My goal for this course is that everything we do with git can be performed via RStudio's interface
+* There is much, much, much more that git can do:
+    + Merging changes made by multiple collaborators
+    + Creating different versions of the same code based for different purposes
+    + Committing changes to experimental code without affecting the main code base
+    + Creating a snapshot that records what your code looked like at the point you submit a manuscript
+* If you want to know more about git, check out [GitHub's list of resources for learning git and GitHub](https://help.github.com/articles/good-resources-for-learning-git-and-github/)
+
+More about R Markdown
+=====================
+* Based on the idea of *literate programming*
+* Simple rules for formatting text as HTML (or PDF via latex)
+* Code can be inserted inline with other text using special 
+  delimiters
+* When compiling the markdown file, the code is executed and 
+  results are inserted into the final HTML file
+
+```{r}
+5 * 10 + 2
+```
+
+Like so.
+
+R Markdown example
+==================
+This is the code I used to generate the preceding slide.
+
+<div style="height:490;">
+```{r echo=FALSE, comment = ''}
+cat("More about R Markdown\n=====================\n* Based on the idea of *literate programming*\n* Simple rules for formatting text as HTML (or PDF via latex)\n* Code can be inserted inline with other text using special\n  delimiters\n* When compiling the markdown file, the code is executed and\n  results are inserted into the final HTML file\n\n```{r}\n5 * 10 + 2\n```\n\nLike so.\n")
+```
+</div>
+
+More about R Markdown
+=====================
+* This is relatively easy to learn, and you should do so
+* In particular, you can control how your code is processed, the size of graphics, etc. via code that looks like this: `` ```{r fig.width=5, fig.height=4}``
+    + Code like `fig.width = 5` is processed by a package called `knitr` if you want to learn more about customizing output
+* RStudio has [an entire site](http://rmarkdown.rstudio.com) dedicated to the R Markdown file format, which you should visit and read this week
+
+
+What you need to do this week
+=============================
+1. Get your R environment in order (see next slide)
+2. Read about R Markdown (mandatory) and git (optional) -- see previous slides for links
+3. Follow the [R tutorials](http://www.jasonmtroos.com/assets/media/teaching/course_assignments_and_data.zip) I developed for my Marketing Analytics MSc course
+    * Assignment 1 -- learning R
+    * Assignment 2, sections 1--2 -- linear and logistic regression
+    * Assignment 3, section 2 -- ggplot2
+    * Assignment 4 -- more ggplot2 and dplyr
+
+
+
+Get your R environment in order
+===============================
+
+```{r eval=FALSE, tidy=FALSE}
+these_packages <- c('devtools', 'dplyr', 'foreign', 'ggplot2',
+                    'Hmisc', 'httr', 'jsonlite', 'lubridate', 
+                    'magrittr', 'plyr', 'RColorBrewer', 'RCurl', 
+                    'readxl', 'reshape2', 'rvest', 'scales', 
+                    'stringr', 'tidyr', 'tm', 'twitteR', 'xml2')
+install.packages(these_packages, dependencies = TRUE)
+```
+
+* Windows users might need to install **RTools**, which provides the necessary toolchain for compiling R packages from source code
+* See (https://CRAN.R-project.org/bin/windows/Rtools/) choosing the default "Package authoring installation" during installation
+
 
 
 

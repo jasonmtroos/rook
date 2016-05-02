@@ -104,7 +104,7 @@ html * {
   display: block;
   padding: 5px;
   overflow: auto;
-  max-height: 400px;
+  max-height: none; /*400px;*/
   word-wrap: normal;
   font-family: 'Hack';
   color: #222222;
