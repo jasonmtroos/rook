@@ -1,9 +1,9 @@
 ---
-title: Setting up git and RStudio
-author: J.M.T. Roos
-date: Last updated 2 May 2016
+title: "Setting up git and RStudio"
+author: "J.M.T. Roos"
+date: "Last updated 2 May 2016"
 autosize: false
-css: session_1.css
+css: "../css/slides.css"
 output: 
   revealjs::revealjs_presentation:
     theme: simple
