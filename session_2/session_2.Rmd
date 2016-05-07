@@ -1,0 +1,53 @@
+---
+title: "Acquiring, preparing, and visualizing data"
+author: "J.M.T. Roos"
+date: "Last updated 7 May 2016"
+autosize: false
+css: "../css/slides.css"
+output: 
+  revealjs::revealjs_presentation:
+    self_contained: true
+    theme: simple
+    highlight: NULL
+    transition: slide
+    slide_level: 1
+    reveal_options:
+      controls: false
+      margin: .05
+    pandoc_args:
+      [
+      "--variable", "slideNumber='c/t'",
+      "--variable", "transitionSpeed=slow",
+      "--variable", "viewDistance=5"
+      ]
+---
+
+
+
+```{r echo=FALSE, include=FALSE, eval=FALSE}
+cat(knitr::knit_theme$get('solarized-light')$highlight)
+```
+```{r echo=FALSE, include=FALSE}
+knitr::opts_chunk$set(tidy = TRUE)
+knitr::knit_hooks$set(
+source = function(x,options){
+  if( options$engine == 'R' ) {
+    # format R code
+    x = highr::hilight( x, format = 'html' )
+  } else if( options$engine == 'bash' ) {
+    # format bash code
+    x = paste0( '<span class="hl std">$</span> ', unlist( stringr::str_split( x, '\\n' ) ), '\n', collapse = '' )
+  }
+  # for (i in names(options)) {
+  #   message( paste( i, options[[i]] ) )
+  # }
+  x = paste(x, collapse = "\n")
+  sprintf("<div class=\"%s\"><pre class=\"%s %s\"><code class=\"%s %s\">%s</code></pre></div>\n", 'sourceCode', 'sourceCode', tolower(options$engine), 'sourceCode', tolower(options$engine), x)
+}
+)
+```
+
+
+First slide
+==================================
+asdf
