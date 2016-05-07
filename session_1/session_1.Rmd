@@ -1,11 +1,12 @@
 ---
 title: "Setting up git and RStudio"
 author: "J.M.T. Roos"
-date: "Last updated 2 May 2016"
+date: "Last updated 7 May 2016"
 autosize: false
 css: "../css/slides.css"
 output: 
   revealjs::revealjs_presentation:
+    self_contained: true
     theme: simple
     highlight: NULL
     transition: slide
@@ -481,12 +482,12 @@ More about R Markdown
 What you need to do this week
 =============================
 1. Get your R environment in order (see next slide)
-2. Read about R Markdown (mandatory) and git (optional) -- see previous slides for links
+2. Get familiar with R Markdown (**mandatory**) and git (*optional*) -- see previous slides for links
 3. Follow the [R tutorials](http://www.jasonmtroos.com/assets/media/teaching/course_assignments_and_data.zip) I developed for my Marketing Analytics MSc course
-    * Assignment 1 -- learning R
-    * Assignment 2, sections 1--2 -- linear and logistic regression
-    * Assignment 3, section 2 -- ggplot2
-    * Assignment 4 -- more ggplot2 and dplyr
+    * Assignment 1 -- learning R (*optional* unless you are lost right now)
+    * Assignment 2, sections 1--2 -- linear and logistic regression (*optional* -- not related to the purpose of this course)
+    * Assignment 3, section 2 -- ggplot2 (**mandatory**)
+    * Assignment 4 -- more ggplot2 and dplyr (**mandatory**)
 
 
 
@@ -503,8 +504,22 @@ install.packages(these_packages, dependencies = TRUE)
 ```
 
 * Windows users might need to install **RTools**, which provides the necessary toolchain for compiling R packages from source code
-* See (https://CRAN.R-project.org/bin/windows/Rtools/) choosing the default "Package authoring installation" during installation
+    * See (https://CRAN.R-project.org/bin/windows/Rtools/) choosing the default "Package authoring installation" during installation
 
 
+These slides
+============
+* To download these slides (more specifically, the R Markdown files that create them), you will need to use git and terminal or git-bash
 
+```{r engine='bash', eval=FALSE}
+cd git_workspace
+git clone http://github.com/jasonmtroos/rook
+```
 
+* You can then open `git_workspace/rook/rook.Rproj` in RStudio and compile the R Markdown files (listed under subdirectories -- see the **File** panel)
+* To get the latest version, you can **pull** from GitHub
+
+```{r engine='bash', eval=FALSE}
+cd git_workspace/rook
+git pull
+```
