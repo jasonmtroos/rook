@@ -17,18 +17,15 @@ output:
     pandoc_args:
       [
       "--variable", "slideNumber='c/t'",
-      "--variable", "transitionSpeed=slow",
+      "--variable", "transitionSpeed=default",
       "--variable", "viewDistance=5"
       ]
 ---
 
 
 
-```{r echo=FALSE, include=FALSE, eval=FALSE}
-cat(knitr::knit_theme$get('solarized-light')$highlight)
-```
 ```{r echo=FALSE, include=FALSE}
-knitr::opts_chunk$set(tidy = TRUE)
+knitr::opts_chunk$set(tidy = TRUE, tidy.opts=list(blank=FALSE, width.cutoff=50), cache=TRUE)
 knitr::knit_hooks$set(
 source = function(x,options){
   if( options$engine == 'R' ) {
@@ -48,6 +45,552 @@ source = function(x,options){
 ```
 
 
-First slide
+Review
 ==================================
-asdf
+* In class
+    * git --- cloning, committing, pushing
+    * R Markdown --- mixing text with R code using `` ```{r} `` blocks
+* During the week
+    * Reviewing/learning the R programming language
+    * Installing packages
+
+```{r echo=FALSE, message=FALSE}
+library(tidyr)
+library(dplyr)
+library(reshape2)
+library(ggplot2)
+```
+
+```{r echo=FALSE}
+test_data <- NULL
+local( {
+  relabel_factors <- function( z ) { eval(parse(text=paste0('c(',paste0(z,1:4,'=',1:4,collapse = ','),')') )) }
+
+  test_data <<- datasets::anscombe %>% melt(id.vars=paste0('y',1:4), value.name = 'num.correct', variable.name = 'x') %>% tbl_df %>% melt(id.vars = c('x','num.correct'), value.name = 'duration', variable.name = 'y') %>% tbl_df %>% mutate( x = plyr::revalue(x,relabel_factors('x')),  y = plyr::revalue(y,relabel_factors('y'))) %>% filter( x == y ) %>% group_by( x ) %>% mutate( respondent = factor(1:n()) ) %>% select( round = x, respondent, num.correct, duration ) %>% ungroup
+} )
+```
+
+
+Applied problem: Merging samples
+=================================
+Repeated measures for 11 individuals, mean (sd)
+
+|Round |Duration |Number Correct |
+|:----:|:-------:|:----------:|
+|1     |7.5      |9.0         |
+|      |(2.0)    |(3.3)       |
+|2     |7.5      |9.0         |
+|      |(2.0)    |(3.3)       |
+|3     |7.5      |9.0         |
+|      |(2.0)    |(3.3)       |
+|4     |7.5      |9.0         |
+|      |(2.0)    |(3.3)       |
+
+
+Regression of `duration` on `num.correct` ($\times$ 4)
+
+|Variable  |Estimate|SE|
+|:---------|-------:|-:|            
+|Intercept  | 3.00   |  1.12   |
+|num.correct| 0.50|   0.12   |
+
+***
+
+<div class='center'>
+```{r echo=FALSE}
+test_data %>% ggplot( aes( x = duration, y = num.correct ) ) + geom_point() + facet_wrap( ~round, labeller = label_both )
+```
+</div>
+
+***
+
+<div class='center'>
+```{r echo=FALSE}
+test_data %>% ggplot( aes( x = duration, y = num.correct ) ) + geom_point() + facet_wrap( ~round, labeller = label_both ) + geom_smooth(method="lm",fullrange=TRUE)
+```
+</div>
+
+Remember...
+========================
+<div class="center">
+## Always look at the data first
+</div>
+
+
+Today
+==================================
+* Data visualization
+* Acquiring (tabular) data
+* Tidying and summarizing data
+
+
+ggplot2
+===================================
+* Plotting package in R intended to replace the core plotting routines
+* Based on the concept of a **grammar of graphics**
+    * Plots are constructed from parts much as sentences are constructed from nouns, verbs, etc. 
+    * Not all arrangements of words lead to comprehensible sentences -- the same is true for plots, and the grammar helps you avoid (visual) nonsense
+    * Leads to a modularity of design, making it easy for programmers to extend
+* Sensible and aesthetically pleasing default settings
+    * Informed by what we know about visual perception and cognition
+
+What is a graph?
+===============
+> A visual display that illustrates one or more relationships among numbers...a shorthand means of presenting information that would take many more words and numbers to describe.
+> 
+> ---Stephen M. Kosslyn. Graph Design for the Eye and Mind. Oxford University Press, 2006
+
+It depends on the goal:
+
+* A tool for discovery --- gain an overview of, convey the scale and complexity of, or facilitate an exploration of **data** (*dataviz*)
+* A tool for communication --- help you to help others understand, tell a story about, or stimulate interest in a **problem or solution** (*infographics*)
+
+At a minimum...
+================
+* Graphs are for comparing quantities
+    * Always ask yourself: "Comparing what?"
+    * Insist on this comparison being obvious to the viewer (and yourself)
+* Graphs should answer a central question
+    * Both question and answer must be clear
+    * Use the title, caption, and other labels to highlight both
+
+Psychological principles (Kosslyn, 2006)
+========================================
+* Connecting with the audience 
+* Directing and holding attention 
+* Promoting understanding and memory
+
+
+Connecting with the audience
+==========================
+1. **Relevance**
+    * Not too much or too little information
+    * Present information that reflects the message you want to convey
+    * Don’t present extraneous information 
+2. **Appropriate knowledge**
+    * Prior knowledge must be sufficient to understand the graph
+    * If you assume too much prior knowledge, viewers will be confused
+    * If you violate norms, viewers will be confused
+
+Directing and holding attention 
+================================
+3. **Salience**
+    * Attention is drawn to large perceptible differences
+    * The most visually striking aspect receives the most attention
+    * Annotations help direct viewers' attention
+4. **Discriminability**
+    * Properties must differ enough to be noticed
+    * Defaults in `ggplot2` do much of this work for you
+5. **Organization**
+    * Groups of elements are seen and remembered as a whole
+
+Understanding and memory 
+=========================
+6. **Compatibility**
+    * Form should be aligned with meaning
+    * Lines express continuous change, bars discrete quantities
+    * More = more (higher, better, bigger, etc.)
+7. **Informative changes**
+    * Changes in properties should carry information
+    * ...and vice versa
+8. **Capacity limitations**
+    * If too much information is presented, none is remembered
+    * Four chunks in working memory
+    * Graph designers err on the side of presenting too much, graph readers err on the side of paying too little attention
+
+ggplot2's grammar
+===================
+* Decomposes graphs into basic parts
+* Sets rules for interactions among those parts 
+* Helps us stay out of trouble
+
+
+ggplot2's grammar
+===================
+* **Default** values for **Data** and **Mapping** available to all layers
+* **Layers** --- one or more, each with the following:
+    * **Data** (overriding the default) --- a `data.frame`
+    * **Mapping** (overriding the default) of columns to **Aesthetics**
+    * **Geometry** specifying what to draw
+    * **Statistic** specifying how to transform the data before drawing
+    * **Position** specifying how to arrange items
+* **Facet** specification for generating subplots
+* **Scales** specifying how to translate the data to lengths, colors, sizes, etc. in the graph
+* **Coordinates** which is the default (Cartesian) 99% of the time, so ignore for now
+
+Layers
+======
+* Layers contain everything we see, often showing different views of the same data
+
+***
+
+<div class="center">
+```{r echo=FALSE}
+ggplot( data=anscombe, aes( x=x1, y = y1 ) ) + geom_point() + labs(title = 'Layer 1: data as points', x = 'x', y = 'y' )
+```
+</div>
+
+***
+
+<div class="center">
+```{r echo=FALSE}
+ggplot( data=anscombe, aes( x=x1, y = y1 ) ) + geom_smooth(method="lm") + labs(title = 'Layer 2: regression line', x = 'x', y = 'y' )
+```
+</div>
+
+***
+
+<div class="center">
+```{r echo=FALSE}
+ggplot( data=anscombe, aes( x=x1, y = y1 ) ) + geom_point() + geom_smooth(method="lm") + labs(title = 'Layer 1 and 2', x = 'x', y = 'y' )
+```
+</div>
+
+Test data
+=========
+```{r}
+test_data
+```
+
+Defaults
+========
+* Specify the defaults first
+* Most graphs use a single set of **data** (`data.frame`) for every layer
+* Most graphs use a single set of **mapping**s between columns and aesthetics
+
+```{r}
+my_plot <- ggplot( data = test_data, mapping = aes( x = duration, y = num.correct ) )
+```
+
+* `aes()` is used to create a list of `aes`thetic mappings
+    * `x` refers to the graph's x-axis, `y` to the y-axis
+    * `duration` $\rightarrow$ x-axis
+    * `num.correct` $\rightarrow$ y-axis
+* `my_plot` now represents a `ggplot` object set to our defaults
+* You don't need to name the arguments; `data` comes first, `mapping` comes second
+
+```{r}
+my_plot <- ggplot( test_data, aes( x = duration, y = num.correct ) )
+```
+
+An empty plot
+=============
+* Defaults by themselves do nothing
+
+
+```{r fig.height=3}
+print( my_plot )
+```
+
+* By default, we get an "empty" plot
+* To see something, we need to specify a layer
+
+Adding a layer
+===============
+* Use the `+` operator to combine ggplot elements
+
+```{r fig.height=3}
+my_plot + geom_point()
+```
+
+* Usually you do not need the `print()` call, so the following two lines are equivalent:
+```{r eval=FALSE}
+my_plot + geom_point()
+print( my_plot + geom_point() )
+```
+
+Each layer has a geometry
+=========================
+```{r fig.height=2.5}
+my_plot + geom_point()
+my_plot + geom_line()
+```
+
+***
+
+<div class='center'>
+```{r}
+my_plot + geom_point() + geom_line()
+```
+</div>
+
+Each layer has a statistic
+==========================
+* Usually the statistic is the `identity` function, $$f(x)=x$$ That is, the data are left unchanged
+* The default statistic for `geom_point` and `geom_line` is `identity` so these plots show the data as is
+* The default statistic for `geom_histogram` is a binning function (called `stat_bin`)
+
+```{r fig.height=2}
+ggplot( test_data, aes( x = duration ) ) + geom_histogram( binwidth = 2 )
+```
+
+***
+
+<div style="font-size: 80%;">
+```{r echo=FALSE, fig.show='hide'}
+local({
+  g <- ggplot( test_data, aes( x = duration ) ) + geom_histogram( binwidth = 2 )
+  p <- print(g)
+  print(test_data)
+  print( p$data[[1]] %>% select(x,y) %>% tbl_df )
+})
+```
+</div>
+
+Geoms and statistics
+================================================
+* Each geom/statistic has a default statistic/geom
+
+
+|Item    |   Default stat/geom|
+|:-------|:-------------------|
+|`geom_point`|`stat_identity` ($f(x)=x$)|
+|`geom_line`|`stat_identity` ($f(x)=x$)|
+|`geom_histogram`|`stat_bin` (binning) |
+|`geom_smooth`|`stat_smooth` (regression) |
+|`stat_smooth`|`geom_smooth` (line + ribbon) |
+|`stat_bin`|`geom_bar` (vertical bars)|
+|`stat_identity`|`geom_point` (dots)|
+
+* Hence, these produce the same output:
+```{r eval=FALSE}
+ggplot( test_data, aes(x=duration) ) + stat_bin(binwidth=1)
+ggplot( test_data, aes(x=duration) ) + geom_histogram(binwidth=1)
+```
+
+Data versus statistics
+=====================
+* Be sure you understand: "Does this layer contain data or statistics?"
+* When in doubt, prefer data to statistics:
+* Example: A scatter plot of observations conveys more information than a box plot showing quantiles
+
+<div class="left">
+```{r fig.height=3.5, fig.width=4.5, tidy=FALSE}
+ggplot(test_data, aes(x = round, 
+  y = duration)) + geom_point()
+```
+</div>
+<div class="right">
+```{r fig.height=3.5, fig.width=4.5, tidy=FALSE}
+ggplot(test_data, aes(x = round, 
+  y = duration)) + geom_boxplot()
+```
+</div>
+
+Aesthetics
+==========
+* Each geometry interacts with one or more aesthetics
+
+|Item    |   Required |  Optional |
+|:-------|:-------------------|:----------------------|
+|`geom_point`|`x`,&nbsp;`y`|`alpha`,&nbsp;`colour`,&nbsp;`fill`,&nbsp;`shape`,&nbsp;`size`,&nbsp;`stroke`|
+|`geom_line`|`x`,&nbsp;`y`|`alpha`,&nbsp;`colour`,&nbsp;`linetype`,&nbsp;`size`|
+|`geom_pointrange`|`x`,&nbsp;`ymax`,&nbsp;`ymin`|`alpha`,&nbsp;`colour`,&nbsp;`linetype`,&nbsp;`size`|
+
+* You can either map data to an aesthetic, or set it explicitly
+
+<div class='left'>
+```{r fig.height=3, fig.width=4.5, tidy=FALSE}
+my_plot + geom_point(
+  mapping = aes(colour = round))
+```
+</div>
+<div class='right'>
+```{r fig.height=3, fig.width=4.5, tidy=FALSE}
+my_plot + geom_point(
+  colour="red")
+```
+</div>
+
+
+Position
+==========
+* Each layer also has a position specification
+* The default is again `identity` meaning don't do anything special
+* Examples: bars can be positioned with `stack` or `dodge`
+
+```{r}
+g <- ggplot(test_data, aes(x = num.correct, fill = round ))
+```
+<div class="left">
+```{r fig.height=3.5, fig.width=4.5, tidy=FALSE}
+g + stat_bin(binwidth=4,
+             position='stack')
+```
+</div>
+<div class="right">
+```{r fig.height=3.5, fig.width=4.5, tidy=FALSE}
+g + stat_bin(binwidth=4,
+             position='dodge')
+```
+</div>
+
+
+Practice with layers
+=====================
+* Work with a neighbor
+* First discuss the task, then one of you does the typing
+* Discuss what you are doing as you write code
+* Write your code in an empty **File > New File... > R Script** and execute each line using `Cmd-Enter`
+* Use the data set called `mpg` which is included in the `ggplot2` package
+
+
+Data
+=======
+```{r tidy=FALSE, eval=FALSE}
+library(ggplot2)
+?mpg
+```
+
+<div style="font-size: 60%;">
+**Usage**
+```
+mpg
+```
+
+<div class="left">
+**Format**
+
+A data frame with 234 rows and 11 variables
+
+* manufacturer.
+* model.
+* displ. engine displacement, in litres
+* year.
+* cyl. number of cylinders
+* trans. type of transmission
+* drv. f = front-wheel drive, r = rear wheel drive, 4 = 4wd
+* cty. city miles per gallon
+* hwy. highway miles per gallon
+* fl.
+* class.
+</div>
+
+<div class="right">
+**Description**
+
+This dataset contains a subset of the fuel economy data that the EPA makes
+available on <a href = 'http://fueleconomy.gov'>http://fueleconomy.gov</a>. It contains only models which
+had a new release every year between 1999 and 2008 - this was used as a
+proxy for the popularity of the car.
+</div>
+</div>
+
+***
+
+```{r}
+mpg
+```
+
+
+Task 0 (Example)
+================
+* Create a plot with 1 layer:
+    * `x` mapped to `cty`
+    * `y` mapped to `hwy`
+    * `point` geometry
+    * `identity` stat
+    * `identity` position
+
+Task 1
+=================
+* Create a plot with 1 layer:
+    * `x` mapped to `displ`
+    * `y` mapped to `hwy`
+    * `colour` mapped to `trans`
+    * geometry `point`
+        * default stat and position for `point`
+
+
+***
+
+```{r}
+ggplot(mpg, aes(x = displ, y = hwy, colour = class)) + geom_point()
+```
+
+
+Task 2
+======
+* Defaults for all layers:
+    * `x` $\rightarrow$ `displ`
+    * `y` $\rightarrow$ `hwy`
+* Layer 1: 
+    * geom `point`
+    * default stat and position
+    * point colour is set to `'red'`
+* Layer 2:
+    * geom `smooth`
+    * default stat and position
+
+***
+
+```{r}
+ggplot(mpg, aes(x = displ, y = hwy)) + geom_point(colour='red') + geom_smooth()
+```
+
+Task 3
+======
+* Defaults for all layers:
+    * `x` $\rightarrow$ `displ`
+    * `y` $\rightarrow$ `hwy`
+    * `colour` $\rightarrow$ `drv`
+* Layer 1: 
+    * geom `point`
+    * default stat and position
+* Layer 2:
+    * geom `smooth`
+    * default stat and position
+
+***
+
+```{r}
+ggplot(mpg, aes(x = displ, y = hwy, colour=drv)) + geom_point() + geom_smooth()
+```
+
+Task 4
+======
+* Defaults for all layers:
+    * `x` $\rightarrow$ `displ`
+    * `y` $\rightarrow$ `hwy`
+    * `colour` $\rightarrow$ `drv`
+* Layer 1: 
+    * geom `point`
+    * default stat and position
+* Layer 2:
+    * geom `smooth`
+    * default stat and position
+    * pass in `method='lm'` to get linear (rather than LOESS) regression
+    * pass in `se=FALSE` to suppress confidence bands
+
+***
+
+```{r}
+ggplot(mpg, aes(x = displ, y = hwy, colour=drv)) + geom_point() + geom_smooth(method="lm", se=FALSE)
+```
+
+Task 5
+======
+* Defaults for all layers:
+    * `x` $\rightarrow$ `displ`
+    * `y` $\rightarrow$ `hwy`
+    * `colour` $\rightarrow$ `cyl` (as discrete values)
+* Layer 1: 
+    * geom `point`
+    * default stat and position
+* Layer 2:
+    * geom `smooth`
+    * default stat and position
+
+***
+
+**Incorrect**
+```{r}
+ggplot(mpg, aes(x = displ, y = hwy, colour=cyl)) + geom_point() + geom_smooth()
+```
+
+***
+
+**Correct**
+```{r}
+ggplot(mpg, aes(x = displ, y = hwy, colour=factor(cyl))) + geom_point() + geom_smooth()
+```
