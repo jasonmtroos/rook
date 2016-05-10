@@ -44,6 +44,37 @@ html * {
 
 
 
+.reveal table {
+  /*border-width: 1px;
+  border-spacing: 2px;
+  */
+  border-style: solid;
+  /*
+  border-color: gray;
+  border-collapse: collapse;*/
+  border-width: 2px 0px 2px 0px;
+  font-size: 0.7em;
+}
+
+.reveal table th {
+  /*border-width: 1px;*/
+  padding-left: 10px;
+  padding-right: 25px;
+  font-weight: bold;
+  border-style: solid; /*dotted;*/
+  border-width: 0px 0px 1px 0px;
+  border-color: gray;
+}
+
+.reveal table td {
+  /*border-width: 1px;*/
+  padding-left: 10px;
+  padding-right: 25px;
+  /*border-style: dotted;
+  border-color: gray;*/
+  border-width: 0px 0px 0px 0px;
+}
+
 
 .reveal p {
   font-weight: 400;
@@ -98,14 +129,23 @@ html * {
 .center {
   text-align: center;
 }
+.left {
+  float: left;
+  width:48%;
+}
+.right {
+  float: right;
+  width:48%;
+}
+
 
 .reveal pre {
     display: block;
     position: relative;
-    width: 95%;
+    width: 100%;
     margin: 10px auto;
     text-align: left;
-    font-size: .9em;
+    font-size: .85em;
     font-family: 'Hack';
     line-height: 1.2em;
     word-wrap: break-word;
@@ -114,7 +154,7 @@ html * {
 
 .reveal code {
   font-family: 'Hack';
-  font-size: .9em;
+  font-size: .85em;
   background-color: #fdf6e3;
   border:solid 1px #B0B0B0;
 }
