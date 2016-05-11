@@ -537,9 +537,15 @@ git clone http://github.com/jasonmtroos/rook
 ```
 
 * You can then open `git_workspace/rook/rook.Rproj` in RStudio and compile the R Markdown files (listed under subdirectories -- see the **File** panel)
+    * You need the `devtools` and (latest version of) `revealjs` packages installed:
+```{r eval=FALSE}
+install.packages('devtools', dependencies=TRUE)
+devtools::install_github('rstudio/revealjs')
+```
 * To get the latest version, you can **pull** from GitHub
 
 ```{r engine='bash', eval=FALSE}
 cd git_workspace/rook
 git pull
 ```
+
