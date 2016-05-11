@@ -17,7 +17,7 @@ output:
     pandoc_args:
       [
       "--variable", "slideNumber='c/t'",
-      "--variable", "transitionSpeed=slow",
+      "--variable", "transitionSpeed=normal",
       "--variable", "viewDistance=5"
       ]
 ---
@@ -28,7 +28,7 @@ output:
 cat(knitr::knit_theme$get('solarized-light')$highlight)
 ```
 ```{r echo=FALSE, include=FALSE}
-knitr::opts_chunk$set(tidy = TRUE)
+knitr::opts_chunk$set(tidy = TRUE, tidy.opts=list(blank=FALSE, width.cutoff=50), cache=TRUE)
 knitr::knit_hooks$set(
 source = function(x,options){
   if( options$engine == 'R' ) {
@@ -51,9 +51,10 @@ source = function(x,options){
 Learning by doing
 ==================================
 * Coding is not as difficult as people think
-* My approach to teaching people to code is to have them type (and click on) things they don't fully understand
-* Because they are curious, they will then ask "Hmm...why did that work?"
-* I then explain what's going on
+* My approach to teaching people to code is 
+    1. Have them type (and click on) things they don't fully understand
+    2. (Because they are curious) they then ask "Hmm...why did that work?"
+    3. I then explain what's going on
 * That's the approach we'll take today
 
 Doing before understanding
@@ -65,7 +66,23 @@ Doing before understanding
     + Set up your local project files
     + Track them using version control
     + Make edits, commit changed, push changes to the online repository, etc.
-* Later, I will explain what all this means
+* Ask questions as we go, and I will explain what all this means
+
+Sticky notes
+============
+* Place a sticky note on your computer to signal:
+
+> <div class="input-color"><div class="color-box" style="background-color: #BFFF42;"></div>I'm done with the exercise, please come and check my work.</div>
+> 
+> <div class="input-color"><div class="color-box" style="background-color: #FF1288;"></div>I've encountered a problem and I need help.</div>
+
+* Please try to help each other first, you'll learn more that way...
+* At the end of each session (e.g., before each break), write on the cards and stick then on the door
+
+> <div class="input-color"><div class="color-box" style="background-color: #BFFF42;"></div>Something you learned or think will be useful</div>
+> 
+> <div class="input-color"><div class="color-box" style="background-color: #FF1288;"></div>Something that we covered too quickly, too slowly, or that you think is irrelevant</div>
+
 
 Setup your local working directory
 ==================================

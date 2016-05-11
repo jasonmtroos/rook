@@ -75,6 +75,21 @@ html * {
   border-width: 0px 0px 0px 0px;
 }
 
+.input-color {
+    position: relative;
+    padding-left: 20px;
+    margin-bottom: 10px;
+}
+.input-color .color-box {
+    width: 1.2em;
+    height: 1.2em;
+    display: inline-block;
+    background-color: #ccc;
+    position: relative;
+    left: 0px;
+    top: .2em;
+    border: 1px solid #000;
+}
 
 .reveal p {
   font-weight: 400;
