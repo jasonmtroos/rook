@@ -602,7 +602,10 @@ Facets
 
 Something here...
 
+Scales
+======
 
+Something here...
 
 
 More reading
@@ -612,4 +615,16 @@ More reading
 * [Chapter 3 of R for Data Science](http://r4ds.had.co.nz/data-visualisation.html) has a very nice introduction to ggplot2 that follows a similar flow to what we covered today
 
 
+
+dplyr
+=====
+
+
+
+
+tidyr
+=====
+```{r eval=FALSE}
+devtools::install_github('garrettgman/DSR')
+```
 
