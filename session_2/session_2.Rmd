@@ -198,6 +198,8 @@ Understanding and memory
     * Four chunks in working memory
     * Graph designers err on the side of presenting too much, graph readers err on the side of paying too little attention
 
+
+
 ggplot2's grammar
 ===================
 * Decomposes graphs into basic parts
@@ -594,3 +596,20 @@ ggplot(mpg, aes(x = displ, y = hwy, colour=cyl)) + geom_point() + geom_smooth()
 ```{r}
 ggplot(mpg, aes(x = displ, y = hwy, colour=factor(cyl))) + geom_point() + geom_smooth()
 ```
+
+Facets
+=======
+
+Something here...
+
+
+
+
+More reading
+============
+* [39 studies about human perception in 30 minutes](https://medium.com/@kennelliott/39-studies-about-human-perception-in-30-minutes-4728f9e31a73) is a nice review of what we know about how perception of data visualizations
+* See the [ggplot2 documentation](http://docs.ggplot2.org/current/) for a visual summary of the available geometries, list of stats, and more; as well as detailed documentation
+* [Chapter 3 of R for Data Science](http://r4ds.had.co.nz/data-visualisation.html) has a very nice introduction to ggplot2 that follows a similar flow to what we covered today
+
+
+

@@ -97,3 +97,9 @@ Session 4: Text and sentiment analysis
 
 * You will also learn how to conduct automatic sentiment analysis (scoring text based its positivity or negativity).
 
+Introductions
+=============
+* Who are you? Which degree program are you in?
+* What do you hope to get out of this course?
+* Is there a specific data set you need to obtain and/or analyze?
+* How much prior experience do you have with R?
