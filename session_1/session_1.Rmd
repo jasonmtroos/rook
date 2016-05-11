@@ -296,7 +296,7 @@ Installing packages
 install.packages('readr', dependencies=TRUE)
 ```
 
-* If the package has been loaded sucessfully, you should be able to execute the following command without producing an error
+* If the package has been loaded successfully, you should be able to execute the following command without producing an error
 
 ```{r}
 library(readr)

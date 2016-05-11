@@ -16,7 +16,7 @@ output:
     pandoc_args:
       [
       "--variable", "slideNumber='c/t'",
-      "--variable", "transitionSpeed=slow",
+      "--variable", "transitionSpeed=normal",
       "--variable", "viewDistance=5"
       ]
 ---
@@ -47,7 +47,7 @@ Course structure
 * Sessions include a mix of lectures, demonstrations, and/or in-class exercises
 * Bring your laptop to every session
     + You **must** have the necessary rights to install software on your laptop
-* Ideadlly, you will work with data sets relevant to your reasearch:
+* Ideally, you will work with data sets relevant to your research:
     + Experiments, surveys, time series, panels, whatever...
     + I will supply data sets as well
 
@@ -70,16 +70,16 @@ Today's session
 
 * We will build an R-markdown file that collects data from an online source, performs a few basic manipulations, and plots the results. You will learn how to use version control software to track changes to this markdown file over time.
 
-Session 2: Acquiring, preparing, and visualising data
+Session 2: Acquiring, preparing, and visualizing data
 ====================================================
 ## 18 May, 13.00 -- 17.00, Mandeville T18--22
 
 
-* You will learn how to write code to acquire data from files located on the web or stored on your local computer, load them into R, and “clean” the data in preparation for further analysis (such as data visualisation). 
+* You will learn how to write code to acquire data from files located on the web or stored on your local computer, load them into R, and “clean” the data in preparation for further analysis (such as data visualization). 
 
-* You will then learn about a powerful yet relatively simple "grammar" for visualising data that has been implemented in the `ggplot2` package in R
+* You will then learn about a powerful yet relatively simple "grammar" for visualizing data that has been implemented in the `ggplot2` package in R
 
-* We will also discuss the underlying theory that drives this grammar (including the psychological principles behind effective data visualisation), and gain an appreciation for how visualisation can lead to insights about data more quickly than statistical analysis.
+* We will also discuss the underlying theory that drives this grammar (including the psychological principles behind effective data visualization), and gain an appreciation for how visualization can lead to insights about data more quickly than statistical analysis.
 
 Session 3: Obtaining data from web sites and social media
 ===================================================
@@ -87,7 +87,7 @@ Session 3: Obtaining data from web sites and social media
 
 * You will learn how to acquire data from various online sources, such as web pages and the Twitter API, and how to automation these procedures. 
 
-* You will continue to gain practice preparing, analysing, and visualising these data.
+* You will continue to gain practice preparing, analyzing, and visualizing these data.
 
 Session 4: Text and sentiment analysis
 ====================================================
@@ -96,5 +96,4 @@ Session 4: Text and sentiment analysis
 * You will learn how to process large amounts of unstructured data (e.g. text documents) to extract important features (e.g., the occurrence of special words).
 
 * You will also learn how to conduct automatic sentiment analysis (scoring text based its positivity or negativity).
-
 
