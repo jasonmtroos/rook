@@ -527,8 +527,36 @@ install.packages(these_packages, dependencies = TRUE)
     * See (https://CRAN.R-project.org/bin/windows/Rtools/) choosing the default "Package authoring installation" during installation
 
 
+A few things in R you should know
+=================================
+* Not covered in my tutorials, so let me know if you need resources covering these concepts
+
+<div style="font-size:70%;">
+```{r}
+for (i in 1:10) {
+  if( i == 8 ) {
+    print(paste('i =',i))
+  }
+}
+i <- 1
+while (TRUE) {
+  i <- i + 1
+  if( i == 8 ) {
+    print(paste('i =',i))
+    break;
+  }
+}
+my_func <- function(x,y) {
+  x+y
+}
+my_func(2,3)
+```
+</div>
+
 These slides
 ============
+* Create a new project from source control using `https://github.com/jasonmtroos/rook.git`
+...or...
 * To download these slides (more specifically, the R Markdown files that create them), you will need to use git and terminal or git-bash
 
 ```{r engine='bash', eval=FALSE}
