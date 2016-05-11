@@ -501,13 +501,13 @@ What you need to do this week
 1. Get your R environment in order (see next slide)
 2. Get familiar with R Markdown (**mandatory**) and git (*optional*) -- see previous slides for links
 3. Follow the [R tutorials](http://www.jasonmtroos.com/assets/media/teaching/course_assignments_and_data.zip) I developed for my Marketing Analytics MSc course
-    * Assignment 1 -- learning R (*optional* unless you are lost right now)
-    * Assignment 2, sections 1--2 -- linear and logistic regression (*optional* -- not related to the purpose of this course)
+    * Assignment 1 -- learning R (**mandatory** if you are lost right now, otherwise optional)
+    * Assignment 2, sections 1--2 -- linear and logistic regression (**mandatory** if you don't know what `y ~ x` means in R, otherwise optional)
     * Assignment 3, section 2 -- ggplot2 (**mandatory**)
     * Assignment 4 -- more ggplot2 and dplyr (**mandatory**)
         * If you want more ggplot2 material, check out [Chapter 3 of R for Data Science](http://r4ds.had.co.nz/data-visualisation.html)
         * If you want more dplyr material, check out [Chapter 4 of R for Data Science](http://r4ds.had.co.nz/transform.html)
-
+4. Email me with questions: roos@rsm.nl
 
 
 
