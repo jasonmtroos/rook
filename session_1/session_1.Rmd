@@ -365,7 +365,7 @@ Commit your changes
 * Click on **Commit**
 * Enter the commit message `Replaced boilerplate with code to download sleep study data`
 * Click on **Commit**
-* **Do no** click on **Push**
+* **Do not** click on **Push** yet
 
 Committing and pushing
 ======================
@@ -505,6 +505,9 @@ What you need to do this week
     * Assignment 2, sections 1--2 -- linear and logistic regression (*optional* -- not related to the purpose of this course)
     * Assignment 3, section 2 -- ggplot2 (**mandatory**)
     * Assignment 4 -- more ggplot2 and dplyr (**mandatory**)
+        * If you want more ggplot2 material, check out [Chapter 3 of R for Data Science](http://r4ds.had.co.nz/data-visualisation.html)
+        * If you want more dplyr material, check out [Chapter 4 of R for Data Science](http://r4ds.had.co.nz/transform.html)
+
 
 
 
