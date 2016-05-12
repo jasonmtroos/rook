@@ -14,6 +14,6 @@ vignettes/*.pdf
 .httr-oauth
 .Rproj.user
 */*.html
-
 */*_cache
 */*_files
+*/*.pdf
