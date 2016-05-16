@@ -1,0 +1,428 @@
+---
+title: "In-class Work"
+author: "J.M.T. Roos"
+date: "Last updated 16 May 2016"
+output: 
+  html_document: default
+  pdf_document: 
+    latex_engine: xelatex
+---
+
+<style>
+pre {
+  display: block;
+  padding: 9.5px;
+  margin: 0 0 10px;
+  font-size: 11px; /*13px;*/
+  line-height: 1.2 /*1.42857143*/;
+  color: #333;
+  word-break: break-all;
+  word-wrap: break-word;
+  background-color: #f5f5f5;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+</style>
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, tidy = TRUE, cache = TRUE, tidy.opts=list(blank=FALSE, width.cutoff=60))
+```
+
+Excercise set 1
+===============
+
+For Tasks 1--4 use the following data
+
+```{r}
+library(dplyr)
+library(ggplot2)
+mpg %>% tbl_df
+```
+
+## Task 1
+
+* Create a plot with 1 layer:
+    * `x` mapped to `displ`
+    * `y` mapped to `hwy`
+    * `colour` mapped to `trans`
+    * geometry `point`
+        * default stat and position for `point`
+
+
+```{r echo=FALSE, eval=FALSE}
+ggplot(mpg, aes(x = displ, y = hwy, colour = class)) + geom_point()
+```
+
+
+## Task 2
+
+* Defaults for all layers:
+    * `x` $\rightarrow$ `displ`
+    * `y` $\rightarrow$ `hwy`
+* Layer 1: 
+    * geom `point`
+    * default stat and position
+    * point colour is set to `'red'`
+* Layer 2:
+    * geom `smooth`
+    * default stat and position
+    * no variables mapped to `colour`
+
+
+
+```{r echo=FALSE, eval=FALSE}
+ggplot(mpg, aes(x = displ, y = hwy)) + geom_point(colour='red') + geom_smooth()
+```
+
+## Task 3
+
+* Defaults for all layers:
+    * `x` $\rightarrow$ `displ`
+    * `y` $\rightarrow$ `hwy`
+    * `colour` $\rightarrow$ `drv`
+* Layer 1: 
+    * geom `point`
+    * default stat and position
+* Layer 2:
+    * geom `smooth`
+    * default stat and position
+    * pass in `method='lm'` to get linear (rather than LOESS) regression
+    * pass in `se=FALSE` to suppress confidence bands
+
+
+```{r echo=FALSE, eval=FALSE}
+ggplot(mpg, aes(x = displ, y = hwy, colour=drv)) + geom_point() + geom_smooth(method="lm", se=FALSE)
+```
+
+## Task 4
+
+* Defaults for all layers:
+    * `x` $\rightarrow$ `displ`
+    * `y` $\rightarrow$ `hwy`
+    * `colour` $\rightarrow$ `cyl` (as discrete values)
+* Layer 1: 
+    * geom `point`
+    * default stat and position
+* Layer 2:
+    * geom `smooth`
+    * default stat and position
+
+
+```{r echo=FALSE, eval=FALSE}
+#wrong
+ggplot(mpg, aes(x = displ, y = hwy, colour=cyl)) + geom_point() + geom_smooth()
+#right
+ggplot(mpg, aes(x = displ, y = hwy, colour=factor(cyl))) + geom_point() + geom_smooth()
+```
+
+
+Exercise set 2
+==============
+
+For Task 5, use the following data
+
+```{r}
+library(dplyr)
+library(ggplot2)
+mpg %>% tbl_df
+```
+
+## Task 5
+
+* Starting with the following plot:
+
+```{r}
+ggplot(mpg, aes( x = displ, y = hwy, colour = factor(cyl))) + geom_point() + geom_smooth(method="lm",se=FALSE)
+```
+
+* Add code to do the following:
+    * `x` and `y` axes are
+        * Plotted on a logarithmic scale
+        * Show breaks at 2, 3, 4, 5, 6, and 7 (x-axis) and 20, 30, and 40 (y-axis)
+    * Set the labels as follows:
+        * Label for the x-axis is `Displacement`
+        * Label for the y-axis is `MPG, highway`
+        * Label for the legend is `Cylinders`
+        * Title of the plot is `Fuel economy and engine size`
+    * Observations are grouped into facets by `year`
+        * Change the facet labels to `Model year 1999` and `Model year 2008`
+* The resulting plot looks like this:
+
+```{r echo = FALSE}
+ggplot(mpg, aes( x = displ, y = hwy, colour = factor(cyl))) + geom_point() + geom_smooth(method="lm",se=FALSE) + scale_x_log10(breaks=2:7) + scale_y_log10(breaks=c(20,30,40)) + facet_wrap(~year, labeller = as_labeller(c('1999' = 'Model year 1999', '2008' = 'Model year 2008'))) + labs( x = 'Displacement', y = 'MPG, highway', colour = 'Cylinders', title = 'Fuel economy and engine size' )
+```
+
+
+
+
+Exercise set 3
+===============
+
+For tasks 6--11, use the following data:
+
+```{r}
+library(dplyr)
+library(tidyr)
+data(mpg, package = 'ggplot2')
+mpg %>% tbl_df
+```
+
+## Task 6
+* Use the `select` verb to extract the following columns from `mpg`: `manufacturer`, `model`, `displ`, `year`, `cyl`, `trans`, `cty`, `hwy` and view the output, which should look something like this:
+
+```{r echo = FALSE}
+(mpg2 <- mpg %>% select(`manufacturer`, `model`, `displ`, `year`, `cyl`, `trans`, `cty`, `hwy`))
+```
+
+* Create a new data frame called `mpg2` that contains this subset of columns (i.e.):
+
+```{r eval = FALSE}
+mpg2 <- mpg %>% [ your code from the previous step ]
+```
+
+## Task 7
+
+* Working with `mpg2`, use the `mutate` verb to create two new columns:
+    * `displ2` is equal to the square of displacement (i.e., `displ * displ` or `displ^2`)
+    * `vol_per_cyl` that is equal to `displ` divided by `cyl` (i.e., `displ / cyl`, rounded to the nearest 1/100th of a liter (i.e., two decimal places)
+* Your output should look like this:
+
+```{r echo = FALSE}
+(mpg3 <- mpg2 %>% mutate( displ2 = displ^2, vol_per_cyl = round(displ / cyl,2) ))
+```
+
+* Create a new data frame called `mpg3` that contains this new data frame with the two extra columns
+
+```{r eval = FALSE}
+mpg3 <- mpg2 %>% [ your code from the previous step ]
+```
+
+## Task 8
+
+* Working with `mpg3`, use the `arrange` verb to re-order the rows in descending order of `vol_per_cyl`
+
+```{r echo = FALSE}
+mpg3 %>% arrange( desc( vol_per_cyl))
+```
+
+* Working again with `mpg3`, use the `filter` verb to extract the subset of rows corresponding to the `manufacturer` `chevrolet`, then use `arrange` to place these rows in descending order by `vol_per_cyl`
+
+```{r echo = FALSE}
+mpg3 %>% filter( manufacturer == 'chevrolet' ) %>% arrange( desc(vol_per_cyl))
+```
+
+* Working again with `mpg3`, use the `group_by` verb to group this data frame by `manufacturer` and `year`. Then, for each unique pair of `manufacturer` and `year`, calculate the largest value of `vol_per_cyl`. Call this new column `max_vol_per_cyl`.
+
+```{r echo = FALSE}
+(mpg4 <- mpg3 %>% group_by( manufacturer, year ) %>% summarise( max_vol_per_cyl = max(vol_per_cyl) ))
+```
+
+* Create a new data frame called `mpg4` that contains this new data frame
+
+```{r eval = FALSE}
+mpg4 <- mpg3 %>% [ your code from the previous step ]
+```
+
+## Task 9
+
+* Working with `mpg4`, use the `spread` verb from the `tidyr` package to create a data frame that looks like this:
+
+```{r echo = FALSE}
+(mpg5 <- mpg4 %>% spread( year, max_vol_per_cyl ))
+```
+
+* *Hint:* the key/value pair in `mpg4` is made up of `year` (key) and `max_vol_per_cyl` (value).
+
+* Create a new data frame called `mpg5` that contains this new data frame
+
+```{r eval = FALSE}
+mpg5 <- mpg4 %>% [ your code from the previous step ]
+```
+
+## Task 10
+
+* Working with `mpg5`, create a new column representing the difference between the value of the columns `2008` and `1999`. Call this variable `change`
+
+* *Note:* Refer to the column names using the backtick character (`` ` ``) so that R knows you mean `2008` the column name, and not `2008` the number. That is, you should write code referring to the column as `` `2008` `` and not ``2008``.
+
+```{r echo = FALSE}
+(mpg6 <- mpg5 %>% mutate( change = `2008` - `1999` ))
+```
+
+* Create a new data frame called `mpg6` that contains this new data frame
+
+```{r eval = FALSE}
+mpg6 <- mpg5 %>% [ your code from the previous step ]
+```
+
+## Task 11
+
+* Working with `mpg6`, rename the columns `1999` and `2008` to be `max_vpc_1999` and `max_vpc_2008`.
+* Then use the `gather` verb to create a key/value pair based on the three numeric columns, with the key column called `variable` and the value column called `value`. 
+* The result should look like this (put `%>% View` at the end of your code to see all of the data in tabular form via the RStudio GUI).
+
+```{r echo = FALSE}
+mpg6 %>% rename( max_vpc_1999 = `1999`, max_vpc_2008 = `2008` ) %>% gather( variable, value, -manufacturer ) %>% as.data.frame
+```
+
+Exercise set 4
+=================
+* Data for tasks 12--14 is obtained by installing the `nycflights13` package:
+
+```{r eval = FALSE}
+install.packages('nycflights13')
+```
+
+* Load these packages
+
+```{r}
+library(dplyr)
+library(ggplot2)
+library(nycflights13)
+flights %>% tbl_df
+airlines %>% tbl_df
+weather %>% tbl_df
+```
+
+## Task 12
+
+* Create two new data frames with subsets of columns from the `flights` and `weather` data frames, named `flights2` and `weather2`.
+
+```{r}
+flights2 <- flights %>% select(origin, year, month, day, hour, sched_dep_time, dep_delay, carrier)
+weather2 <- weather %>% select(origin, year, month, day, hour, precip, wind_speed, visib )
+```
+
+* Write code to perform an inner join between `flights` and `airlines`. The output should look like this:
+
+```{r echo = FALSE, message = FALSE}
+flights2 %>% inner_join( airlines )
+```
+
+* Which column was used as the key for this join? 
+* Next, write code to perform an outer join between `flights2` and `weather2` that includes all rows from `flights2`. Your output should look like this:
+
+```{r echo = FALSE}
+flights2 %>% left_join( weather2 ) 
+```
+
+* Why are there `NA` values under `precip`, `wind_speed`, and `visib`?
+
+## Task 13
+
+* Which airlines have the worst departure delays when conditions are ideal? First, we need to know what it means for conditions to be ideal. Precipition and high winds are bad, so we need to know their minimum values. Visibility is good, so we need to know its maximum value. In the code that follows, `na.rm=TRUE` allows us to ignore any weather data where one of these variables might be missing (i.e., `NA`). You can execute this code or just look at mine:
+
+```{r}
+weather2 %>% summarise(min_precip = min(precip,na.rm=TRUE), min_wind = min(wind_speed,na.rm=TRUE),max_visib = max(visib,na.rm=TRUE))
+```
+
+* Now write code to create a new data frame based on `flights2` joined with `weather2`
+    * The new data frame should only include rows corresponding with flights that had ideal conditions upon departure. 
+    * Name this new data frame `good_weather_delays`
+    * Your code should include a call to `inner_join` and another call to `filter`. Use the `%>%` operator to chain all of this together
+* The data frame `good_weather_delays` should look like this:
+
+```{r echo = FALSE}
+(good_weather_delays <- flights2 %>% inner_join(weather2) %>% filter( precip == 0 & wind_speed == 0 & visib == 10 ) )
+```
+
+* To answer the question, "Which airlines have the worst departure delays when conditions are ideal?" write code to: 
+    * Use this data frame (`good_weather_delays`)
+    * Group observations by carrier
+    * Calculate the average departure delay (`dep_delay`)
+    * Order rows by this new summary statistic
+    * Join the `airlines` data frame to get the full name of the airlines
+* Your output should look like this:
+
+```{r echo = FALSE}
+(avg_good_weather_delays <- good_weather_delays %>% group_by(carrier) %>% summarise( dep_delay = mean(dep_delay,na.rm=TRUE) ) %>% arrange(desc(dep_delay)) %>% inner_join(airlines))
+```
+
+* Create a new data frame using the output from Task 13. Call this data frame `avg_good_weather_delays`
+
+```{r eval = FALSE}
+avg_good_weather_delays <- [ your code from the previous step ]
+```
+
+Task 14
+=======
+
+* Create a plot that summarizes the distribution of delays when weather conditions were ideal
+* This is mine:
+
+```{r echo = FALSE, warning = FALSE, message = FALSE}
+ranked_airline_labels <- avg_good_weather_delays %>% transmute( carrier, name = factor(-row_number(),labels=name) )
+good_weather_delays %>% inner_join(ranked_airline_labels) %>% ggplot( aes( x = name, y = dep_delay ) ) + stat_summary() + coord_flip() + labs(x='', y = 'Average departure delay', title = 'Departure delays under ideal weather conditions\nNYC airports, 2013' )
+```
+
+* To create this plot, I used the following techniques:
+* I used `avg_good_weather_delays` to create an ordered factor based on the name of the airlines. The ordered factor causes ggplot to arrange the airlines in descending order based on their average values. This is the code I wrote to do this:
+    
+```{r}
+ranked_airline_labels <- avg_good_weather_delays %>% transmute( carrier, name = factor(-row_number(),labels=name) )
+```
+
+* I joined this new data frame (`ranked_airline_labels`) with the `good_weather_delays` data frame, then passed the result into ggplot2
+* I mapped `name` to the `x` (not `y`) axis, and mapped `dep_delay` to the `y` axis. This is reverse from what you see, but I did it because `stat_summary`, which creates the points with error bars, expects to summarize over `y`
+* To reverse the orientation of the plot, I added `coord_flip()` to my ggplot call, which transposes the plot by 90 degrees
+* I then relabeled the axes and added a title
+
+
+## Solutions
+
+```{r eval = FALSE, tidy = TRUE, tidy.opts=list(blank = FALSE, cutoff.width = 50)}
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(nycflights13)
+
+## Task 1
+ggplot(mpg, aes(x = displ, y = hwy, colour = class)) + geom_point()
+
+## Task 2
+ggplot(mpg, aes(x = displ, y = hwy)) + geom_point(colour='red') + geom_smooth()
+
+## Task 3
+ggplot(mpg, aes(x = displ, y = hwy, colour=drv)) + geom_point() + geom_smooth(method="lm", se=FALSE)
+
+## Task 4
+ggplot(mpg, aes(x = displ, y = hwy, colour=factor(cyl))) + geom_point() + geom_smooth()
+
+## Task 5
+ggplot(mpg, aes( x = displ, y = hwy, colour = factor(cyl))) + geom_point() + geom_smooth(method="lm",se=FALSE) + scale_x_log10(breaks=2:7) + scale_y_log10(breaks=c(20,30,40)) + facet_wrap(~year, labeller = as_labeller(c('1999' = 'Model year 1999', '2008' = 'Model year 2008'))) + labs( x = 'Displacement', y = 'MPG, highway', colour = 'Cylinders', title = 'Fuel economy and engine size' )
+
+## Task 6
+mpg2 <- mpg %>% select(manufacturer, model, displ, year, cyl, trans, cty, hwy)
+
+## Task 7
+mpg3 <- mpg2 %>% mutate( displ2 = displ^2, vol_per_cyl = round(displ / cyl,2) )
+
+## Task 8
+mpg3 %>% arrange( desc( vol_per_cyl))
+mpg3 %>% filter( manufacturer == 'chevrolet' ) %>% arrange( desc(vol_per_cyl))
+mpg4 <- mpg3 %>% group_by( manufacturer, year ) %>% summarise( max_vol_per_cyl = max(vol_per_cyl) )
+
+## Task 9
+mpg5 <- mpg4 %>% spread( year, max_vol_per_cyl )
+
+## Task 10
+mpg6 <- mpg5 %>% mutate( change = `2008` - `1999` )
+
+## Task 11
+mpg6 %>% rename( max_vpc_1999 = `1999`, max_vpc_2008 = `2008` ) %>% gather( variable, value, -manufacturer ) %>% as.data.frame
+
+## Task 12
+flights2 <- flights %>% select(origin, year, month, day, hour, sched_dep_time, dep_delay, carrier)
+weather2 <- weather %>% select(origin, year, month, day, hour, precip, wind_speed, visib )
+flights2 %>% inner_join( airlines )
+flights2 %>% left_join( weather2 ) 
+
+## Task 13
+weather2 %>% summarise(min_precip = min(precip,na.rm=TRUE), min_wind = min(wind_speed,na.rm=TRUE),max_visib = max(visib,na.rm=TRUE))
+good_weather_delays <- flights2 %>% inner_join(weather2) %>% filter( precip == 0 & wind_speed == 0 & visib == 10 )
+avg_good_weather_delays <- good_weather_delays %>% group_by(carrier) %>% summarise( dep_delay = mean(dep_delay,na.rm=TRUE) ) %>% arrange(desc(dep_delay)) %>% inner_join(airlines)
+
+## Task 14
+ranked_airline_labels <- avg_good_weather_delays %>% transmute( carrier, name = factor(-row_number(),labels=name) )
+good_weather_delays %>% inner_join(ranked_airline_labels) %>% ggplot( aes( x = name, y = dep_delay ) ) + stat_summary() + coord_flip() + labs(x='', y = 'Average departure delay', title = 'Departure delays under ideal weather conditions\nNYC airports, 2013' )
+```
