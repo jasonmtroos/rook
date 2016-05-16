@@ -1133,7 +1133,9 @@ library(nycflights13)
 
 Reading data
 =================
-
+* Focus in this course is on web scraping and API calls (covered in next session)
+* Here I will briefly mention three packages that are used to read tabular data
+    * If you have specific questions or need examples, let me know...
 
 readr
 =====
@@ -1142,28 +1144,30 @@ readr
 library(readr)
 ```
 
-* csv
-* tsv (hotdogs?)
+* For reading delimited text files representing tabular (i.e. rectangular) data
+* `readr::read_csv` instead of `base::read.csv`
+* Very fast, with better defaults, good detection of special data (e.g., dates)
 
-readxl
-=================
+readxl and haven
+================
 
 ```{r eval = FALSE}
 install.packges('readxl', dependencies = TRUE)
 library(readxl)
 ```
 
-haven
-=============
+* For reading Excel spreadsheets
+
 ```{r eval = FALSE}
 install.packages('haven', dependencies = TRUE)
 library(haven)
 ```
 
+* For reading SAS, STAT, and SPSS data files
+* Has some limited ability to write to these formats as well
 
+This week
+========
 
-Other stuff 
-==========
-https://github.com/caesar0301/awesome-public-datasets
-http://journals.plos.org/plosbiology/article?id=10.1371/journal.pbio.1001745#
-http://www.hafro.is/~einarhj/education/ggplot2/layers.html
+TBD...
+
