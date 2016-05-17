@@ -1,7 +1,7 @@
 ---
 title: "Acquiring, preparing, and visualizing data"
 author: "J.M.T. Roos"
-date: "Last updated 7 May 2016"
+date: "Last updated 17 May 2016"
 autosize: false
 css: "../css/slides.css"
 output: 
@@ -1122,7 +1122,7 @@ students %>% full_join( grades )
 
 
 
-Join excercies (Tasks xxx -- xxx )
+Join excercies (Tasks 12--14)
 ==================
 ```{r eval = FALSE}
 install.packages('nycflights13')
@@ -1166,8 +1166,80 @@ library(haven)
 * For reading SAS, STAT, and SPSS data files
 * Has some limited ability to write to these formats as well
 
-This week
-========
 
-TBD...
 
+This week: Preliminary work for next week's session (Twitter)
+=============================================================
+
+<div style="font-size: 80%;">
+
+* Follow [this tutorial](http://bigcomputing.blogspot.nl/2016/02/the-twitter-r-package-by-jeff-gentry-is.html) which provides detailed instructions for setting up programmatic access to Twitter. 
+* Specifically, do the following **before our next session** (but follow the detailed instructions in the tutorial):
+    1. `install.packages('twitteR', dependencies = TRUE)`
+    2. [Create a Twitter account](http://twitter.com/signup) if you do not already have one
+    3. Visit the [Twitter apps](https://apps.twitter.com) site and create a new app
+    4. Create and record the four variables needed to access the Twitter API, and insert them into the code below to verify everything is working without error
+    
+```{r eval = FALSE}
+library(twitteR)
+setup_twitter_oauth("your_consumer_key", "your_consumer_secret", "your_access_token", "your_access_secret")
+searchTwitter(searchString='#hashtag', n=100, lang='en', since=NULL, until=NULL, locale=NULL, geocode=NULL, sinceID=NULL, maxID=NULL, resultType='recent', retryOnRateLimit=120 )
+```
+
+</div>
+
+This week: Preliminary work for next week's session (HTML)
+===============================================================
+* Do the following **before our next session**:
+    * [Play this game](http://flukeout.github.io) to learn CSS
+    * Install [SelectorGadget](https://chrome.google.com/webstore/detail/selectorgadget/mhjhnkcfbdhnjickkkdbjoemdmbfginb/related) for Chrome and try it, or else do a lot of playing around with "Inspect Element" in your favorite browser
+
+
+This week: Write some code and share it
+=======================================
+* Be sure `readr` is installed:
+
+```{r eval = FALSE}
+install.packages('readr', dependencies = TRUE)
+```
+
+* Create a new repository on github and then create a corresponding project in R (follow instructions from Session 1 slides)
+* Create an R Markdown file, and in that file, download, clean up, and visualize some data. Download data that would be relevant to your research --- if you need inspiration, visit this list of [awesome public datasets](https://github.com/caesar0301/awesome-public-datasets)
+* Email the URL of your repository to another student (e.g., [https://github.com/jasonmtroos/rook](https://github.com/jasonmtroos/rook))
+* Also email the URL of your repository to me
+
+This week: Run somebody else's code and send them feedback
+============================================================
+* After you receive an email from another student, clone their repository
+
+```{r engine='bash', eval = FALSE}
+cd "name of your git workspace folder goes here"
+git clone "url to your colleague's github repository"
+```
+
+* Locate and open the `.Rproj` file and try to `knit` their R Markdown file
+* Did it work? Yes? then great! 
+    * Send them feedback about their R Markdown file
+    * Did you think it was readable? 
+    * Did the code make sense to you before you ran it? Not at all?
+
+
+
+This week: Want more practice?
+=================================
+
+* Visit these sites, read them, and write some code
+    1. [ggplot2 documentation](http://docs.ggplot2.org/current/)
+    2. [Chapter 3 of R for Data Science (visualization)](http://r4ds.had.co.nz/data-visualisation.html)
+    3. [Chapter 14 of R for Data Science (functions)](http://r4ds.had.co.nz/functions.html)
+    4. [Chapter 16 of R for Data Science (iteration)](http://r4ds.had.co.nz/iteration.html)
+* Make sure `rvest` is installed:
+
+```{r eval = FALSE}
+install.packages('rvest', dependencies = TRUE)
+```
+
+
+
+    
+    
