@@ -120,14 +120,16 @@ Remember...
 Today
 ==================================
 * Data visualization with `ggplot2`
+    * Basics
+    * In-class exercises
+    * More advanced concepts
+    * In-class exercises
 * Tidying and summarizing data with `dplyr`, `reshape2`, and `tidyr`
     * Single table operations
+    * In-class exercises
     * Joins
-* Acquiring (tabular) data
-
-Data visualization
-==================
-
+    * In-class exercises
+* Acquiring (tabular) data (*briefly covered today*)
 
 
 ggplot2
@@ -438,14 +440,14 @@ g + stat_bin(binwidth=4,
 </div>
 
 
-Practice with layers
+Practice with layers (Tasks 1--4)
 =====================
 * Work with a neighbor
 * First discuss the task, then one of you does the typing (take turns for each task)
 * Discuss what you are doing as you write code
 * Write your code in an empty **File > New File... > R Script** and execute each line using `Cmd-Enter`
 * Use the data set called `mpg` which is included in the `ggplot2` package
-
+* Exercises can be found at http://jasonmtroos.com/assets/media/teaching/rook/session_2_in_class.html or `http://goo.gl/Gx5LAK`
 
 Data
 =======
@@ -504,6 +506,12 @@ Task 0 (Example)
     * `identity` stat
     * `identity` position
 
+
+Basic exercises (Tasks 1--4)
+============================
+
+* http://jasonmtroos.com/assets/media/teaching/rook/session_2_in_class.html
+* `http://goo.gl/Gx5LAK`
 
 Facets and discrete groups
 ==========================
@@ -1190,9 +1198,15 @@ searchTwitter(searchString='#hashtag', n=100, lang='en', since=NULL, until=NULL,
 
 This week: Preliminary work for next week's session (HTML)
 ===============================================================
-* Do the following **before our next session**:
-    * [Play this game](http://flukeout.github.io) to learn CSS
-    * Install [SelectorGadget](https://chrome.google.com/webstore/detail/selectorgadget/mhjhnkcfbdhnjickkkdbjoemdmbfginb/related) for Chrome and try it, or else do a lot of playing around with "Inspect Element" in your favorite browser
+* Do all of the following **before our next session**
+* Make sure `rvest` is installed:
+
+```{r eval = FALSE}
+install.packages('rvest', dependencies = TRUE)
+```
+
+* [Play this game](http://flukeout.github.io) to learn CSS
+* Install [SelectorGadget](https://chrome.google.com/webstore/detail/selectorgadget/mhjhnkcfbdhnjickkkdbjoemdmbfginb/related) for Chrome and try it, or else do a lot of playing around with "Inspect Element" in your favorite browser
 
 
 This week: Write some code and share it
@@ -1233,12 +1247,6 @@ This week: Want more practice?
     2. [Chapter 3 of R for Data Science (visualization)](http://r4ds.had.co.nz/data-visualisation.html)
     3. [Chapter 14 of R for Data Science (functions)](http://r4ds.had.co.nz/functions.html)
     4. [Chapter 16 of R for Data Science (iteration)](http://r4ds.had.co.nz/iteration.html)
-* Make sure `rvest` is installed:
-
-```{r eval = FALSE}
-install.packages('rvest', dependencies = TRUE)
-```
-
 
 
     
