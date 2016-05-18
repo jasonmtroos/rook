@@ -445,7 +445,7 @@ Practice with layers (Tasks 1--4)
 * Work with a neighbor
 * First discuss the task, then one of you does the typing (take turns for each task)
 * Discuss what you are doing as you write code
-* Write your code in an empty **File > New File... > R Script** and execute each line using `Cmd-Enter`
+* Write your code in an empty **File > New File... > R Script** and execute each line using `Cmd-Enter` (Mac) or `Control-Enter` (Windows)
 * Use the data set called `mpg` which is included in the `ggplot2` package
 * Exercises can be found at http://jasonmtroos.com/assets/media/teaching/rook/session_2_in_class.html or `http://goo.gl/Gx5LAK`
 
