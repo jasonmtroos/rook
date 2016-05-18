@@ -600,7 +600,7 @@ Relabelling
 ===========
 
 ```{r fig.height=3}
-ggplot(mpg, aes(x = displ, y = hwy, colour = plyr::revalue(drv,c('f' = 'Fore', 'r' = 'Rear', '4' = '4WD')) ) )+ geom_point() + labs( colour = 'Drive train' )
+ggplot(mpg, aes(x = displ, y = hwy, colour = plyr::revalue(drv, c("f" = "Fore", "r" = "Rear", "4" = "4WD")))) + geom_point() + labs(colour = "Drive train")
 ```
 
 ***
@@ -1036,7 +1036,7 @@ format.table(dl %>% trunc.dots(14),
 ```
 
 
-Single table exercises (Tasks 7--11)
+Single table exercises (Tasks 6--11)
 =====================================
 ```{r eval = FALSE}
 library(dplyr)
