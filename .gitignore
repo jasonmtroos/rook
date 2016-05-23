@@ -17,3 +17,4 @@ vignettes/*.pdf
 */*_cache
 */*_files
 */*.pdf
+oauth_cache.RData
