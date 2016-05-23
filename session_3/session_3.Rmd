@@ -1,0 +1,539 @@
+---
+title: "Obtaining data from web sites and social media"
+author: "J.M.T. Roos"
+date: "Last updated 23 May 2016"
+autosize: false
+css: "../css/slides.css"
+output: 
+  revealjs::revealjs_presentation:
+    self_contained: true
+    theme: simple
+    highlight: NULL
+    transition: slide
+    slide_level: 1
+    reveal_options:
+      controls: false
+      margin: .05
+    pandoc_args:
+      [
+      "--variable", "slideNumber='c/t'",
+      "--variable", "transitionSpeed=default",
+      "--variable", "viewDistance=5"
+      ]
+---
+
+
+
+```{r echo=FALSE, include=FALSE}
+knitr::opts_chunk$set(tidy = TRUE, tidy.opts=list(blank=FALSE, width.cutoff=50), cache=FALSE)
+knitr::knit_hooks$set(
+source = function(x,options){
+  if( options$engine == 'R' ) {
+    # format R code
+    x = highr::hilight( x, format = 'html' )
+  } else if( options$engine == 'bash' ) {
+    # format bash code
+    x = paste0( '<span class="hl std">$</span> ', unlist( stringr::str_split( x, '\\n' ) ), '\n', collapse = '' )
+  }
+  # for (i in names(options)) {
+  #   message( paste( i, options[[i]] ) )
+  # }
+  x = paste(x, collapse = "\n")
+  sprintf("<div class=\"%s\"><pre class=\"%s %s\"><code class=\"%s %s\">%s</code></pre></div>\n", 'sourceCode', 'sourceCode', tolower(options$engine), 'sourceCode', tolower(options$engine), x)
+}
+)
+```
+
+
+Review
+==================================
+* In class
+    * `ggplot2`
+    * `dplyr`
+* During the week
+    * Reviewing/learning the R programming language
+    * Completing exercises
+    * `readr` and `git`
+    * Setting up `twitteR`
+
+```{r echo=FALSE, message=FALSE}
+
+```
+
+
+Today
+========================================
+
+1. Scraping data from web sites
+    * HTML and CSS selectors
+    * `rvest`
+2. Social media
+    * JSON and OATH
+    * `twitteR`
+    
+    
+    
+Crash course in HTML
+===================
+
+Basic structure of an HTML document
+
+```
+<html>
+  <head>
+    <title>This appears in the title window</title>
+    ... CSS and JavaScript typically goes here ...
+  </head>
+  <body>
+    ... Most of what you see goes here ...
+  </body>
+</html>
+```
+
+
+```{r echo=FALSE}
+html_doc <- xml2::read_html('<html>
+  <head>
+    <title>This appears in the title window</title>
+  </head>
+  <body>
+  </body>
+</html>')
+```
+
+```{r}
+library(rvest)
+html_doc %>% html_nodes('head title') %>% html_text
+```
+
+
+HTML Body
+============
+<div class="font-90">
+* HTML is very flexible about what goes between the `<body>` and `</body>` tags
+* Originally, HTML comprised tags like 
+    * `<h1>` for header-level-1
+    * `<p>` for paragraph break
+    * `<a>` for hyperlinks (`a` = "anchor"), etc.
+* The standard was made a bit more formal (so computers could read HTML more quickly)
+    * E.g., `<p>` was paired with `</p>`, whereas before it could stand alone
+    * `<br/>` became legal, and is the same as `<br></br>` (`br` = "line break")
+* And the standard was made a bit more flexible (so designers could create better looking pages)
+    * `<div>`'s contain blocks of content
+    * `<span>`'s contain small sections of content (usually individual words) that should be *styled* in a special way
+    * Cascading style sheets (CSS) provide a way to define how content should look and/or behave
+</div>
+
+Tags and attributes
+==============
+* Tag 
+    * `<div>`
+    * `<img>`
+    * `<a>`
+* Attribute
+    * `<div class="headline" id="story-id-43234">`
+    * `<img src="/img/another-cat.gif">`
+    * `<a href="http://www.google.com">`
+    
+
+CSS
+==============
+```
+<div style="{background-color: black; color: white;}" id="story-id-43234">
+... the headline goes here ...
+</div>
+```
+
+* This requires a lot of typing and is prone to mistakes
+* A better approach is provided by CSS:
+
+```
+<style>
+div .headline {
+  background-color: black;
+  color: white;
+}
+</style>
+
+<div class="headline" id="story-id-43234">
+... the headline goes here ...
+</div>
+```
+
+* With CSS, tags often include `class`es that indicate their purpose --- we use these `class` definitions as roadmaps for where the interesting content is
+
+***
+
+* In this style definition:
+```
+<style>
+div .headline {
+  background-color: black;
+  color: white;
+}
+</style>
+```
+* The style for `div .headline` will be applied to any object that matches this selector
+* In CSS, `div .headline` means "any `div` tag with `class="headline"`
+* You can have more than one class for a given tag, hence
+```
+<div class="headline ptw" id="story-id-43234"></div>
+```
+could be matched by `div .headline` `div` `div .headline .ptw` `div #story-id-43234` and many other selectors
+
+Nesting tags
+=============
+
+* HTML tags can be nested
+```
+<div class="articleBody">
+<div class="mainBody">
+<div class="quotedBlock">
+A quote by a famous thinker
+</div>
+</div>
+</div>
+```
+* The `div` containing the famous quote text is matched by all of the following selectors
+```
+div.quotedBlock
+.quotedBlock
+div.articleBody > div.mainBody > div.quotedBlock
+```
+
+```{r echo = FALSE, eval = FALSE}
+html_body <- read_html('<div class="articleBody">
+<div class="mainBody">
+<div class="quotedBlock">
+A quote by a famous thinker
+</div>
+</div>
+</div>
+') %>% html_nodes('body')
+html_body %>% html_nodes( 'div.articleBody > div.mainBody > div.quotedBlock' )
+```
+
+CSS Selectors
+===============
+
+* See http://www.w3schools.com/cssref/css_selectors.asp for a complete listing
+
+|Selector |Example |Example description                                          |
+|---------|--------|-------------------------------------------------------------|
+|.*class*           |`.headline`      |Selects all elements with `class="intro"`|
+|#*id*              |`#firstname`     |Selects the element with `id="firstname"`|
+|*                  |`*`	          |Selects all elements                     |
+|*element*          |`p`              |Selects all `<p>`                        |
+|*element*&nbsp;*element*|`div p`          |Selects all `<p>` elements inside `<div>`|
+|*element*&nbsp;>&nbsp;*element*|`div > p`          |Selects all `<p>` elements where the parent is a `<div>` element|
+|*element*&nbsp;+&nbsp;*element*|`div + p`          |Selects all `<p>` elements that are placed immediately after `<div>` elements|
+|:first-child       |`p:first-child`  |Selects every `<p>` element that is the first child of its parent|
+|:first-of-type     |`p:first-of-type`|Selects every `<p>` element that is the first `<p>` element of its parent|
+
+* [Play this game](http://flukeout.github.io) to learn CSS (if you haven't already)
+
+
+CSS examples
+============
+```{r echo = FALSE, comment = ''}
+cat_html <- . %>% as.character %>% stringr::str_replace( '.*\\n.*\\n','') %>% cat
+html_snippet <- read_html( '<html><body>
+<div class="outer">
+<div class="inner">
+This is the target
+</div>
+</div>
+</body></html>' )
+html_snippet %>% cat_html
+```
+
+```{r}
+library(rvest)
+html_snippet %>% html_nodes(css='div')
+html_snippet %>% html_nodes(css='div.inner')
+```
+
+***
+
+```{r echo = FALSE, comment = ''}
+html_snippet %>% cat_html
+```
+
+```{r}
+html_snippet %>% html_nodes('div.outer > div.inner')
+html_snippet %>% html_nodes('div.outer > div.inner') %>% html_text()
+html_snippet %>% html_nodes('.inner') %>% html_text()
+```
+
+***
+
+```{r echo = FALSE, comment = ''}
+html_snippet <- read_html( '<html><body>
+<div class="ads">...</div>
+<div class="foo">
+<p>This is the target</p>
+</div>
+<div class="foo">
+<p>This is not the target</p>
+</div>
+</body></html>' )
+html_snippet %>% cat_html
+```
+
+```{r}
+html_snippet %>% html_nodes('div.foo')
+html_snippet %>% html_nodes('div.ads + div.foo > p') %>% html_text()
+```
+
+Tags, attributes, text 
+=======================
+```{r echo=FALSE}
+html_snippet <- read_html('<a href="http://eur.nl">Erasmus</a>') %>% html_nodes('body')
+```
+* `<a href="http://eur.nl">Erasmus</a>` produces this: <a href="http://eur.nl">Erasmus</a>
+* `<a>` is a tag (node) indicating a link should be produced
+```{r}
+html_snippet %>% html_nodes('a')
+```
+* `href="http://eur.nl"` is the attribute determining the link target
+```{r}
+html_snippet %>% html_nodes('a') %>% html_attr('href')
+```
+* `Erasmus` is text embedded in this tag; it is highlighted and clickable
+```{r}
+html_snippet %>% html_nodes('a') %>% html_text()
+```
+
+Task 1
+==========
+
+```{r}
+library(rvest)
+page <- html_session( 'http://www.eur.nl/english/education/phdp/' )
+```
+
+* Complete this code:
+```{r eval = FALSE, tidy=FALSE}
+links <- page %>% html_nodes('[your selector goes here]')
+links
+```
+in order to yield this result:
+
+<div class="font-70">
+```{r echo = FALSE}
+ow <- options()$width
+options(width=200)
+links <- page %>% html_nodes( 'h3+ul>li>a' )
+links
+options(width=ow)
+```
+</div>
+
+Task 2
+=======
+* Complete this code:
+```{r eval = FALSE, tidy=FALSE}
+urls <- links %>% '[your code goes here]'
+schools <- links %>% '[your code goes here]'
+```
+in order to yield this result:
+
+
+<div class="font-90">
+```{r echo = FALSE}
+urls <- links %>% html_attr('href')
+schools <- links %>% html_text
+```
+```{r}
+urls
+schools
+```
+</div>
+
+
+Job browsing demo
+=================
+
+See [URL goes here](url to the thing)
+
+
+More tasks
+=============
+
+Go here.
+
+Platform API's
+==============
+* You are Mark Zuckerberg and you run Facebook
+* I want to build a feature into my mobile app that posts content to my users' Facebook accounts
+* I ask you to set up a web page that my app will use to post content
+* I have 100,000 friends making similar requests, but each with slightly different needs
+* Rather than build a tool for each customer, you build a single tool that everybody can use
+    * API: Application programming interface
+        * Functions that return data or do things
+        * Security model
+    * Sets the rules for how you interact with platforms like Facebook and Twitter
+    
+OAuth
+================
+* Platforms care a lot about security and want to be sure the app trying to post to your wall
+    1. Actually has permission to do so
+    2. Is really the app it says it is
+* **Problem:** allow my app to access your account without allowing...
+    * ...my app to see your password
+    * ...malicious hackers to trick you into giving away your password
+* **Solution:** OAuth 2.0
+
+How OAuth works, at a very high level...
+===================
+1. App asks platform for a request token
+2. Platform provides app a request token and secret
+3. App sends user to platform, user logs in and confirms level of access to be given to app
+4. App sends request token back to platform, receives an access token in return
+5. All future requests to the platform use the access token and are "signed" using the secret
+
+API calls
+===============
+* API calls always include the OAuth access token
+* API call is performed by making a request to a web page on platform's server
+* Response from the platform's web server is text, in a format called JSON (JavaScript Object Notation)
+* JSON is easy for humans to read; easy for computers to parse
+
+***
+
+```
+{  
+   "id":"23462029838",
+   "first_name":"Jason",
+   "last_name":"Roos",
+   "location":{  
+      "id":"10952412900",
+      "name":"Rotterdam, Netherlands"
+   },
+   "friends":{  
+      "data":[  
+         {  
+            "name":"Hammi Hammerschmidt",
+            "id":"5278757"
+         },
+         {  
+            "name":"Davy McDavyface",
+            "id":"72186234457"
+         }
+      ]
+   }
+}
+```
+
+
+API wrappers
+====================
+* Language-specific interfaces that interact with the platform behind-the-scenes
+    * Examples in R: `twitteR` and `Rfacebook`
+* Instead of writing code to send requests to https://api.twitter.com/1.1/search/tweets.json?q=uber we call the `twitteR` function `searchTwitter`
+```{r eval = FALSE}
+library(twitteR)
+setup_twitter_oauth( '[credentials go here]' )
+statuses <- searchTwitter(searchString='#hashtag', n=10, lang='en', resultType='recent' )
+```
+
+* The API wrapper calls the API and converts the JSON response into a language-friendly format (e.g., `data.frame` in R)
+
+```{r echo = FALSE}
+library(twitteR)
+library(purrr)
+load_cached_oath_credentials <- safely( function() {
+  token_env <- new.env()
+  load("../oauth_cache.RData", token_env) 
+  assign("oauth_token", token_env$token, envir=twitteR:::oauth_cache)
+  NULL
+} )
+load_result <- load_cached_oath_credentials()
+if(!is.null(load_result$error)){
+  stop('OAuth credentials need to be cached before this code can run. See "session_3.Rmd" at or near line 455 for instructions.')
+  # Be sure the working directory is set to the root of the 'rook' project, 
+  # then execute the following code, after substituting your consumer_key, 
+  # consumer_secret, access_token, and access_secret into the call to setup_twitter_oauth.
+  #
+  # library(twitteR)
+  # options(httr_oauth_cache=TRUE)
+  # setup_twitter_oauth( consumer_key='asdf',
+  #                    consumer_secret='asdfasdf',
+  #                    access_token='asdf-asdfasdfasdf',
+  #                    access_secret='asdfasdfasdf'
+  # )
+  # token <- get("oauth_token", twitteR:::oauth_cache)
+  # save(token,file="oauth_cache.RData")
+}
+```
+
+***
+
+Basic setup of twitteR calls
+=======================================
+```{r eval = FALSE, tidy = FALSE}
+library(twitteR)
+options(httr_oauth_cache=TRUE)
+setup_twitter_oauth(consumer_key='your key goes here',
+                    consumer_secret='your secret goes here',
+                    access_token='your token goes here',
+                    access_secret='a different secret goes here')
+```
+
+getUser
+========
+
+```{r}
+bc90k <- getUser('battlecobra90k') 
+bc90k$screenName
+bc90k$name %>% cat
+bc90k$description
+bc90k$lastStatus$created
+```
+
+***
+
+```{r}
+botimeline <- userTimeline('barackobama', n=10)
+class(botimeline)
+length(botimeline)
+(tweet_list_to_data_frame <- . %>% plyr::llply(as.data.frame) %>% plyr::ldply(dplyr::bind_rows) %>% tibble::as_data_frame(.))
+```
+
+***
+
+<div class="font-70">
+```{r echo=FALSE}
+ow <- options()$width
+options(width=200)
+```
+```{r message=FALSE}
+library(stringr)
+library(dplyr)
+botimeline %>% tweet_list_to_data_frame %>% mutate( text = str_sub(text,1,32) ) %>% select( text, favoriteCount, retweetCount, created, id )
+```
+```{r echo=FALSE}
+options(width=ow)
+```
+</div>
+
+Task X
+==========
+* Write code to search for something interesting on Twitter
+
+```{r eval = FALSE, tidy = FALSE}
+library(dplyr)
+tweet_list_to_data_frame <- . %>% plyr::llply(as.data.frame) %>% 
+                            plyr::ldply(dplyr::bind_rows) %>% as_data_frame
+
+library(twitteR)
+options(httr_oauth_cache=TRUE)
+setup_twitter_oauth(consumer_key='your key goes here',
+                    consumer_secret='your secret goes here',
+                    access_token='your token goes here',
+                    access_secret='a different secret goes here')
+searchTwitter( '[ your code goes here ]' ) %>% tweet_list_to_data_frame
+```
+
+
+
