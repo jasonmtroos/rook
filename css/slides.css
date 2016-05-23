@@ -152,7 +152,18 @@ html * {
   float: right;
   width:48%;
 }
-
+.reveal .font-80 {
+  font-size: 80%;
+}
+.reveal .font-90 {
+  font-size: 90%;
+}
+.reveal .font-70 {
+  font-size: 70%;
+}
+.reveal .font-60 {
+  font-size: 60%;
+}
 
 .reveal pre {
     display: block;
