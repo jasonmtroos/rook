@@ -572,7 +572,7 @@ options(width=ow)
 ```
 </div>
 
-Task X
+Exercise
 ==========
 * Write code to search for something interesting on Twitter
 
@@ -589,6 +589,31 @@ setup_twitter_oauth(consumer_key='your key goes here',
                     access_secret='a different secret goes here')
 searchTwitter( '[ your code goes here ]' ) %>% tweet_list_to_data_frame
 ```
+
+* Try plotting the results with ggplot2
+
+This week 
+============
+```{r eval = FALSE}
+install.packages('tm',dependencies=TRUE)
+```
+* Read and follow (type along with) this tutorial:
+```{r eval = FALSE}
+vignette('tm',package='tm')
+```
+(or https://cran.r-project.org/web/packages/tm/vignettes/tm.pdf if that doesn't work...)
+* Skim pp 1--7 of [Gonçalves, et al. "A Benchmark Comparison of State-of-the-Practice Sentiment Analysis Methods." arXiv preprint arXiv:1512.01818 (2015). http://arxiv.org/pdf/1512.01818.pdf](http://arxiv.org/pdf/1512.01818.pdf)
+
+This week
+==========
+
+* Create a new repository on github
+* Create a new RStudio project using that repository
+* Create an R Markdown file
+    * Download some interesting data from the web using `rvest` or `twitteR`
+    * Clean up the data using `dplyr` and/or `tidyr`
+    * Visualize the data using `ggplot2`
+* Share the repository with somebody else (and CC: me)
 
 
 
