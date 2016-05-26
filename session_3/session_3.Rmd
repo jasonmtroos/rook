@@ -1,7 +1,7 @@
 ---
 title: "Obtaining data from web sites and social media"
 author: "J.M.T. Roos"
-date: "Last updated 23 May 2016"
+date: "Last updated 25 May 2016"
 autosize: false
 css: "../css/slides.css"
 output: 
@@ -226,7 +226,7 @@ CSS Selectors
 
 |Selector |Example |Example description                                          |
 |---------|--------|-------------------------------------------------------------|
-|.*class*           |`.headline`      |Selects all elements with `class="intro"`|
+|.*class*           |`.headline`      |Selects all elements with `class="headline"`|
 |#*id*              |`#firstname`     |Selects the element with `id="firstname"`|
 |*                  |`*`	          |Selects all elements                     |
 |*element*          |`p`              |Selects all `<p>`                        |
@@ -505,7 +505,7 @@ load_cached_oath_credentials <- safely( function() {
 } )
 load_result <- load_cached_oath_credentials()
 if(!is.null(load_result$error)){
-  stop('OAuth credentials need to be cached before this code can run. See "session_3.Rmd" at or near line 455 for instructions.')
+  stop('OAuth credentials need to be cached before this code can run. See "session_3.Rmd" at or near line 509 for instructions.')
   # Be sure the working directory is set to the root of the 'rook' project, 
   # then execute the following code, after substituting your consumer_key, 
   # consumer_secret, access_token, and access_secret into the call to setup_twitter_oauth.
