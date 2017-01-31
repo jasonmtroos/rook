@@ -458,7 +458,7 @@ More about git
 * My goal for this course is that everything we do with git can be performed via RStudio's interface
 * There is much, much, much more that git can do:
     + Merging changes made by multiple collaborators
-    + Creating different versions of the same code based for different purposes
+    + Creating different versions of the same code for different purposes
     + Committing changes to experimental code without affecting the main code base
     + Creating a snapshot that records what your code looked like at the point you submit a manuscript
 * If you want to know more about git, check out [GitHub's list of resources for learning git and GitHub](https://help.github.com/articles/good-resources-for-learning-git-and-github/)
