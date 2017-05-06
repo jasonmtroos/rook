@@ -103,6 +103,12 @@ html * {
   font-size: 1.7em;
   color: #EB3454;
 }
+h1.title {
+  color: #857F03;
+}
+h1.subtitle {
+  font-size: 1.5em;
+}
 .reveal h2 {
   font-family: "Avenir Next", "sans-serif";
   text-transform: none;
@@ -143,6 +149,9 @@ html * {
 
 .center {
   text-align: center;
+}
+.fullwidth {
+  width:100%;
 }
 .left {
   float: left;
