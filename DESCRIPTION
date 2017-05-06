@@ -1,0 +1,18 @@
+Package: rook
+Title: Introduction to Data Visualization, Web Scraping, and Text Analysis in R
+Version: 0.0.0.9000
+Authors@R: person("Jason", "Roos", email = "my.last.name@rsm.nl", role = c("aut", "cre"))
+Description: Slides and in-class materials for this course.
+Depends:
+    R (>= 3.3.2)
+Imports:
+    devtools, 
+    tidyverse,
+    rmarkdown,
+    knitr
+Suggests:
+    roxygen2
+License: What license is it under?
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 6.0.1
