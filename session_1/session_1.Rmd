@@ -1,10 +1,14 @@
 ---
-title: "Setting up git and RStudio"
+title: "`r rook::course_title()`"
+subtitle: "Session 1: Getting your development environment in order"
 author: "J.M.T. Roos"
-date: "Last updated 7 May 2016"
+date: 'Last updated: `r lubridate::now()`'
 autosize: false
 css: "../css/slides.css"
 output: 
+  html_document: 
+    theme: paper
+    highlight: pygments
   revealjs::revealjs_presentation:
     self_contained: true
     theme: simple
@@ -27,7 +31,9 @@ output:
 ```{r echo=FALSE, include=FALSE, eval=FALSE}
 cat(knitr::knit_theme$get('solarized-light')$highlight)
 ```
-```{r echo=FALSE, include=FALSE}
+```{r echo=FALSE, include=FALSE, cache = FALSE}
+library(knitr)
+library(rook)
 knitr::opts_chunk$set(tidy = TRUE, tidy.opts=list(blank=FALSE, width.cutoff=50), cache=TRUE)
 knitr::knit_hooks$set(
 source = function(x,options){
@@ -251,9 +257,12 @@ Make a change to your R Markdown file
 
 * Change the boilerplate text in the R Markdown file you just created by inserting `This is my first markdown file.` above `## R Markdown`
 
+~~~
 ```{r echo=FALSE, comment=''}
-cat( '```{r setup, include=FALSE}\nknitr::opts_chunk$set(echo = TRUE)\n```\n\nThis is my first markdown file.\n\n## R Markdown\n\nThis is an R Markdown document. Markdown...\n')
+asis_output( '```{r setup, include=FALSE}\nknitr::opts_chunk$set(echo = TRUE)\n```\n\nThis is my first markdown file.\n\n## R Markdown\n\nThis is an R Markdown document. Markdown...\n')
 ```
+~~~
+
 * Save your changes by selecting **File > Save**
 * Click on **Knit** again to see how your file has changed
 
@@ -300,48 +309,39 @@ What you've done so far
 
 What's next
 ======================================
-* Install a few packages in R
+* Verify you previously installed required R packages
 * Edit your R Markdown file so that it does something useful
 * Get used to keeping track of files using git
 * Understand how git, R, RStudio, and R Markdown can help you become a more organized and efficient researcher
 
 Installing packages
 ====================
-* Install the `readr` package by typing the following command in the **Console** window
-
-```{r eval=FALSE}
-install.packages('readr', dependencies=TRUE)
-```
-
-* If the package has been loaded successfully, you should be able to execute the following command without producing an error
+* You should have already installed a number of packages as part of the pre-work. 
+* Check to see if the following code generates an error:
 
 ```{r}
-library(readr)
+library('tidyverse')
 ```
 
-A few more packages
-===================
-* Install the following packages
-
-```{r eval=FALSE, echo=FALSE}
-#packages_to_load <- c('devtools', 'dplyr', 'foreign', 'ggplot2', 'Hmisc', 'httr', 'jsonlite', 'lubridate', 'magrittr', 'plyr', 'RColorBrewer', 'RCurl', 'readxl', 'reshape2', 'rvest', 'scales', 'stringr', 'tidyr', 'tm', 'twitteR', 'xml2')
+* If you get an error, then run this now:
+    
+```{r eval = FALSE}
+install.packages('tidyverse', dependencies = TRUE)
 ```
 
-```{r eval=FALSE}
-packages_to_install <- c('ggplot2', 'RColorBrewer','Hmisc')
-install.packages( packages_to_install, dependencies = TRUE )
-```
+* And re-read the pre-work assignment **carefully**
 
-* If any of these fail to install, make a note of which ones and let me know
 
 Edit your R Markdown file
 =========================
 
 * Delete everything that comes *after* the following lines of code
 
-```{r echo=FALSE, comment=''}
-cat( '```{r setup, include=FALSE}\nknitr::opts_chunk$set(echo = TRUE)\n```\n\n[Deleted from this point forward]\n')
+~~~
+```{r echo = FALSE, comment = ''}
+asis_output('```{r setup, include=FALSE}\nknitr::opts_chunk$set(echo = TRUE)\n```\n\n[Deleted from this point forward]\n')
 ```
+~~~
 
 * We will now do something useful with this file...
 * Edit your file to include the code in the following slides
@@ -378,9 +378,11 @@ Plot the data
 
 * Add this code to your R Markdown file
 
+~~~
 ```{r echo=FALSE, comment=''}
-cat( "Plot the data by subject\n```{r}\nlibrary(ggplot2)\nggplot(sleep, aes(x = Days, y = Reaction)) +\n  geom_point() +\n  geom_smooth() +\n  scale_x_continuous(breaks = seq(0,8,by=2)) +\n  facet_wrap(~Subject)\n```" )
+asis_output("Plot the data by subject\n```{r}\nlibrary(ggplot2)\nggplot(sleep, aes(x = Days, y = Reaction)) +\n  geom_point() +\n  geom_smooth() +\n  scale_x_continuous(breaks = seq(0, 8, by = 2)) +\n  facet_wrap(~ Subject)\n```")
 ```
+~~~
 
 * Click on **Knit**
 
@@ -391,24 +393,22 @@ cat( "Plot the data by subject\n```{r}\nlibrary(ggplot2)\nggplot(sleep, aes(x = 
 
 Group and summarise
 ===========================
-* First, install the `dplyr` package
-
-```{r eval=FALSE}
-install.packages('dplyr',dependencies=TRUE)
-```
 
 * Next, add this code to your R Markdown file
 
+~~~
 ```{r echo=FALSE, comment=''}
-cat( "Summary statistics by subject\n```{r}\nlibrary(dplyr)\nsleep %>%\n  group_by(Subject) %>%\n  summarise(mean(Reaction))\n```" )
+asis_output("Summary statistics by subject\n\n```{r}\nlibrary(dplyr)\nsleep %>%\n  group_by(Subject) %>%\n  summarise(mean(Reaction))\n```")
 ```
+~~~
 
 ***
 
+~~~
 ```{r echo=FALSE, comment=''}
-cat( "Mean-center reaction times and plot on a single axis\n```{r}\nsleep %>%\n  group_by(Subject) %>%\n  mutate(mean_centered_reaction = Reaction - mean(Reaction)) %>%\n  ggplot(aes(x = Days, y = mean_centered_reaction,\n      colour = factor(Subject))) + \n    geom_smooth(show.legend = FALSE, se = FALSE) +\n    scale_x_continuous(breaks = seq(0, 8, by = 2))\n```" )
+asis_output("Mean-center reaction times and plot on a single axis\n\n```{r}\nsleep %>%\n  group_by(Subject) %>%\n  mutate(mean_centered_reaction = Reaction - mean(Reaction)) %>%\n  ggplot(aes(x = Days, y = mean_centered_reaction,\n      colour = factor(Subject))) + \n    geom_smooth(show.legend = FALSE, se = FALSE) +\n    scale_x_continuous(breaks = seq(0, 8, by = 2))\n```")
 ```
-
+~~~
 
 Commit your changes and push them to GitHub
 =========================================
@@ -483,9 +483,11 @@ R Markdown example
 This is the code I used to generate the preceding slide.
 
 <div style="height:490;">
+~~~
 ```{r echo=FALSE, comment = ''}
-cat("More about R Markdown\n=====================\n* Based on the idea of *literate programming*\n* Simple rules for formatting text as HTML (or PDF via latex)\n* Code can be inserted inline with other text using special\n  delimiters\n* When compiling the markdown file, the code is executed and\n  results are inserted into the final HTML file\n\n```{r}\n5 * 10 + 2\n```\n\nLike so.\n")
+asis_output("More about R Markdown\n=====================\n* Based on the idea of *literate programming*\n* Simple rules for formatting text as HTML (or PDF via latex)\n* Code can be inserted inline with other text using special\n  delimiters\n* When compiling the markdown file, the code is executed and\n  results are inserted into the final HTML file\n\n```{r}\n5 * 10 + 2\n```\n\nLike so.\n")
 ```
+~~~
 </div>
 
 More about R Markdown
@@ -496,9 +498,15 @@ More about R Markdown
 * RStudio has [an entire site](http://rmarkdown.rstudio.com) dedicated to the R Markdown file format, which you should visit and read this week
 
 
-What you need to do this week
+```{r echo = FALSE}
+if(program() == 'egsh') {
+  asis_output('What you need to do this week')
+} else if(program() == 'erim') {
+  asis_output('What you need to do during the break and/or this week') 
+}
+```
 =============================
-1. Get your R environment in order (see next slide)
+1. Ensure your R environment is in order (see next slide)
 2. Get familiar with R Markdown (**mandatory**) and git (*optional*) -- see previous slides for links
 3. Follow the [R tutorials](http://www.jasonmtroos.com/assets/media/teaching/course_assignments_and_data.zip) I developed for my Marketing Analytics MSc course
     * Assignment 1 -- learning R (**mandatory** if you are lost right now, otherwise optional)
@@ -507,24 +515,29 @@ What you need to do this week
     * Assignment 4 -- more ggplot2 and dplyr (**mandatory**)
         * If you want more ggplot2 material, check out [Chapter 3 of R for Data Science](http://r4ds.had.co.nz/data-visualisation.html)
         * If you want more dplyr material, check out [Chapter 4 of R for Data Science](http://r4ds.had.co.nz/transform.html)
-4. Email me with questions: roos@rsm.nl
+4. Email me with questions: [roos@rsm.nl](mailto:roos@rsm.nl)
 
 
 
 Get your R environment in order
 ===============================
 
-```{r eval=FALSE, tidy=FALSE}
-these_packages <- c('devtools', 'dplyr', 'foreign', 'ggplot2',
-                    'Hmisc', 'httr', 'jsonlite', 'lubridate', 
-                    'magrittr', 'plyr', 'RColorBrewer', 'RCurl', 
-                    'readxl', 'reshape2', 'rvest', 'scales', 
-                    'stringr', 'tidyr', 'tm', 'twitteR', 'xml2')
-install.packages(these_packages, dependencies = TRUE)
+```{r eval = FALSE}
+install.packages('devtools', dependencies = TRUE)
+install.packages('tidyverse', dependencies = TRUE)
+install.pacakges('Hmisc', dependencies = TRUE)
+install.packages('tm', dependencies = TRUE)
+install.pacakges('twitteR', dependencies = TRUE)
+install.pacakges('topicmodels', dependencies = TRUE)
 ```
 
-* Windows users might need to install **RTools**, which provides the necessary toolchain for compiling R packages from source code
+* Windows users will need to install **RTools**, which provides the necessary toolchain for compiling R packages from source code
     * See (https://CRAN.R-project.org/bin/windows/Rtools/) choosing the default "Package authoring installation" during installation
+    
+```{r eval = FALSE}
+devtools::setup_rtools()
+```
+
 
 
 A few things in R you should know
@@ -553,6 +566,8 @@ my_func(2,3)
 ```
 </div>
 
+<!--
+
 These slides
 ============
 * Create a new project from source control using `https://github.com/jasonmtroos/rook.git`
@@ -576,4 +591,7 @@ devtools::install_github('rstudio/revealjs')
 cd git_workspace/rook
 git pull
 ```
+
+-->
+
 

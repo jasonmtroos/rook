@@ -1,17 +1,22 @@
 ---
-title: "In-class Work"
+title: "`r rook::course_title()`: Session 2"
+subtitle: "In-class Work"
 author: "J.M.T. Roos"
-date: "Last updated 17 May 2016"
+date: 'Last updated: `r lubridate::now()`'
 output: 
-  html_document: default
-  pdf_document: 
-    latex_engine: xelatex
+  html_document: 
+    theme: paper
+    highlight: pygments
+knitr:
+  cache: 1
+  echo: true
+  tidy: true
 ---
 
 
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, tidy = TRUE, cache = TRUE, tidy.opts=list(blank=FALSE, width.cutoff=60))
+```{r setup, include = FALSE, cache = FALSE}
+knitr::opts_chunk$set(echo = TRUE, tidy = TRUE, cache = 1, tidy.opts=list(blank=FALSE, width.cutoff=60))
 ```
 
 Excercise set 1
@@ -20,8 +25,7 @@ Excercise set 1
 For Tasks 1--4 use the following data
 
 ```{r}
-library(dplyr)
-library(ggplot2)
+library(tidyverse)
 mpg %>% tbl_df
 ```
 
@@ -35,7 +39,7 @@ mpg %>% tbl_df
         * default stat and position for `point`
 
 
-```{r echo=FALSE, eval=FALSE}
+```{r echo = FALSE, eval = FALSE}
 ggplot(mpg, aes(x = displ, y = hwy, colour = class)) + geom_point()
 ```
 
@@ -57,7 +61,9 @@ ggplot(mpg, aes(x = displ, y = hwy, colour = class)) + geom_point()
 
 
 ```{r echo=FALSE, eval=FALSE}
-ggplot(mpg, aes(x = displ, y = hwy)) + geom_point(colour='red') + geom_smooth()
+ggplot(mpg, aes(x = displ, y = hwy)) + 
+  geom_point(colour = 'red') + 
+  geom_smooth()
 ```
 
 ## Task 3
@@ -76,8 +82,10 @@ ggplot(mpg, aes(x = displ, y = hwy)) + geom_point(colour='red') + geom_smooth()
     * pass in `se=FALSE` to suppress confidence bands
 
 
-```{r echo=FALSE, eval=FALSE}
-ggplot(mpg, aes(x = displ, y = hwy, colour=drv)) + geom_point() + geom_smooth(method="lm", se=FALSE)
+```{r echo = FALSE, eval = FALSE}
+ggplot(mpg, aes(x = displ, y = hwy, colour = drv)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE)
 ```
 
 ## Task 4
@@ -94,11 +102,11 @@ ggplot(mpg, aes(x = displ, y = hwy, colour=drv)) + geom_point() + geom_smooth(me
     * default stat and position
 
 
-```{r echo=FALSE, eval=FALSE}
+```{r echo = FALSE, eval = FALSE}
 #wrong
-ggplot(mpg, aes(x = displ, y = hwy, colour=cyl)) + geom_point() + geom_smooth()
+ggplot(mpg, aes(x = displ, y = hwy, colour = cyl)) + geom_point() + geom_smooth()
 #right
-ggplot(mpg, aes(x = displ, y = hwy, colour=factor(cyl))) + geom_point() + geom_smooth()
+ggplot(mpg, aes(x = displ, y = hwy, colour = factor(cyl))) + geom_point() + geom_smooth()
 ```
 
 
@@ -108,8 +116,7 @@ Exercise set 2
 For Task 5, use the following data
 
 ```{r}
-library(dplyr)
-library(ggplot2)
+library(tidyverse)
 mpg %>% tbl_df
 ```
 
@@ -118,7 +125,9 @@ mpg %>% tbl_df
 * Starting with the following plot:
 
 ```{r}
-ggplot(mpg, aes( x = displ, y = hwy, colour = factor(cyl))) + geom_point() + geom_smooth(method="lm",se=FALSE)
+ggplot(mpg, aes(x = displ, y = hwy, colour = factor(cyl))) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE)
 ```
 
 * Add code to do the following:
@@ -135,7 +144,15 @@ ggplot(mpg, aes( x = displ, y = hwy, colour = factor(cyl))) + geom_point() + geo
 * The resulting plot looks like this:
 
 ```{r echo = FALSE}
-ggplot(mpg, aes( x = displ, y = hwy, colour = factor(cyl))) + geom_point() + geom_smooth(method="lm",se=FALSE) + scale_x_log10(breaks=2:7) + scale_y_log10(breaks=c(20,30,40)) + facet_wrap(~year, labeller = as_labeller(c('1999' = 'Model year 1999', '2008' = 'Model year 2008'))) + labs( x = 'Displacement', y = 'MPG, highway', colour = 'Cylinders', title = 'Fuel economy and engine size' )
+ggplot(mpg, aes(x = displ, y = hwy, colour = factor(cyl))) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  scale_x_log10(breaks = 2:7) +
+  scale_y_log10(breaks = c(20, 30, 40)) +
+  facet_wrap( ~ year, labeller = as_labeller(c('1999' = 'Model year 1999',
+                                               '2008' = 'Model year 2008'))) +
+  labs(x = 'Displacement', y = 'MPG, highway',
+       colour = 'Cylinders', title = 'Fuel economy and engine size')
 ```
 
 
@@ -147,8 +164,7 @@ Exercise set 3
 For tasks 6--11, use the following data:
 
 ```{r}
-library(dplyr)
-library(tidyr)
+library(tidyverse)
 data(mpg, package = 'ggplot2')
 mpg %>% tbl_df
 ```
@@ -262,8 +278,7 @@ install.packages('nycflights13')
 * Load these packages
 
 ```{r}
-library(dplyr)
-library(ggplot2)
+library(tidyverse)
 library(nycflights13)
 flights %>% tbl_df
 airlines %>% tbl_df
@@ -299,7 +314,11 @@ flights2 %>% left_join( weather2 )
 * Which airlines have the worst departure delays when conditions are ideal? First, we need to know what it means for conditions to be ideal. Precipition and high winds are bad, so we need to know their minimum values. Visibility is good, so we need to know its maximum value. In the code that follows, `na.rm=TRUE` allows us to ignore any weather data where one of these variables might be missing (i.e., `NA`). You can execute this code or just look at mine:
 
 ```{r}
-weather2 %>% summarise(min_precip = min(precip,na.rm=TRUE), min_wind = min(wind_speed,na.rm=TRUE),max_visib = max(visib,na.rm=TRUE))
+weather2 %>%
+  summarise(min_precip = min(precip, na.rm = TRUE),
+            min_wind = min(wind_speed, na.rm = TRUE),
+            max_visib = max(visib, na.rm = TRUE)
+            )
 ```
 
 * Now write code to create a new data frame based on `flights2` joined with `weather2`
@@ -357,9 +376,7 @@ ranked_airline_labels <- avg_good_weather_delays %>% transmute( carrier, name = 
 ## Solutions
 
 ```{r eval = FALSE, tidy = TRUE, tidy.opts=list(blank = FALSE, cutoff.width = 50)}
-library(dplyr)
-library(tidyr)
-library(ggplot2)
+library(tidyverse)
 library(nycflights13)
 
 ## Task 1

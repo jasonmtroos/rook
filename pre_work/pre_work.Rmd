@@ -1,26 +1,36 @@
 ---
-title: 'Big data analysis and visualisation: Pre-work'
+title: "`r rook::course_title()`: Pre-work"
 author: "J.M.T. Roos"
-date: "25 April 2016"
-output: html_document
+date: 'Last updated: `r lubridate::now()`'
+output: 
+  html_document: 
+    theme: paper
+    highlight: pygments
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(rook)
 ```
 
-Welcome to the [Big data analysis and visualisation course](http://www.egs3h.eur.nl/doctoral-education/phd-course-guide/methodology-courses-and-philosophy-of-science/big-data-analysis-and-visualisation/) offered by the EGS3H. Because we have more material to cover than we have time together, you will need to do a few things before our first meeting.
+Welcome to the `r rook::course_title()` course offered by `r toupper(program())`. Because we have more material to cover than we have time together, you will need to do a few things before our first meeting.
 
 ## Familiarity with R
 
-You should already be *familiar*  with [R programming language](https://www.r-project.org/) (i.e., you do not need to be *proficient* [yet], but you should have had some experience with R in the past). Please see [this page I put together](http://www.jasonmtroos.com/learning-r/) for a list of resources that will help you gain experience using R. 
+You should already be *familiar*  with [R programming language](https://www.r-project.org/) (i.e., you do not need to be *fully proficient* [yet], but you should have had some experience with R in the past). Please see [this page I put together](http://www.jasonmtroos.com/learning-r/) for a list of resources that will help you gain experience using R. 
 
-In particular, you should follow [this tutorial I created for my Marketing Analytics course](http://www.jasonmtroos.com/assets/media/teaching/assignment_1.pdf) prior to the first session.
+If you have limited experience with R, you should, at a minimum, follow [this tutorial I created for my Marketing Analytics course](http://www.jasonmtroos.com/assets/media/teaching/assignment_1.pdf) prior to the first session. But for you to gain the most from this course, you should be actively learning to write code in R on a regular basis.
 
 
 ## Software
 
-You need to have the following two programs installed on whichever laptop you will bring to the course sessions: [git](https://git-scm.com), and [RStudio](https://www.rstudio.com).
+You need to have the following programs installed on whichever laptop you will bring to the course sessions: 
+
+- [git](https://git-scm.com)
+- [R](https://cloud.r-project.org/)   
+- [RTools](https://cran.r-project.org/bin/windows/Rtools/) (Windows only) 
+- [RStudio](https://www.rstudio.com)
+
 
 #### Git
 
@@ -29,20 +39,72 @@ Git is a program for keeping track of changes you make to your code over time.
 Install git on your computer if you do not already have it. You can download git from https://git-scm.com/downloads and find detailed installation instructions at [https://git-scm.com/book/en/v2/Getting-Started-Installing-Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git). 
 
 
-#### RStudio
+#### R and RStudio
 
 RStudio provides an integrated development environment (IDE) for writing and executing scripts written in R.
 
-Install RStudio on your computer if you do not already have it. You can download RStudio from [https://www.rstudio.com/products/rstudio/download/](https://www.rstudio.com/products/rstudio/download/). 
+Install R on your computer if you do not already have it installed. You can download R from [https://cloud.r-project.org/](https://cloud.r-project.org/). If you are working on a Windows computer, you should also install [RTools](https://cran.r-project.org/bin/windows/Rtools/).
 
-Please note the following: 
+If you have an older version of R on your computer, now is a good time to upgrade to the latest version. As of the time of writing, the current version of R is `r rversions::r_release()$version`. To see the version on your computer, execute the following code in the R Console (or R Studio if already installed):
 
-* RStudio offers both commercial and free versions; you should install the free version
-* Installing RStudio also installs R on your computer, so should not be a need to install R if it is not already installed. If you already have R installed on your computer, you might want to update it to the latest version before installing RStudio 
+```{r eval = FALSE}
+version$version.string
+```
+
+
+Install RStudio on your computer if you do not already have it. You can download RStudio from [https://www.rstudio.com/products/rstudio/download/](https://www.rstudio.com/products/rstudio/download/). Note that RStudio offers both commercial and free versions; you should install the free version.
+
+
+**Note:** Jason is running  `r paste(unlist(R.version[c('version.string', 'nickname')]), collapse = " ")` and RStudio `r rstudioapi::getVersion()` at the time of writing.
+
+
+
+#### R Packages
+
+Open an R console and execute the following:
+```{r eval = FALSE}
+install.packages('devtools', dependencies = TRUE)
+install.packages('tidyverse', dependencies = TRUE)
+install.pacakges('Hmisc', dependencies = TRUE)
+install.packages('tm', dependencies = TRUE)
+install.pacakges('twitteR', dependencies = TRUE)
+install.pacakges('topicmodels', dependencies = TRUE)
+```
+
+Windows users will want to execute the following R code *after* they have installed the `devtools` package and installed RTools. Open RStudio and type the following into the R Console, then hit Enter.
+
+```{r eval = FALSE}
+devtools::setup_rtools()
+```
+
+OS X users may need to install the XCode command-line tool chain, by opening a Terminal window can executing the following command:
+
+```{r engine = 'bash', eval = FALSE}
+xcode-select --install
+```
+
+
 
 ## GitHub account
 
 We will use [GitHub](https://github.com/) to share code and data. Please sign up for an account at https://github.com/ if you do not already have one.
 
+After you have created a GitHub account, you need to do a little bit of configuration:
+
+* Start a new **terminal** (OS X) or **bash** (Linux) or **git-bash** (Windows) session
+* Execute the following commands, substituting your information
+* **Note:** Use the email address associated with your **GitHub** account
+
+```{r engine='bash', eval=FALSE, highlight=TRUE}
+git config --global user.name "Jane Doe"
+git config --global user.email "janedoe@example.com"
+```
+
+* OS X users might need to issue the following commands as well
+
+```{r engine='bash', eval=FALSE, highlight=TRUE}
+git credential-osxkeychain
+git config --global credential.helper osxkeychain
+```
 
 

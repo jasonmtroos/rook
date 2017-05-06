@@ -1,10 +1,13 @@
 ---
-title: "Course overview"
+title: "`r rook::course_title()`: Course overview"
 author: "J.M.T. Roos"
-date: "Last updated 4 May 2016"
+date: 'Last updated: `r lubridate::now()`'
 autosize: false
 css: "../css/slides.css"
 output: 
+  html_document: 
+    theme: paper
+    highlight: pygments
   revealjs::revealjs_presentation:
     theme: simple
     highlight: NULL
@@ -19,11 +22,18 @@ output:
       "--variable", "transitionSpeed=normal",
       "--variable", "viewDistance=5"
       ]
+knitr:
+  cache: 0
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+```{r setup, include = FALSE, cache = FALSE}
+library(knitr)
+opts_chunk$set(echo = FALSE, message = FALSE, cache = FALSE)
+library(rook)
+library(tidyverse)
+library(lubridate)
 ```
+
 
 Course abstract
 ===============
@@ -42,9 +52,16 @@ Objectives
 
 Course structure
 =================
-* Next four Wednesdays from 13.00 -- 17.00
-* Different room each week ([see this page for details](http://www.egs3h.eur.nl/doctoral-education/phd-course-guide/methodology-courses-and-philosophy-of-science/big-data-analysis-and-visualisation/))
-* Sessions include a mix of lectures, demonstrations, and/or in-class exercises
+
+```{r}
+if(program() == 'egsh') {
+  asis_output("
+* Next four Mondays from 13.30--16.30
+* Room may not be the same each week ([see this page for details](https://www.egsh.eur.nl/doctoral-education/phd-course-guide/methodology-courses-and-philosophy-of-science/big-data-analysis-and-visualisation/))
+")
+  }
+```
+* Sessions include a mix of lectures, demonstrations, and in-class exercises
 * Bring your laptop to every session
     + You **must** have the necessary rights to install software on your laptop
 * Ideally, you will work with data sets relevant to your research:
@@ -52,6 +69,9 @@ Course structure
     + I will supply data sets as well
 
 
+```{r}
+if(program() == 'egsh') {
+  asis_output("
 Unlocking achievements
 ======================
 * Attend every session (there will be a sign-in sheet)
@@ -60,10 +80,12 @@ Unlocking achievements
     + 17.5 hours per week, including time in class
     + With 4 hours in class each week, 2.5 ECTS implies **13.5 hours per week of work on your own**
 * Learning new programming skills takes time, so if you want to get something from this course, 13.5 hours per week represents the **minimum level of effort**
+  ")
+}
+```
 
-
-Today's session
-=====
+This session
+===================================================
 ## Course overview and first steps with R
 
 * You will create, edit, and compile an R-markdown file that contains both a free text discussion of your data analysis, your code, and any output from that code (including plots).
@@ -72,8 +94,7 @@ Today's session
 
 Session 2: Acquiring, preparing, and visualizing data
 ====================================================
-## 18 May, 13.00 -- 17.00, Mandeville T18--22
-
+## `r print_session_info(2)`
 
 * You will learn how to write code to acquire data from files located on the web or stored on your local computer, load them into R, and “clean” the data in preparation for further analysis (such as data visualization). 
 
@@ -83,7 +104,7 @@ Session 2: Acquiring, preparing, and visualizing data
 
 Session 3: Obtaining data from web sites and social media
 ===================================================
-## 25 May, 13.00 -- 17.00, Mandeville T5--85
+## `r print_session_info(3)`
 
 * You will learn how to acquire data from various online sources, such as web pages and the Twitter API, and how to automation these procedures. 
 
@@ -91,14 +112,14 @@ Session 3: Obtaining data from web sites and social media
 
 Session 4: Text and sentiment analysis
 ====================================================
-## 1 June, 13.00 -- 17.00, Mandeville T18--42
+## `r print_session_info(4)`
 
 * You will learn how to process large amounts of unstructured data (e.g. text documents) to extract important features (e.g., the occurrence of special words).
 
 * You will also learn how to conduct automatic sentiment analysis (scoring text based its positivity or negativity).
 
 Introductions
-=============
+====================================================
 * Who are you? Which degree program are you in?
 * What do you hope to get out of this course?
 * Is there a specific data set you need to obtain and/or analyze?

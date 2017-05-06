@@ -1,10 +1,14 @@
 ---
-title: "Acquiring, preparing, and visualizing data"
+title: "`r rook::course_title()`: Session 2"
+subtitle: "Acquiring, preparing, and visualizing data"
 author: "J.M.T. Roos"
-date: "Last updated 17 May 2016"
+date: 'Last updated: `r lubridate::now()`'
 autosize: false
 css: "../css/slides.css"
 output: 
+  html_document: 
+    theme: paper
+    highlight: pygments
   revealjs::revealjs_presentation:
     self_contained: true
     theme: simple
@@ -20,27 +24,41 @@ output:
       "--variable", "transitionSpeed=default",
       "--variable", "viewDistance=5"
       ]
+knitr:
+  cache: 1
 ---
 
 
 
-```{r echo=FALSE, include=FALSE}
-knitr::opts_chunk$set(tidy = TRUE, tidy.opts=list(blank=FALSE, width.cutoff=50), cache=TRUE)
+```{r echo = FALSE, include = FALSE, cache = FALSE}
+knitr::opts_chunk$set(
+  tidy = TRUE,
+  tidy.opts = list(blank = FALSE, width.cutoff = 50),
+  cache = 1
+)
 knitr::knit_hooks$set(
-source = function(x,options){
-  if( options$engine == 'R' ) {
-    # format R code
-    x = highr::hilight( x, format = 'html' )
-  } else if( options$engine == 'bash' ) {
-    # format bash code
-    x = paste0( '<span class="hl std">$</span> ', unlist( stringr::str_split( x, '\\n' ) ), '\n', collapse = '' )
+  source = function(x, options) {
+    if (options$engine == 'R') {
+      # format R code
+      x = highr::hilight(x, format = 'html')
+    } else if (options$engine == 'bash') {
+      # format bash code
+      x = paste0('<span class="hl std">$</span> ',
+                 unlist(stringr::str_split(x, '\\n')),
+                 '\n',
+                 collapse = '')
+    }
+    x = paste(x, collapse = "\n")
+    sprintf(
+      "<div class=\"%s\"><pre class=\"%s %s\"><code class=\"%s %s\">%s</code></pre></div>\n",
+      'sourceCode',
+      'sourceCode',
+      tolower(options$engine),
+      'sourceCode',
+      tolower(options$engine),
+      x
+    )
   }
-  # for (i in names(options)) {
-  #   message( paste( i, options[[i]] ) )
-  # }
-  x = paste(x, collapse = "\n")
-  sprintf("<div class=\"%s\"><pre class=\"%s %s\"><code class=\"%s %s\">%s</code></pre></div>\n", 'sourceCode', 'sourceCode', tolower(options$engine), 'sourceCode', tolower(options$engine), x)
-}
 )
 ```
 
@@ -54,20 +72,45 @@ Review
     * Reviewing/learning the R programming language
     * Installing packages
 
-```{r echo=FALSE, message=FALSE}
-library(tidyr)
-library(dplyr)
-library(reshape2)
-library(ggplot2)
+```{r echo = FALSE, message = FALSE, cache = FALSE}
+library(tidyverse)
+library(stringr)
 ```
 
 ```{r echo=FALSE}
 test_data <- NULL
-local( {
-  relabel_factors <- function( z ) { eval(parse(text=paste0('c(',paste0(z,1:4,'=',1:4,collapse = ','),')') )) }
-
-  test_data <<- datasets::anscombe %>% melt(id.vars=paste0('y',1:4), value.name = 'num.correct', variable.name = 'x') %>% tbl_df %>% melt(id.vars = c('x','num.correct'), value.name = 'duration', variable.name = 'y') %>% tbl_df %>% mutate( x = plyr::revalue(x,relabel_factors('x')),  y = plyr::revalue(y,relabel_factors('y'))) %>% filter( x == y ) %>% group_by( x ) %>% mutate( respondent = factor(1:n()) ) %>% select( round = x, respondent, num.correct, duration ) %>% ungroup
-} )
+local({
+  relabel_factors <-
+    function(z) {
+      eval(parse(text = paste0(
+        'c(', paste0(z, 1:4, '=', 1:4, collapse = ','), ')'
+      )))
+    }
+  
+  test_data <<-
+    datasets::anscombe %>% 
+    reshape2::melt(
+      id.vars = paste0('y', 1:4),
+      value.name = 'num.correct',
+      variable.name = 'x'
+    ) %>% 
+    tbl_df %>% 
+    reshape2::melt(
+      id.vars = c('x', 'num.correct'),
+      value.name = 'duration',
+      variable.name = 'y'
+    ) %>% 
+    tbl_df %>% 
+    mutate(
+      x = plyr::revalue(x, relabel_factors('x')),
+      y = plyr::revalue(y, relabel_factors('y'))
+    ) %>% 
+    filter(x == y) %>% 
+    group_by(x) %>% 
+    mutate(respondent = factor(1:n())) %>% 
+    select(round = x, respondent, num.correct, duration) %>% 
+    ungroup
+})
 ```
 
 
@@ -75,6 +118,25 @@ Applied problem: Merging samples
 =================================
 Repeated measures for 11 individuals, mean (sd)
 
+```{r echo = FALSE}
+test_data %>%
+  group_by(Round = round, stat = 'mean') %>%
+  summarise(Duration = round(mean(duration), 1),
+            `Number Correct` = mean(num.correct)) %>%
+  bind_rows(test_data %>%
+              group_by(Round = round, stat = 'sd') %>%
+              summarise(Duration = round(sd(duration), 1),
+                        `Number Correct` = round(sd(num.correct), 1))) %>%
+  mutate_at(vars(Duration, `Number Correct`), funs(ifelse(stat == 'sd', paste0('(', format(.), ')'), format(.)))) %>%
+  ungroup %>%
+  arrange(Round, stat) %>% 
+  mutate(Round = ifelse(stat == 'mean', format(Round), '')) %>% 
+  select(-stat) %>%
+  pander::pander() %>%
+  asis_output
+```
+
+<!--
 |Round |Duration |Number Correct |
 |:----:|:-------:|:----------:|
 |1     |7.5      |9.0         |
@@ -85,20 +147,50 @@ Repeated measures for 11 individuals, mean (sd)
 |      |(2.0)    |(3.3)       |
 |4     |7.5      |9.0         |
 |      |(2.0)    |(3.3)       |
+-->
+
+Applied problem: Merging samples
+=================================
+
+Regression of `Duration` on `Number Correct` repeated for each round
 
 
-Regression of `duration` on `num.correct` ($\times$ 4)
+```{r echo = FALSE}
+test_data %>%
+  plyr::ddply(.variables = 'round', .fun = function(d) {
+    lm(duration ~ num.correct, data = d) %>%
+      broom::tidy()
+  }) %>%
+  mutate_at(vars(-round, -term), funs(format(round(., 2)))) %>%
+  select(-statistic, -p.value) %>%
+  mutate(round = ifelse(term == 'num.correct', '', round)) %>%
+  rename(Round = round, Term = term, Estimate = estimate, `SE` = std.error) %>%
+  pander::pander(justify = 'clrr')
+```
+
+
+<!--
 
 |Variable  |Estimate|SE|
 |:---------|-------:|-:|            
 |Intercept  | 3.00   |  1.12   |
 |num.correct| 0.50|   0.12   |
 
+-->
+
+```{r echo = FALSE}
+if (str_detect(opts_current$get()$fig.path, 'handout'))
+  asis_output('\n<!--\n')
+```
+
 ***
 
 <div class='center'>
 ```{r echo=FALSE}
-test_data %>% ggplot( aes( x = duration, y = num.correct ) ) + geom_point() + facet_wrap( ~round, labeller = label_both )
+test_data %>%
+  ggplot(aes(x = duration, y = num.correct)) +
+  geom_point() +
+  facet_wrap(~ round, labeller = label_both)
 ```
 </div>
 
@@ -106,7 +198,11 @@ test_data %>% ggplot( aes( x = duration, y = num.correct ) ) + geom_point() + fa
 
 <div class='center'>
 ```{r echo=FALSE}
-test_data %>% ggplot( aes( x = duration, y = num.correct ) ) + geom_point() + facet_wrap( ~round, labeller = label_both ) + geom_smooth(method="lm",fullrange=TRUE)
+test_data %>%
+  ggplot(aes(x = duration, y = num.correct)) +
+  geom_point() +
+  facet_wrap(~ round, labeller = label_both) +
+  geom_smooth(method = "lm", fullrange = TRUE)
 ```
 </div>
 
@@ -116,8 +212,13 @@ Remember...
 ## Always look at the data first
 </div>
 
+```{r echo = FALSE}
+if (str_detect(opts_current$get()$fig.path, 'handout'))
+  asis_output('\n-->\n')
+```
 
-Today
+
+This session
 ==================================
 * Data visualization with `ggplot2`
     * Basics
@@ -129,7 +230,7 @@ Today
     * In-class exercises
     * Joins
     * In-class exercises
-* Acquiring (tabular) data (*briefly covered today*)
+* Acquiring (tabular) data (*briefly covered*)
 
 
 ggplot2
@@ -356,15 +457,15 @@ Geoms and statistics
 * Each geom/statistic has a default statistic/geom
 
 
-|Item    |   Default stat/geom|
-|:-------|:-------------------|
-|`geom_point`|`stat_identity` ($f(x)=x$)|
-|`geom_line`|`stat_identity` ($f(x)=x$)|
-|`geom_histogram`|`stat_bin` (binning) |
-|`geom_smooth`|`stat_smooth` (regression) |
-|`stat_smooth`|`geom_smooth` (line + ribbon) |
-|`stat_bin`|`geom_bar` (vertical bars)|
-|`stat_identity`|`geom_point` (dots)|
+| Item             | Default stat/geom            |
+|:-----------------|:-----------------------------|
+|`geom_point`      |`stat_identity` ($f(x)=x$)    |
+|`geom_line`       |`stat_identity` ($f(x)=x$)    |
+|`geom_histogram`  |`stat_bin` (binning)          |
+|`geom_smooth`     |`stat_smooth` (regression)    |
+|`stat_smooth`     |`geom_smooth` (line + ribbon) |
+|`stat_bin`        |`geom_bar` (vertical bars)    |
+|`stat_identity`   |`geom_point` (dots)           |
 
 * Hence, these produce the same output:
 ```{r eval=FALSE}
@@ -395,7 +496,7 @@ Aesthetics
 ==========
 * Each geometry interacts with one or more aesthetics
 
-|Item    |   Required |  Optional |
+|Item    |   Required         |  Optional             |
 |:-------|:-------------------|:----------------------|
 |`geom_point`|`x`,&nbsp;`y`|`alpha`,&nbsp;`colour`,&nbsp;`fill`,&nbsp;`shape`,&nbsp;`size`,&nbsp;`stroke`|
 |`geom_line`|`x`,&nbsp;`y`|`alpha`,&nbsp;`colour`,&nbsp;`linetype`,&nbsp;`size`|
@@ -424,18 +525,18 @@ Position
 * Examples: bars can be positioned with `stack` or `dodge`
 
 ```{r}
-g <- ggplot(test_data, aes(x = num.correct, fill = round ))
+g <- ggplot(test_data, aes(x = num.correct, fill = round))
 ```
 <div class="left">
 ```{r fig.height=3.5, fig.width=4.5, tidy=FALSE}
-g + stat_bin(binwidth=4,
-             position='stack')
+g + stat_bin(binwidth = 4,
+             position = 'stack')
 ```
 </div>
 <div class="right">
 ```{r fig.height=3.5, fig.width=4.5, tidy=FALSE}
-g + stat_bin(binwidth=4,
-             position='dodge')
+g + stat_bin(binwidth = 4,
+             position = 'dodge')
 ```
 </div>
 
@@ -451,10 +552,30 @@ Practice with layers (Tasks 1--4)
 
 Data
 =======
-```{r tidy=FALSE, eval=FALSE}
-library(ggplot2)
+```{r tidy = FALSE, eval = FALSE}
+library(ggplot2) #library(tidyverse)
 ?mpg
 ```
+
+```{r echo = FALSE}
+rd2markdown <- function(rd) {
+  html <- tempfile()
+  md <- tempfile()
+  tools::Rd2HTML(rd, out = html)
+  system(paste0('pandoc -f html -t markdown ', html, ' -o ', md))
+  rendered_md <- readr::read_file(md)
+  unlink(md)
+  unlink(html)
+  rendered_md <- stringr::str_replace(rendered_md, '.*\\n.*\\n.*\\n.*\\n', '')
+  rendered_md <- paste0('## ', rendered_md)
+  rendered_md <- stringr::str_replace(rendered_md, '-{5,1000}', '')
+  
+  rendered_md
+}
+rd2markdown(tools::Rd_db('ggplot2')$mpg) %>% asis_output
+```
+
+<!--
 
 <div style="font-size: 60%;">
 **Usage**
@@ -489,6 +610,7 @@ had a new release every year between 1999 and 2008 - this was used as a
 proxy for the popularity of the car.
 </div>
 </div>
+-->
 
 ***
 
