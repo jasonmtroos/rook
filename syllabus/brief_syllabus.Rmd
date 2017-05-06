@@ -1,0 +1,65 @@
+---
+title: '`r rook::course_title()`'
+author: "J.M.T. Roos"
+date: 'Last updated: `r lubridate::now("CET")`'
+output:
+  html_document: 
+    theme: lumen
+
+subtitle: Brief course syllabus
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+```
+
+
+# Aims
+
+Many researchers rely on data that are obtained from a wide variety of online sources, including web sites, social media, and external data providers. This course introduces you to procedures for collecting, preparing, analysing, and visualising such data. Participants will learn about core ideas in data visualization, web scraping, and text analysis while gaining practice writing, debugging, and tracking changes to code in R.
+
+The main objectives of this course are the following: 
+
+* To be able to write code in R in order to obtain, prepare, analyse, and visualise data obtained from online sources
+* To be able to monitor and manage the various steps of data collection and analysis for both integrity and replication purposes
+* To help you become a more productive (taking less time to analyse your data) and careful (making fewer mistakes) scientist
+
+# Information
+
+There are four sessions of 4 hours each taking place on two days. Sessions will include a mix of brief lectures, coding demonstrations, and in-class exercises. You will need to bring a laptop to these sessions on which you have the necessary rights to install software. Students will work with data sets supplied for the course, as well as obtain their own data from the Internet by applying what they have learned in the course. 
+
+## Session 1. Introduction
+  * Create, edit, and compile an R-markdown file that contains both a free text discussion of your data analysis, your code, and any output from that code (including plots)
+  * Build an R-markdown file that collects data from an online source, performs a few basic manipulations, and plots the results
+  * Use `git` (version control software) to track changes to this markdown file over time
+
+## Session 2. Acquiring, preparing, and visualizing data
+  * Write code to acquire data from files located on the web or stored on your local computer, load them into R, and clean the data in preparation for further analysis.
+  * Learn the powerful yet simple "grammar" for visualizing data implemented in the `ggplot2` R package
+  * Learn many of the psychological principles behind effective data visualization
+
+## Session 3. Obtaining data from web sites and social media
+  * Acquire data from online sources, including web pages and the Twitter API, and automate its collection
+  * Further practice preparing, analyzing, and visualizing these data in the context of your own research interests
+  
+## Session 4. Text and sentiment analysis
+  * Process large amounts of unstructured data (e.g. text documents), extract important features (e.g., the occurrence of special words), and summarize results
+  * Perform basic types of text analysis, including sentiment tagging and topic identification
+
+
+# Assignments
+
+Sessions are both iterative and cumulative, hence attendance for all four sessions is mandatory. During sessions, you will work on exercises allowing you to practice new skills. These exercises will not be graded, but their completion is mandatory. Between sessions, you will complete additional exercises based on your own research interests. Students will also review and replicate each other's code.
+
+
+
+# Additional info
+
+Students are expected to satisfy the following entry requirements:
+
+* Prior experience writing code in the R programming language (please visit http://www.jasonmtroos.com/learning-r for a list of resources for learning R).
+* Use of a laptop computer with current versions of [R](https://cloud.r-project.org/), [RTools](https://cran.r-project.org/bin/windows/Rtools/) (Windows only), and [RStudio](https://www.rstudio.com/products/rstudio/download/) already installed
+
+
+
+
