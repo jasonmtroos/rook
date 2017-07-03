@@ -4,7 +4,7 @@
 \alias{render_html_from_Rmd}
 \title{render_html_from_Rmd}
 \usage{
-render_html_from_Rmd(file = NULL, format = NULL)
+render_html_from_Rmd(file = NULL, format = NULL, suppress_view = FALSE)
 }
 \arguments{
 \item{file}{}

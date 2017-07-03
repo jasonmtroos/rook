@@ -1,12 +1,11 @@
 ---
-title: '`r rook::course_title()`'
-author: "J.M.T. Roos"
-date: 'Last updated: `r lubridate::now("CET")`'
-output:
-  html_document: 
-    theme: lumen
-
+title: "`r rook::course_title()`"
 subtitle: Brief course syllabus
+author: "J.M.T. Roos"
+date: 'Last updated: `r lubridate::now()`'
+output:
+  html_document:
+    theme: paper
 ---
 
 ```{r setup, include=FALSE}

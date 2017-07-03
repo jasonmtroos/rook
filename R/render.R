@@ -5,7 +5,7 @@
 #'
 #' @return
 #' @export
-render_html_from_Rmd <- function(file = NULL, format = NULL) {
+render_html_from_Rmd <- function(file = NULL, format = NULL, suppress_view = FALSE) {
   if (is.null(file)) {
     file <- rstudioapi::getSourceEditorContext()$path
     message(paste('Rendering file', file))
@@ -17,6 +17,8 @@ render_html_from_Rmd <- function(file = NULL, format = NULL) {
     outdir <- dirname(path.expand(file))
   }
   yaml_output <- rmarkdown::yaml_front_matter(file)$output
+  if(is.null(names(yaml_output)))
+    names(yaml_output) <- yaml_output
   if (!is.null(format)) {
     format <- names(yaml_output[stringr::str_detect(names(yaml_output), format)])
   } else {
@@ -31,8 +33,70 @@ render_html_from_Rmd <- function(file = NULL, format = NULL) {
     outfiles[i] <- paste0(basename, '_', outtype[i], '.html')
     rmarkdown::render(file, output_file = outfiles[i], output_dir = outdir, output_format = format[i])
   }
-  rstudioapi::viewer(outfiles[1])
+  if (!suppress_view)
+    rstudioapi::viewer(outfiles[1])
   invisible(NULL)
 }
 
+list_of_rmds <- function() {
+  tibble::frame_data(~file, ~type,
+                     'pre_work/pre_work.Rmd', 'html',
+                     'syllabus/brief_syllabus.Rmd', 'html',
+                     'overview/overview.Rmd', 'html',
+                     'overview/overview.Rmd', 'revealjs',
+                     'session_1/session_1.Rmd', 'html',
+                     'session_1/session_1.Rmd', 'revealjs',
+                     'session_2/in_class_work.Rmd', 'html',
+                     'session_2/session_2.Rmd', 'html',
+                     'session_2/session_2.Rmd', 'revealjs',
+                     'session_3/session_3.Rmd', 'html',
+                     'session_3/session_3.Rmd', 'revealjs',
+                     'session_3/job_browsing.Rmd', 'html',
+                     'session_4/session_4.Rmd', 'html',
+                     'session_4/session_4.Rmd', 'revealjs',
+                     'session_4/session_4_in_class.Rmd', 'html'
+  ) %>% mutate(id = row_number())
+}
+special_destinations <- function() {
+  tibble::frame_data(~file, ~destination,
+                     'session_2/in_class_work_handout.html', '~/git_workspace/site/media/teaching/rook/session_2_in_class.html',
+                     'session_3/job_browsing_handout.html', '~/git_workspace/site/media/teaching/rook/job_browsing.html',
+                     'session_4/session_4_in_class_handout.html', '~/git_workspace/site/media/teaching/rook/session_4_in_class.html')
+}
 
+#' render_all
+#'
+#' @export
+render_all <- function() {
+  files <- list_of_rmds()
+  plyr::d_ply(files, .variables = 'id', .fun = function(x) {
+    render_html_from_Rmd(here::here(x$file), x$type, suppress_view = TRUE)
+  })
+}
+
+#' Publish
+#'
+#' @export
+publish <- function() {
+  dirs <- c('syllabus', 'pre_work', 'overview', 'session_1', 'session_2', 'session_3', 'session_4')
+  plyr::a_ply(dirs, 1, function(x) {
+    compiled <- list.files(paste0(here::here(x),'/'), pattern = '\\.html')
+    compiled <- normalizePath(file.path(paste0(here::here(x),'/'), compiled))
+    dest <- normalizePath(file.path(here::here('compiled'), x))
+    if (!dir.exists(dest))
+      dir.create(dest)
+    file.copy(from = compiled, to = dest, overwrite = TRUE)
+    invisible(NULL)
+    })
+  system('zip -q compiled.zip -r compiled')
+  system('zip -q compiled.zip -d *.DS_Store')
+  special_destinations() %>%
+    transmute(from = here::here(file),
+              to = normalizePath(destination)) %>%
+    plyr::d_ply(.variables = 'from', .fun = function(row) {
+      with(row, file.copy(from = from, to = to, overwrite = TRUE))
+      invisible(NULL)
+    })
+  if(menu(choices = c('No', 'Yes'), title = 'Compile web site and push to S3?') == 2)
+    system('bash -l -c "(cd /Users/Jason/git_workspace/site && ruhoh compile && s3_website push --site /Users/Jason/git_workspace/site/compiled)"')
+}

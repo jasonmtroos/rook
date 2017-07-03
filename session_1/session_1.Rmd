@@ -498,7 +498,7 @@ More about R Markdown
 * RStudio has [an entire site](http://rmarkdown.rstudio.com) dedicated to the R Markdown file format, which you should visit and read this week
 
 
-```{r echo = FALSE}
+```{r echo = FALSE, cache = FALSE}
 if(program() == 'egsh') {
   asis_output('What you need to do this week')
 } else if(program() == 'erim') {
@@ -525,10 +525,10 @@ Get your R environment in order
 ```{r eval = FALSE}
 install.packages('devtools', dependencies = TRUE)
 install.packages('tidyverse', dependencies = TRUE)
-install.pacakges('Hmisc', dependencies = TRUE)
+install.packages('Hmisc', dependencies = TRUE)
 install.packages('tm', dependencies = TRUE)
-install.pacakges('twitteR', dependencies = TRUE)
-install.pacakges('topicmodels', dependencies = TRUE)
+install.packages('twitteR', dependencies = TRUE)
+install.packages('lda', dependencies = TRUE)
 ```
 
 * Windows users will need to install **RTools**, which provides the necessary toolchain for compiling R packages from source code

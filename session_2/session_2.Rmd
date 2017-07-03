@@ -13,7 +13,7 @@ output:
     self_contained: true
     theme: simple
     highlight: NULL
-    transition: slide
+    transition: fade
     slide_level: 1
     reveal_options:
       controls: false
@@ -21,7 +21,7 @@ output:
     pandoc_args:
       [
       "--variable", "slideNumber='c/t'",
-      "--variable", "transitionSpeed=default",
+      "--variable", "transitionSpeed=fast",
       "--variable", "viewDistance=5"
       ]
 knitr:
@@ -68,7 +68,7 @@ Review
 * In class
     * git --- cloning, committing, pushing
     * R Markdown --- mixing text with R code using `` ```{r} `` blocks
-* During the week
+* During the `r if(program() == 'egsh') {asis_output('week')} else if(program() == 'erim') {asis_output('break')}`
     * Reviewing/learning the R programming language
     * Installing packages
 
@@ -132,6 +132,7 @@ test_data %>%
   arrange(Round, stat) %>% 
   mutate(Round = ifelse(stat == 'mean', format(Round), '')) %>% 
   select(-stat) %>%
+  as.data.frame %>%
   pander::pander() %>%
   asis_output
 ```
@@ -190,7 +191,8 @@ if (str_detect(opts_current$get()$fig.path, 'handout'))
 test_data %>%
   ggplot(aes(x = duration, y = num.correct)) +
   geom_point() +
-  facet_wrap(~ round, labeller = label_both)
+  facet_wrap(~ round, labeller = label_both) +
+  lims(y = c(-1.31, 20.98))
 ```
 </div>
 
@@ -202,7 +204,8 @@ test_data %>%
   ggplot(aes(x = duration, y = num.correct)) +
   geom_point() +
   facet_wrap(~ round, labeller = label_both) +
-  geom_smooth(method = "lm", fullrange = TRUE)
+  geom_smooth(method = "lm", fullrange = TRUE) +
+  lims(y = c(-1.31, 20.98))
 ```
 </div>
 
@@ -341,7 +344,10 @@ Layers
 
 <div class="center">
 ```{r echo=FALSE}
-ggplot( data=anscombe, aes( x=x1, y = y1 ) ) + geom_point() + labs(title = 'Layer 1: data as points', x = 'x', y = 'y' )
+ggplot( data=anscombe, aes( x=x1, y = y1 ) ) + 
+  geom_point() + 
+  labs(title = 'Layer 1: data as points', x = 'x', y = 'y' ) +
+  lims(y = c(3.0, 11.99))
 ```
 </div>
 
@@ -349,7 +355,7 @@ ggplot( data=anscombe, aes( x=x1, y = y1 ) ) + geom_point() + labs(title = 'Laye
 
 <div class="center">
 ```{r echo=FALSE}
-ggplot( data=anscombe, aes( x=x1, y = y1 ) ) + geom_smooth(method="lm") + labs(title = 'Layer 2: regression line', x = 'x', y = 'y' )
+ggplot( data=anscombe, aes( x=x1, y = y1 ) ) + geom_smooth(method="lm") + labs(title = 'Layer 2: regression line', x = 'x', y = 'y' ) + lims(y = c(3.0, 11.99))
 ```
 </div>
 
@@ -357,7 +363,7 @@ ggplot( data=anscombe, aes( x=x1, y = y1 ) ) + geom_smooth(method="lm") + labs(t
 
 <div class="center">
 ```{r echo=FALSE}
-ggplot( data=anscombe, aes( x=x1, y = y1 ) ) + geom_point() + geom_smooth(method="lm") + labs(title = 'Layer 1 and 2', x = 'x', y = 'y' )
+ggplot( data=anscombe, aes( x=x1, y = y1 ) ) + geom_point() + geom_smooth(method="lm") + labs(title = 'Layer 1 and 2', x = 'x', y = 'y' ) + lims(y = c(3.0, 11.99))
 ```
 </div>
 
@@ -440,6 +446,8 @@ ggplot( test_data, aes( x = duration ) ) + geom_histogram( binwidth = 2 )
 ```
 
 ***
+
+Result of applying binning function to `duration`
 
 <div style="font-size: 80%;">
 ```{r echo=FALSE, fig.show='hide'}
@@ -552,12 +560,42 @@ Practice with layers (Tasks 1--4)
 
 Data
 =======
+<div style="font-size:60%;">
 ```{r tidy = FALSE, eval = FALSE}
-library(ggplot2) #library(tidyverse)
+library(ggplot2) # or: library(tidyverse)
 ?mpg
 ```
 
-```{r echo = FALSE}
+```
+Fuel economy data from 1999 and 2008 for 38 popular models of car
+
+Description:
+     This dataset contains a subset of the fuel economy data that the
+     EPA makes available on http://fueleconomy.gov. It contains
+     only models which had a new release every year between 1999 and
+     2008 - this was used as a proxy for the popularity of the car.
+
+Usage:
+     mpg
+     
+Format:
+     A data frame with 234 rows and 11 variables
+
+     manufacturer
+     model         model name
+     displ         engine displacement, in litres
+     year          year of manufacture
+     cyl           number of cylinders
+     trans         type of transmission
+     drv           f = front-wheel drive, r = rear wheel drive, 4 = 4wd
+     cty           city miles per gallon
+     hwy           highway miles per gallon
+     fl            fuel type
+     class         "type" of car
+```
+</div>
+
+```{r echo = FALSE, eval = FALSE}
 rd2markdown <- function(rd) {
   html <- tempfile()
   md <- tempfile()
@@ -575,42 +613,6 @@ rd2markdown <- function(rd) {
 rd2markdown(tools::Rd_db('ggplot2')$mpg) %>% asis_output
 ```
 
-<!--
-
-<div style="font-size: 60%;">
-**Usage**
-```
-mpg
-```
-
-<div class="left">
-**Format**
-
-A data frame with 234 rows and 11 variables
-
-* manufacturer.
-* model.
-* displ. engine displacement, in litres
-* year.
-* cyl. number of cylinders
-* trans. type of transmission
-* drv. f = front-wheel drive, r = rear wheel drive, 4 = 4wd
-* cty. city miles per gallon
-* hwy. highway miles per gallon
-* fl.
-* class.
-</div>
-
-<div class="right">
-**Description**
-
-This dataset contains a subset of the fuel economy data that the EPA makes
-available on <a href = 'http://fueleconomy.gov'>http://fueleconomy.gov</a>. It contains only models which
-had a new release every year between 1999 and 2008 - this was used as a
-proxy for the popularity of the car.
-</div>
-</div>
--->
 
 ***
 
@@ -670,14 +672,14 @@ Groups
 ***
 
 <div class='left'>
-```{r fig.height=3.5, fig.width=4.5, tidy=FALSE}
+```{r fig.height=3.5, fig.width=4.5, tidy=FALSE, message = FALSE, warning = FALSE}
 ggplot(mpg, aes(x = displ, y = hwy, 
               colour=cyl)) + 
   geom_point() + geom_smooth()
 ```
 </div>
 <div class='right'>
-```{r fig.height=3.5, fig.width=4.5, tidy=FALSE}
+```{r fig.height=3.5, fig.width=4.5, tidy=FALSE, message = FALSE, warning = FALSE}
 ggplot(mpg, aes(x = displ, y = hwy, 
               colour=factor(cyl))) + 
   geom_point() + geom_smooth()
@@ -687,7 +689,7 @@ ggplot(mpg, aes(x = displ, y = hwy,
 
 * To override the automatic grouping, specify `aes(group=1)` when creating a layer
 
-```{r fig.height=5}
+```{r fig.height=5, message = FALSE, warning = FALSE}
 ggplot(mpg, aes(x = displ, y = hwy, colour=factor(cyl))) + geom_point() + geom_smooth(aes(group=1))
 ```
 
@@ -710,13 +712,23 @@ Labels
     * x- and y-axes
     * Legends and colour bars
 
-```{r fig.height=3, fig.width=4, tidy=FALSE}
-ggplot(mpg, aes(x = displ, y = hwy, colour = drv)) + geom_point() +
-    scale_y_log10(breaks = c(15, 30, 45)) + labs(x = "Displacement (litres)",
-    y = "Highway miles per gallon (log scale)",
-    colour = "Drive train",
-    title = "Engine size and fuel consumption")
+<div class='left'>
+```{r annotated_fig_ex, fig.height=3.5, fig.width=4, tidy=FALSE, fig.show='hide'}
+ggplot(mpg, aes(x = displ,
+                y = hwy,
+                colour = drv)) +
+ geom_point() +
+ labs(x = "Displacement (litres)",
+      y = "Highway miles per gallon",
+      colour = "Drive train",
+      title = "Automobile features")
 ```
+</div>
+<div class='right'>
+```{r echo = FALSE}
+paste0('![](', file.path(opts_current$get()$fig.path, paste0('annotated_fig_ex-1', '.', opts_current$get()$dev)), ')') %>% asis_output
+```
+</div>
 
 Relabelling
 ===========
@@ -732,6 +744,7 @@ ggplot(mpg, aes(x = displ, y = hwy, colour = plyr::revalue(drv, c("f" = "Fore", 
 ggplot(mpg, aes(x = displ, y = hwy ) )+ geom_point() + facet_wrap(~drv, labeller = as_labeller(c('f' = 'Fore', 'r' = 'Rear', '4' = '4WD')))
 ```
 
+- Another alternative is to use the `forcats` package to relabel/reorder factors
 
 Task 5
 =======================
@@ -1081,7 +1094,7 @@ e %>% group_by(manufacturer,model) %>% summarise( cty = mean(cty), n = n() ) %>%
 ```
 
 ```{r results='asis', echo=FALSE}
-trunc.dots <- function(x,n){x <- format(x%>%head(n));x[n,] <- '...';x}
+trunc.dots <- function(x,n){x <- format(as.data.frame(x%>%head(n)));x[n,] <- '...';x}
 format.table(mpg %>% select( manufacturer, model, cty ) %>% trunc.dots(14),
 mpg %>% select( manufacturer, model, cty ) %>% group_by(manufacturer,model) %>% summarise( cty = mean(cty), n = n() ) %>% filter( cty == max(cty) ) %>% rename( max_cty = cty )  %>% trunc.dots(10)
 )
@@ -1281,24 +1294,24 @@ library(readr)
 readxl and haven
 ================
 
-```{r eval = FALSE}
-install.packges('readxl', dependencies = TRUE)
-library(readxl)
-```
+* Installed with `tidyverse`, but not loaded by default
 
 * For reading Excel spreadsheets
 
 ```{r eval = FALSE}
-install.packages('haven', dependencies = TRUE)
-library(haven)
+library(readxl)
 ```
 
 * For reading SAS, STAT, and SPSS data files
-* Has some limited ability to write to these formats as well
+
+```{r eval = FALSE}
+library(haven)
+```
 
 
 
-This week: Preliminary work for next week's session (Twitter)
+
+This week: Preliminary work for the next session (Twitter)
 =============================================================
 
 <div style="font-size: 80%;">
@@ -1318,30 +1331,32 @@ searchTwitter(searchString='#hashtag', n=100, lang='en', since=NULL, until=NULL,
 
 </div>
 
-This week: Preliminary work for next week's session (HTML)
+This week: Preliminary work for the next session (HTML)
 ===============================================================
 * Do all of the following **before our next session**
-* Make sure `rvest` is installed:
 
-```{r eval = FALSE}
-install.packages('rvest', dependencies = TRUE)
-```
-
+* [Review or learn the basics of HTML](https://www.w3schools.com/html/html_intro.asp)
 * [Play this game](http://flukeout.github.io) to learn CSS
 * Install [SelectorGadget](https://chrome.google.com/webstore/detail/selectorgadget/mhjhnkcfbdhnjickkkdbjoemdmbfginb/related) for Chrome and try it, or else do a lot of playing around with "Inspect Element" in your favorite browser
+* Skim [this Wikipedia article about CGI query strings](https://en.wikipedia.org/wiki/Query_string) so that you have a sense of why I might infer that if this page generates page 1 of data: `http://some-site.com/show_data?page=1`, then this page: `http://some-site.com/show_data?page=2` will probably generate page 2.
+
+This week: Preliminary work for Session 4 (text analysis)
+===========================================================
+* Read and follow (type along with) this tutorial:
+```{r eval = FALSE}
+vignette('tm', package='tm')
+```
+(or https://cran.r-project.org/web/packages/tm/vignettes/tm.pdf if that doesn't work...)
+
+* Skim pp 1--7 of [Gonçalves, et al. "A Benchmark Comparison of State-of-the-Practice Sentiment Analysis Methods." arXiv preprint arXiv:1512.01818 (2015). http://arxiv.org/pdf/1512.01818.pdf](http://arxiv.org/pdf/1512.01818.pdf)
 
 
 This week: Write some code and share it
 =======================================
-* Be sure `readr` is installed:
-
-```{r eval = FALSE}
-install.packages('readr', dependencies = TRUE)
-```
 
 * Create a new repository on github and then create a corresponding project in R (follow instructions from Session 1 slides)
 * Create an R Markdown file, and in that file, download, clean up, and visualize some data. Download data that would be relevant to your research --- if you need inspiration, visit this list of [awesome public datasets](https://github.com/caesar0301/awesome-public-datasets)
-* Email the URL of your repository to another student (e.g., [https://github.com/jasonmtroos/rook](https://github.com/jasonmtroos/rook))
+* Email the URL of your repository (e.g., [https://github.com/jasonmtroos/rook](https://github.com/jasonmtroos/rook)) to another student 
 * Also email the URL of your repository to me
 
 This week: Run somebody else's code and send them feedback
@@ -1353,23 +1368,29 @@ cd "name of your git workspace folder goes here"
 git clone "url to your colleague's github repository"
 ```
 
-* Locate and open the `.Rproj` file and try to `knit` their R Markdown file
-* Did it work? Yes? then great! 
+* Locate and open the `.Rproj` file 
+* Or clone it through RStudio as we did in Session 1
+* Try to `knit` their R Markdown file -- did it work? Yes? then great! 
     * Send them feedback about their R Markdown file
     * Did you think it was readable? 
     * Did the code make sense to you before you ran it? Not at all?
 
 
 
+
 This week: Want more practice?
 =================================
 
-* Visit these sites, read them, and write some code
-    1. [ggplot2 documentation](http://docs.ggplot2.org/current/)
-    2. [Chapter 3 of R for Data Science (visualization)](http://r4ds.had.co.nz/data-visualisation.html)
-    3. [Chapter 14 of R for Data Science (functions)](http://r4ds.had.co.nz/functions.html)
-    4. [Chapter 16 of R for Data Science (iteration)](http://r4ds.had.co.nz/iteration.html)
+Visit these sites, read them, and write some code:
 
-
-    
-    
+* Visualization
+    - [ggplot2 Documentation](http://docs.ggplot2.org/current/)
+    - [Chapter 3 of R for Data Science](http://r4ds.had.co.nz/data-visualisation.html)
+* Functions
+    - [DataCamp tutorial on functions](https://www.datacamp.com/community/tutorials/functions-in-r-a-tutorial)
+    - [Chapter 14 of R for Data Science](http://r4ds.had.co.nz/functions.html)
+        - A more advanced treatment
+* Loops
+    - [DataCamp tutorial on loops](https://www.datacamp.com/community/tutorials/tutorial-on-loops-in-r)
+        - If you get to the last section about the `apply` family of functions, skim it then learn about the replacement tools implemented in the `plyr` and `purrr` packages instead
+    - [Chapter 16 of R for Data Science](http://r4ds.had.co.nz/iteration.html)

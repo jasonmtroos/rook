@@ -178,7 +178,7 @@ mpg %>% tbl_df
 
 * Create a new data frame called `mpg2` that contains this subset of columns (i.e.):
 
-```{r eval = FALSE}
+```{r eval = FALSE, tidy = FALSE}
 mpg2 <- mpg %>% [ your code from the previous step ]
 ```
 
@@ -195,7 +195,7 @@ mpg2 <- mpg %>% [ your code from the previous step ]
 
 * Create a new data frame called `mpg3` that contains this new data frame with the two extra columns
 
-```{r eval = FALSE}
+```{r eval = FALSE, tidy = FALSE}
 mpg3 <- mpg2 %>% [ your code from the previous step ]
 ```
 
@@ -221,7 +221,7 @@ mpg3 %>% filter( manufacturer == 'chevrolet' ) %>% arrange( desc(vol_per_cyl))
 
 * Create a new data frame called `mpg4` that contains this new data frame
 
-```{r eval = FALSE}
+```{r eval = FALSE, tidy = FALSE}
 mpg4 <- mpg3 %>% [ your code from the previous step ]
 ```
 
@@ -237,7 +237,7 @@ mpg4 <- mpg3 %>% [ your code from the previous step ]
 
 * Create a new data frame called `mpg5` that contains this new data frame
 
-```{r eval = FALSE}
+```{r eval = FALSE, tidy = FALSE}
 mpg5 <- mpg4 %>% [ your code from the previous step ]
 ```
 
@@ -253,7 +253,7 @@ mpg5 <- mpg4 %>% [ your code from the previous step ]
 
 * Create a new data frame called `mpg6` that contains this new data frame
 
-```{r eval = FALSE}
+```{r eval = FALSE, tidy = FALSE}
 mpg6 <- mpg5 %>% [ your code from the previous step ]
 ```
 
@@ -345,7 +345,7 @@ weather2 %>%
 
 * Create a new data frame using the output from Task 13. Call this data frame `avg_good_weather_delays`
 
-```{r eval = FALSE}
+```{r eval = FALSE, tidy = FALSE}
 avg_good_weather_delays <- [ your code from the previous step ]
 ```
 

@@ -11,4 +11,4 @@ knitr::opts_chunk$set(echo = TRUE)
 
 This is the course site for the `r tolower(rook::course_title())` PhD course offered at Erasmus. Below you can find links to compiled versions of the slides and in-class work. 
 
-[Top-level directory](./compiled)
+... to be completed ...

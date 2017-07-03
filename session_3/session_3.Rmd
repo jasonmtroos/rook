@@ -1,15 +1,19 @@
 ---
-title: "Obtaining data from web sites and social media"
+title: "`r rook::course_title()`: Session 3"
+subtitle: "Obtaining data from web sites and social media"
 author: "J.M.T. Roos"
-date: "Last updated 25 May 2016"
+date: 'Last updated: `r lubridate::now()`'
 autosize: false
 css: "../css/slides.css"
 output: 
+  html_document: 
+    theme: paper
+    highlight: pygments
   revealjs::revealjs_presentation:
     self_contained: true
     theme: simple
     highlight: NULL
-    transition: slide
+    transition: fade
     slide_level: 1
     reveal_options:
       controls: false
@@ -17,30 +21,45 @@ output:
     pandoc_args:
       [
       "--variable", "slideNumber='c/t'",
-      "--variable", "transitionSpeed=default",
+      "--variable", "transitionSpeed=fast",
       "--variable", "viewDistance=5"
       ]
+knitr:
+  cache: 1
 ---
 
 
 
 ```{r echo=FALSE, include=FALSE}
 knitr::opts_chunk$set(tidy = TRUE, tidy.opts=list(blank=FALSE, width.cutoff=50), cache=FALSE)
+knitr::opts_chunk$set(
+  tidy = TRUE,
+  tidy.opts = list(blank = FALSE, width.cutoff = 50),
+  cache = 1
+)
 knitr::knit_hooks$set(
-source = function(x,options){
-  if( options$engine == 'R' ) {
-    # format R code
-    x = highr::hilight( x, format = 'html' )
-  } else if( options$engine == 'bash' ) {
-    # format bash code
-    x = paste0( '<span class="hl std">$</span> ', unlist( stringr::str_split( x, '\\n' ) ), '\n', collapse = '' )
+  source = function(x, options) {
+    if (options$engine == 'R') {
+      # format R code
+      x = highr::hilight(x, format = 'html')
+    } else if (options$engine == 'bash') {
+      # format bash code
+      x = paste0('<span class="hl std">$</span> ',
+                 unlist(stringr::str_split(x, '\\n')),
+                 '\n',
+                 collapse = '')
+    }
+    x = paste(x, collapse = "\n")
+    sprintf(
+      "<div class=\"%s\"><pre class=\"%s %s\"><code class=\"%s %s\">%s</code></pre></div>\n",
+      'sourceCode',
+      'sourceCode',
+      tolower(options$engine),
+      'sourceCode',
+      tolower(options$engine),
+      x
+    )
   }
-  # for (i in names(options)) {
-  #   message( paste( i, options[[i]] ) )
-  # }
-  x = paste(x, collapse = "\n")
-  sprintf("<div class=\"%s\"><pre class=\"%s %s\"><code class=\"%s %s\">%s</code></pre></div>\n", 'sourceCode', 'sourceCode', tolower(options$engine), 'sourceCode', tolower(options$engine), x)
-}
 )
 ```
 
@@ -241,9 +260,11 @@ CSS Selectors
 
 CSS examples
 ============
+
+~~~
 ```{r echo = FALSE, comment = ''}
-cat_html <- . %>% as.character %>% stringr::str_replace( '.*\\n.*\\n','') %>% cat
-cat_break_html <- . %>% as.character %>% stringr::str_replace_all('><','>\n<') %>% stringr::str_replace( '.*\\n.*\\n','') %>% cat
+cat_html <- . %>% as.character %>% stringr::str_replace( '.*\\n','') %>% knitr::asis_output()
+cat_break_html <- . %>% as.character %>% stringr::str_replace_all('><','>\n<') %>% stringr::str_replace( '.*\\n','') %>% knitr::asis_output()
 
 html_snippet <- read_html( '<html><body>
 <div class="outer">
@@ -254,6 +275,7 @@ This is the target
 </body></html>' )
 html_snippet %>% cat_html
 ```
+~~~
 
 ```{r}
 library(rvest)
@@ -263,9 +285,11 @@ html_snippet %>% html_nodes(css='div.inner')
 
 ***
 
+~~~
 ```{r echo = FALSE, comment = ''}
 html_snippet %>% cat_html
 ```
+~~~
 
 ```{r}
 html_snippet %>% html_nodes('div.outer > div.inner')
@@ -275,6 +299,7 @@ html_snippet %>% html_nodes('.inner') %>% html_text()
 
 ***
 
+~~~
 ```{r echo = FALSE, comment = ''}
 html_snippet <- read_html( '<html><body>
 <div class="ads">...</div>
@@ -287,6 +312,7 @@ html_snippet <- read_html( '<html><body>
 </body></html>' )
 html_snippet %>% cat_html
 ```
+~~~
 
 ```{r}
 html_snippet %>% html_nodes('div.foo')
@@ -296,10 +322,12 @@ html_snippet %>% html_nodes('div.ads + div.foo > p') %>% html_text()
 A useful tool
 ===================
 <div class="left">
+~~~
 ```{r echo=FALSE, comment = ''}
 html_snippet <- read_html( '<html><body><div class="ads"><div class="dyn-ad"/><div class="dyn-ad"/></div><div class="headline"><h1>Bad yogurt</h1></div><div class="article"><p>It is everywhere these days.</p><p>Get some now.</p></div></body></html>' )
 html_snippet %>% cat_break_html
 ```
+~~~
 </div>
 <div class="right">
 ```{r}
@@ -337,9 +365,10 @@ html_snippet %>% html_nodes('a') %>% html_text()
 Task 1
 ==========
 
-```{r}
+```{r message = FALSE, warning = FALSE}
 library(rvest)
-page <- html_session( 'http://www.eur.nl/english/education/phdp/' )
+library(tidyverse)
+page <- html_session( 'https://www.eur.nl/english/education/phdp/' )
 ```
 
 * Complete this code:
@@ -381,7 +410,7 @@ schools
 </div>
 
 
-Job browsing demo
+Task 3: Job browsing demo
 =================
 
 See http://www.jasonmtroos.com/assets/media/teaching/rook/job_browsing.html or http://goo.gl/e5DnG7
@@ -393,13 +422,11 @@ Reading tabular data
 ```{r message=FALSE}
 doc <- read_html('https://en.wikipedia.org/wiki/List_of_countries_by_cigarette_consumption_per_capita')
 smoking <- doc %>% html_node('table.wikitable') %>% html_table
-library(dplyr)
-smoking %>% rename(rank = Ranking, country = `Country/Territory`, num_per_adult = `Number of cigarettes
-per adult per year[7]`) %>% tbl_df
+smoking %>% rename(rank = Ranking, country = `Country/Territory`, num_per_adult = `Number of cigarettes\nper person aged ≥ 15 per year[7]`) %>% tbl_df
 ```
 </div>
 
-Exercise
+Task 4:
 =========
 
 ```{r echo=FALSE, eval = FALSE}
@@ -407,14 +434,27 @@ doc <- read_html('https://en.wikipedia.org/wiki/Most_common_words_in_English')
 doc %>% html_nodes('table.wikitable') %>% plyr::llply(html_table) %>% plyr::ldply(bind_rows)
 ```
 
-* Use `html_table(fill = TRUE)` to extract the table at https://en.wikipedia.org/wiki/List_of_parrots
-* Draw the rest of the parrot:
+* Use `html_table()` to extract the first table at https://en.wikipedia.org/wiki/List_of_newspapers_in_the_Republic_of_Ireland 
 
 ```{r echo = FALSE}
-doc <- read_html('https://en.wikipedia.org/wiki/List_of_parrots')
-birds <- doc %>% html_node('table.wikitable') %>% html_table(fill=TRUE) %>% tbl_df
-birds %>% select( 1, 2 )
+doc <- read_html('https://en.wikipedia.org/wiki/List_of_newspapers_in_the_Republic_of_Ireland')
+doc %>% html_node('table.wikitable') %>% html_table 
 ```
+
+
+***
+
+Use `html_node()`, the CSS selector `table.wikitable`, and `html_table()` to extract the first table
+
+`https://en.wikipedia.org/wiki/List_of_newspapers_in_the_Republic_of_Ireland`
+
+```{r eval = FALSE}
+doc <- read_html('https://en.wikipedia.org/wiki/List_of_...etc.')
+doc %>% '[your code goes here]'
+```
+
+
+
 
 Platform API's
 ==============
@@ -440,11 +480,13 @@ OAuth
 
 How OAuth works, at a very high level...
 ===================
-1. App asks platform for a request token
-2. Platform provides app a request token and secret
-3. App sends user to platform, user logs in and confirms level of access to be given to app
-4. App sends request token back to platform, receives an access token in return
-5. All future requests to the platform use the access token and are "signed" using the secret
+1. App: asks platform for a `request token`
+2. Platform: here is a `request token` and a `secret`
+3. App: redirects user to web page hosted by platform
+4. User: logs in and confirms level of access to be given to app
+5. Platform: redirects user back to app
+6. Platform: sends app an `access token`
+7. App: uses `secret` and `access token` to encrypt and authenticate
 
 API calls
 ===============
@@ -539,11 +581,11 @@ getUser
 ========
 
 ```{r}
-bc90k <- getUser('battlecobra90k') 
-bc90k$screenName
-bc90k$name %>% cat
-bc90k$description
-bc90k$lastStatus$created
+jmtroos <- getUser('jmtroos') 
+jmtroos$screenName
+jmtroos$name
+jmtroos$description
+jmtroos$lastStatus$created
 ```
 
 ***
@@ -552,7 +594,6 @@ bc90k$lastStatus$created
 botimeline <- userTimeline('barackobama', n=10)
 class(botimeline)
 length(botimeline)
-(tweet_list_to_data_frame <- . %>% plyr::llply(as.data.frame) %>% plyr::ldply(dplyr::bind_rows) %>% tibble::as_data_frame(.))
 ```
 
 ***
@@ -560,12 +601,12 @@ length(botimeline)
 <div class="font-70">
 ```{r echo=FALSE}
 ow <- options()$width
-options(width=200)
+options(width=210)
 ```
 ```{r message=FALSE}
 library(stringr)
 library(dplyr)
-botimeline %>% tweet_list_to_data_frame %>% mutate( text = str_sub(text,1,32) ) %>% select( text, favoriteCount, retweetCount, created, id )
+botimeline %>% twListToDF %>% mutate(text = str_trunc(text, 32) ) %>% select( text, favoriteCount, retweetCount, created, id )
 ```
 ```{r echo=FALSE}
 options(width=ow)
@@ -578,16 +619,13 @@ Exercise
 
 ```{r eval = FALSE, tidy = FALSE}
 library(dplyr)
-tweet_list_to_data_frame <- . %>% plyr::llply(as.data.frame) %>% 
-                            plyr::ldply(dplyr::bind_rows) %>% as_data_frame
-
 library(twitteR)
 options(httr_oauth_cache=TRUE)
 setup_twitter_oauth(consumer_key='your key goes here',
                     consumer_secret='your secret goes here',
                     access_token='your token goes here',
                     access_secret='a different secret goes here')
-searchTwitter( '[ your code goes here ]' ) %>% tweet_list_to_data_frame
+searchTwitter( '[ your code goes here ]' ) %>% twListToDF
 ```
 
 * Try plotting the results with ggplot2
@@ -596,6 +634,7 @@ This week
 ============
 ```{r eval = FALSE}
 install.packages('tm',dependencies=TRUE)
+install.packages('lda',dependencies=TRUE)
 ```
 * Read and follow (type along with) this tutorial:
 ```{r eval = FALSE}

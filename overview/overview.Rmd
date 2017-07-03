@@ -37,7 +37,7 @@ library(lubridate)
 
 Course abstract
 ===============
-A systematic introduction to issues of collecting, preparing, analyzing, and visualizing so-called 'big data.' 
+A systematic introduction to issues of collecting, preparing, analyzing, and visualizing online data. 
 
 You will learn how to write, debug, and keep track of your own code using R, a popular programming language for data manipulation, analysis, and visualization. 
 
@@ -84,9 +84,9 @@ Unlocking achievements
 }
 ```
 
-This session
+Session 1: Course overview and first steps
 ===================================================
-## Course overview and first steps with R
+## `r print_session_info(1)`
 
 * You will create, edit, and compile an R-markdown file that contains both a free text discussion of your data analysis, your code, and any output from that code (including plots).
 
@@ -118,9 +118,16 @@ Session 4: Text and sentiment analysis
 
 * You will also learn how to conduct automatic sentiment analysis (scoring text based its positivity or negativity).
 
+```{r}
+if(program() != 'erim') {
+  asis_output("
 Introductions
 ====================================================
 * Who are you? Which degree program are you in?
 * What do you hope to get out of this course?
 * Is there a specific data set you need to obtain and/or analyze?
 * How much prior experience do you have with R?
+")
+}
+```
+

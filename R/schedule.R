@@ -13,13 +13,12 @@ get_sessions <- function() {
     mutate(Date = coalesce(ymd(Date), ymd(Date)[1] + weeks(0:3)),
            Time = '13.30--16.30')
   } else if(program() == 'erim') {
-    frame_data(~Session, ~Date, ~Location,
-               1, '2017-07-03', 'Location TBD',
-               2, NA, 'Location TBD',
-               3, '2017-07-06', 'Location TBD',
-               4, NA, 'Location TBD') %>%
-      mutate(Date = coalesce(ymd(Date), lag(ymd(Date))),
-             Time = 'Time TBD')
+    frame_data(~Session, ~Date, ~Location, ~Time,
+               1, '2017-07-03', 'Polak Y1--07', '09:00--12:00',
+               2, NA, 'Polak Y1--07', '13:30--16:30',
+               3, '2017-07-06', 'Polak Y1--07', '09:00--12:00',
+               4, NA, 'Polak Y1--07', '13:30--16:30') %>%
+      mutate(Date = coalesce(ymd(Date), lag(ymd(Date))))
   }
 }
 
@@ -53,5 +52,5 @@ course_title <- function() {
 #' @export
 #'
 program <- function() {
-  'egsh'
+  'erim' #'egsh'
 }

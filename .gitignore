@@ -18,3 +18,5 @@ vignettes/*.pdf
 */*_files
 */*.pdf
 oauth_cache.RData
+packrat/lib*/
+packrat/src/

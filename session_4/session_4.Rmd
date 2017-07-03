@@ -1,15 +1,19 @@
 ---
-title: "Text and sentiment analysis"
+title: "`r rook::course_title()`: Session 4"
+subtitle: "Text and sentiment analysis"
 author: "J.M.T. Roos"
-date: "Last updated 1 June 2016"
+date: 'Last updated: `r lubridate::now()`'
 autosize: false
 css: "../css/slides.css"
 output: 
+  html_document: 
+    theme: paper
+    highlight: pygments
   revealjs::revealjs_presentation:
     self_contained: true
     theme: simple
-    highlight: NULL
-    transition: slide
+    highlight: pygments
+    transition: fade
     slide_level: 1
     reveal_options:
       controls: false
@@ -17,31 +21,37 @@ output:
     pandoc_args:
       [
       "--variable", "slideNumber='c/t'",
-      "--variable", "transitionSpeed=default",
+      "--variable", "transitionSpeed=fast",
       "--variable", "viewDistance=5"
       ]
+knitr:
+  cache: 1
 ---
 
 
 
-```{r echo=FALSE, include=FALSE}
-knitr::opts_chunk$set(tidy = TRUE, tidy.opts=list(blank=FALSE, width.cutoff=50), cache=TRUE)
-knitr::knit_hooks$set(
-source = function(x,options){
-  if( options$engine == 'R' ) {
-    # format R code
-    x = highr::hilight( x, format = 'html' )
-  } else if( options$engine == 'bash' ) {
-    # format bash code
-    x = paste0( '<span class="hl std">$</span> ', unlist( stringr::str_split( x, '\\n' ) ), '\n', collapse = '' )
-  }
-  # for (i in names(options)) {
-  #   message( paste( i, options[[i]] ) )
-  # }
-  x = paste(x, collapse = "\n")
-  sprintf("<div class=\"%s\"><pre class=\"%s %s\"><code class=\"%s %s\">%s</code></pre></div>\n", 'sourceCode', 'sourceCode', tolower(options$engine), 'sourceCode', tolower(options$engine), x)
-}
+```{r echo = FALSE, include = FALSE, cache = FALSE}
+knitr::opts_chunk$set(
+  tidy = TRUE,
+  tidy.opts = list(blank = FALSE, width.cutoff = 70),
+  cache = 1
 )
+# knitr::knit_hooks$set(
+# source = function(x,options){
+#   if( options$engine == 'R' ) {
+#     # format R code
+#     x = highr::hilight( x, format = 'html' )
+#   } else if( options$engine == 'bash' ) {
+#     # format bash code
+#     x = paste0( '<span class="hl std">$</span> ', unlist( stringr::str_split( x, '\\n' ) ), '\n', collapse = '' )
+#   }
+#   # for (i in names(options)) {
+#   #   message( paste( i, options[[i]] ) )
+#   # }
+#   x = paste(x, collapse = "\n")
+#   sprintf("<div class=\"%s\"><pre class=\"%s %s\"><code class=\"%s %s\">%s</code></pre></div>\n", 'sourceCode', 'sourceCode', tolower(options$engine), 'sourceCode', tolower(options$engine), x)
+# }
+# )
 ```
 
 
@@ -53,7 +63,7 @@ Review
 * During the week
     * Reviewing/learning the R programming language
     * Completing exercises (building a project, downloading data, etc.)
-    * Installing `tm`
+    * Installing `tm`, `lda`, and `topicmodels`
     * Completing the `tm` introductory tutorial
 
 
@@ -131,7 +141,7 @@ Special characters
 * In R, the backslash character `\` must be written as `\\` inside of strings
 
 ```{r}
-cat( '\\n' )
+cat('\\n')
 ```
 
 * So to write `c:\` as a REGEX inside an R string, we write `c:\\\\`
@@ -143,11 +153,11 @@ stringr
     * The work is done by the `stringi` package, which is more flexible but harder to work with
 * `stringr::str_detect(s, r)` returns `TRUE` if `s` can be matched by `r`
 
-```{r}
+```{r cache = FALSE}
 library(stringr)
 s <- 'This is the string to be matched'
 r <- 'm'
-str_detect( s, r )
+str_detect(s, r)
 ```
 
 ***
@@ -170,16 +180,16 @@ str_detect(s, r)
 
 *** 
 
-* `str_match(s, r)` will return the portion of `s` that was matched by `r`
+* `str_match(s, r)[[1]]` will return the portion of `s` that was matched by `r`
 
 ```{r}
 s <- 'This is the string to be matched'
 r <- ' [^ ]+ '
-str_match(s, r)
+str_match(s, r)[[1]]
 r <- '(is ){2}'
-str_match(s, r)
+str_match(s, r)[[1]]
 r <- '(is )+?'
-str_match(s, r)
+str_match(s, r)[[1]]
 ```
 
 Task
@@ -203,6 +213,7 @@ Task
 Task
 =================
 ```{r}
+library(stringr)
 s <- 'This is hi$ fist'
 ```
 * Write regular expressions in R using `str_match_all(s, r)` that produce the following matches
@@ -247,23 +258,33 @@ The `tm` package
 
 <div class="font-80">
 ```{r echo = FALSE}
-library(magrittr)
 # the html returned by this page is badly mangled, so I had to write this code to clean it up.
 get_ufo_sightings <- function(url) {
-  html <- httr::GET( url )
-  html <- html$content %>% rvest::repair_encoding() %>% stringr::str_split('[\\r\\n]') %>% .[[1]]
+  html <- httr::GET(url)
+  html <-
+    html$content %>% 
+    rvest::repair_encoding() %>% 
+    stringr::str_split('[\\r\\n]') %>% 
+    .[[1]]
   tab_delims <- which(stringr::str_detect(html, 'TABLE'))
-  table <- html[tab_delims[1]:tab_delims[2]] %>% stringr::str_c(., collapse = '')
-  xml2::read_html(table) %>% rvest::html_node('table') %>% rvest::html_table(.) %>% dplyr::as_data_frame(.) %>% dplyr::rename(., Date = `Date / Time`)
+  table <-
+    html[tab_delims[1]:tab_delims[2]] %>% 
+    stringr::str_c(., collapse = '')
+  xml2::read_html(table) %>% 
+    rvest::html_node('table') %>% 
+    rvest::html_table(.) %>% 
+    dplyr::as_data_frame(.) %>% 
+    dplyr::rename(., Date = `Date / Time`)
 }
 ```
 
-```{r message=FALSE}
-library(dplyr)
+```{r message=FALSE, cache = FALSE}
+library(tidyverse)
+```
+```{r message = FALSE}
 ufos <- get_ufo_sightings('http://www.nuforc.org/webreports/ndxe201604.html') #see .Rmd file for source
-ufos <- ufos %>% bind_rows( get_ufo_sightings('http://www.nuforc.org/webreports/ndxe201603.html') )
-library(stringr)
-ufos %>% transmute( Date, City, Duration, Summary = paste0( str_sub(Summary, 1, 18 ), '...') )
+ufos <- ufos %>% bind_rows( get_ufo_sightings('http://www.nuforc.org/webreports/ndxe201603.html'))
+ufos %>% transmute(Date, City, Duration, Summary = str_trunc(Summary, 21)) 
 ```
 </div>
 
@@ -274,9 +295,11 @@ ufo_text <- ufos$Summary
 ```
 
 ***
+```{r cache = FALSE}
+library(tm)
+```
 
 ```{r tidy=FALSE, message = FALSE}
-library(tm)
 ufo_corp <- Corpus(VectorSource(ufo_text)) %>%  # create corpus
   tm_map(content_transformer(tolower)) %>%      # lower case
   tm_map(removePunctuation) %>%                 # remove punctuation
@@ -292,8 +315,14 @@ as.character(ufo_corp[[4]]) %>% str_wrap %>% cat
 
 ```{r}
 tdm <- ufo_corp %>% TermDocumentMatrix
-tdm_long <- with( tdm, data_frame( term = i, document = j, count = v ) )
+tdm_long <- with(tdm, data_frame(term = i, document = j, count = v)) 
 tdm_long
+```
+
+***
+
+```{r}
+inspect(tdm[1:10,1:6])
 ```
 
 ***
@@ -305,10 +334,19 @@ inspect(tdm[535:545,1:6])
 
 ***
 
-* Use dplyr to aggregate counts across documents
+* Use `dplyr` to aggregate counts across documents
+```{r tidy = FALSE}
+tdm_long <- tdm_long %>% mutate(term = factor(term, labels = Terms(tdm)))
+tdm_long %>% group_by(term) %>% summarise(count = sum(count)) %>% 
+  arrange(desc(count))  
+```
+
+
+***
+
+* Alternative method to achieve same end from the `tidytext` package:
 ```{r}
-tdm_long <- tdm_long %>% mutate( term = factor(term, labels = Terms(tdm)) ) 
-tdm_long %>% group_by(term) %>% summarise(count = sum(count)) %>% arrange( desc(count))
+tdm %>% tidytext::tidy()
 ```
 
 ***
@@ -323,9 +361,9 @@ tdm %>% findFreqTerms(40)
 * Find terms that correlate with some other term
 
 ```{r}
-tdm %>% findAssocs( "shape", .2 ) # cor(x,y) >= .2
-tdm %>% findAssocs( "sky", .13 )
-tdm %>% findAssocs( "hover", .14 )
+tdm %>% findAssocs("shape", .2) # cor(x,y) >= .2
+tdm %>% findAssocs("sky", .13)
+tdm %>% findAssocs("hover", .14)
 ```
 
 ***
@@ -350,7 +388,14 @@ Scoring a term-document matrix
 <div class="font-80">
 ```{r echo = FALSE}
 stem_and_split <- function(x) {
-  x %>% VectorSource %>% Corpus %>% tm_map(stemDocument) %>% .[[1]] %>% as.character %>% str_split(' ') %>% .[[1]]
+  x %>% 
+    VectorSource %>% 
+    Corpus %>% 
+    tm_map(stemDocument) %>% 
+    .[[1]] %>% 
+    as.character %>% 
+    str_split(' ') %>% 
+    .[[1]]
 }
 ```
 ```{r}
@@ -360,7 +405,7 @@ words <- c('moving light night midnight minute white red pink orange yellow colo
 * Sums occurrances of terms within each document (very quickly)
 
 ```{r}
-tdm %>% tm_term_score(words) %>% data_frame( document = names(.), score = . )
+tdm %>% tm_term_score(words) %>% data_frame(document = names(.), score = .)
 ```
 </div>
 
@@ -379,16 +424,20 @@ Word lists
 * Typical lists include positive-negative, and VAD
 * Top 99 percent V/A/D words:
 
-```{r}
+```{r message = FALSE, warning = FALSE}
 word_scores_url <- 'http://crr.ugent.be/papers/Ratings_Warriner_et_al.csv'
-(words <- readr::read_csv(word_scores_url) %>% select(Word,valence=V.Mean.Sum,arousal=A.Mean.Sum,dominance=D.Mean.Sum))
+(words <- readr::read_csv(word_scores_url) %>% 
+    select(Word, valence = V.Mean.Sum, arousal = A.Mean.Sum, dominance = D.Mean.Sum))
 ```
 
 ***
 
 ```{r}
-library(tidyr)
-words %>% gather(variable,value,-Word) %>% group_by(variable) %>% filter(percent_rank(value)>.99) %>% ungroup %>% arrange(Word) 
+words %>% gather(variable, value, -Word) %>% 
+  group_by(variable) %>% 
+  filter(percent_rank(value) > .99) %>% 
+  ungroup %>% 
+  arrange(Word)
 ```
 
 High arousal words
@@ -397,8 +446,12 @@ High arousal words
 * Get the scores for words scoring highest on arousal
 * Then "stem" the words so they match with our UFO data
 
-```{r warning=FALSE}
-(arousal_words <- words %>% select(Word,arousal) %>% filter(percent_rank(arousal)>.9) %>% mutate( term = stemDocument(Word) ))
+```{r warning = FALSE}
+(arousal_words <- 
+   words %>% 
+   select(Word, arousal) %>% 
+   filter(percent_rank(arousal) > .9) %>% 
+   mutate(term = stemDocument(Word)))
 ```
 
 Merge scores and TDM
@@ -406,7 +459,7 @@ Merge scores and TDM
 * Join scores with the term-document matrix (in long data frame form)
 
 ```{r message=FALSE, warning=FALSE}
-tdm_long %>% inner_join( arousal_words )
+tdm_long %>% inner_join(arousal_words)
 ```
 
 UFO reports with highest arousal
@@ -416,18 +469,51 @@ UFO reports with highest arousal
 * Arrange by score then print out the top 5 reports
 
 ```{r warning=FALSE, message = FALSE, comment = ""}
-d <- tdm_long %>% inner_join( arousal_words ) %>% group_by( document ) %>% summarise( score=sum(arousal) ) %>% arrange(desc(score)) %>% top_n(5) %>% getElement('document')
-ufo_text[d] %>% str_wrap(width=70, exdent = 2) %>% str_c("* ", . ) %>% cat(sep = "\n")
+d <-
+  tdm_long %>% 
+  inner_join(arousal_words) %>% 
+  group_by(document) %>% 
+  summarise(score = sum(arousal)) %>% 
+  arrange(desc(score)) %>% 
+  top_n(5) %>% 
+  getElement('document')
+ufo_text[d] %>% 
+  str_wrap(width = 70, exdent = 2) %>% 
+  str_c("* ", .) %>% 
+  cat(sep = "\n")
 ```
 
 UFO reports with least arousal
 ====================================
 
 ```{r warning=FALSE, message = FALSE, comment = ""}
-low_arousal_words <- words %>% select(Word,arousal) %>% filter(percent_rank(arousal)<.1) %>% mutate( term = stemDocument(Word) )
-d <- tdm_long %>% inner_join( low_arousal_words ) %>% group_by( document ) %>% summarise( score=sum(arousal) ) %>% arrange(score) %>% top_n(5) %>% getElement('document')
-ufo_text[d] %>% str_wrap(width=70, exdent = 2) %>% str_c("* ", . ) %>% cat(sep = "\n")
+low_arousal_words <-
+  words %>% 
+  select(Word, arousal) %>% 
+  filter(percent_rank(arousal) < .1) %>% 
+  mutate(term = stemDocument(Word))
+d <-
+  tdm_long %>% 
+  inner_join(low_arousal_words) %>% 
+  group_by(document) %>% 
+  summarise(score = sum(arousal)) %>% 
+  arrange(score) %>% 
+  top_n(5) %>% 
+  getElement('document')
+ufo_text[d] %>% 
+  str_wrap(width = 70, exdent = 2) %>% 
+  str_c("* ", .) %>% 
+  cat(sep = "\n")
 ```
+
+
+A New Approach
+==============================
+
+* If you use text mining, you might want to look at the `tidytext` package and its accompanying (free) text http://tidytextmining.com/ 
+
+* The concepts are the same as we have already seen with `tm`, but the approach looks more like `dplyr`
+
 
 
 Latent Dirichlet allocation
@@ -449,41 +535,64 @@ txt <- c('Abe is funny',
 
 ```{r echo = FALSE}
 library(lda)
-lc <- txt %>% removeWords(stopwords()) %>% stripWhitespace %>% lexicalize
-K <- 4
+lc <- 
+  txt %>% 
+  removeWords(stopwords()) %>% 
+  stripWhitespace %>% 
+  lexicalize  # create a special structure used by the lda package
+K <- 4  # number of topics to detect
 set.seed(1234)
-f1 <- lda.collapsed.gibbs.sampler( lc$documents, K, lc$vocab, 500,.5,.1)
-(top.words <- top.topic.words(f1$topics, 1, by.score=TRUE))
-K <- 2
+f1 <- lda.collapsed.gibbs.sampler(lc$documents, K, lc$vocab, 500, .5, .1)
+(top.words <- top.topic.words(f1$topics, 1, by.score = TRUE))
+K <- 2  # number of topics to detect
 set.seed(1234)
-f1 <- lda.collapsed.gibbs.sampler( lc$documents, K, lc$vocab, 500,.5,.1)
-(top.words <- top.topic.words(f1$topics, 1, by.score=TRUE))
+f1 <- lda.collapsed.gibbs.sampler(lc$documents, K, lc$vocab, 500, .5, .1)
+(top.words <- top.topic.words(f1$topics, 1, by.score = TRUE))
 ```
 
+***
+
+![](lda.png){width=100%} \ 
 
 `lda`
 ====
+```{r echo = FALSE, cache = FALSE, results = 'hide'}
+library(lda)
+```
 
 ```{r}
 library(lda)
-lda_corp <- ufo_corp %>% plyr::laply( as.character ) %>% str_replace('(^| )[0-9]( |$)', ' [number] ') %>% str_replace('^ ','') %>% lexicalize
-K <- 14
+lda_corp <-
+  ufo_corp %>% 
+  plyr::laply(as.character) %>% 
+  str_replace('(^| )[0-9]( |$)', ' [number] ') %>% 
+  str_replace('^ ', '') %>% 
+  lexicalize
+K <- 14  # number of topics to detect
 set.seed(1234)
-fit <- lda.collapsed.gibbs.sampler( lda_corp$documents, K, lda_corp$vocab, 500,.5,.1)
-(top.words <- top.topic.words(fit$topics, 4, by.score=TRUE))
+fit <-
+  lda.collapsed.gibbs.sampler(lda_corp$documents, K, lda_corp$vocab, 500, .5, .1)
+(top.words <- top.topic.words(fit$topics, 4, by.score = TRUE))
 ```
 
 ***
 
 ```{r message=FALSE}
 get_topic_names <- function(fit) {
-# code copied from lda::top.topic.words:
-normalized.topics <- fit$topics/(rowSums(fit$topics) + 1e-05)
-scores <- apply(normalized.topics, 2, function(x) x * (log(x + 1e-05) - sum(log(x + 1e-05))/length(x)))
-# end
-cutoff <- min(apply(scores,1,function(x)max(x)))
-library(tidyr)
-scores %>% as.data.frame %>% mutate(f = 1:nrow(.)) %>% gather(key,value,-f) %>% filter( value >= cutoff ) %>% group_by(f) %>% arrange(f,desc(value)) %>% summarise( name = paste(key,collapse=' ') ) %>% getElement('name')
+  # code copied from lda::top.topic.words:
+  normalized.topics <- fit$topics / (rowSums(fit$topics) + 1e-05)
+  scores <- apply(normalized.topics, 2, function(x) x * (log(x + 1e-05) - sum(log(x + 1e-05)) / length(x)))
+  # end
+  cutoff <- min(apply(scores, 1, function(x) max(x)))
+  scores %>% 
+    as.data.frame %>% 
+    mutate(f = 1:nrow(.)) %>% 
+    gather(key, value, -f) %>% 
+    filter(value >= cutoff) %>% 
+    group_by(f) %>% 
+    arrange(f, desc(value)) %>% 
+    summarise(name = paste(key, collapse = ' ')) %>% 
+    getElement('name')
 }
 get_topic_names(fit)
 ```
@@ -493,12 +602,15 @@ get_topic_names(fit)
 <div class="font-90">
 ```{r echo = FALSE, results="asis"}
 exemp_tab <- function(fit) {
-exemplars <- fit$document_sums %>% apply(1,function(x)x/sum(x)) %>% as.data.frame %>% mutate( d = 1:nrow(.)) %>% gather(key,value,-d) %>% group_by(key) %>% filter( value == max(value) ) %>% group_by(key) %>% filter(d==min(d)) %>% getElement('d')
-
-exemp <- data_frame( name=get_topic_names(fit), top=ufo_text[exemplars] ) 
-cat('<table><thead><tr><th>Topic</th><th>Best match</th></tr></thead><tbody>')
-exemp %>% mutate(x=paste('<tr><td>',name,'</td><td>',top,'</td></tr>')) %>% getElement('x') %>% paste0(collapse='\n') %>% cat
-cat('</tbody></table>')
+  exemplars <-
+    fit$document_sums %>% apply(1, function(x)
+      x / sum(x)) %>% as.data.frame %>% mutate(d = 1:nrow(.)) %>% 
+    gather(key, value, -d) %>% group_by(key) %>% 
+    filter(value == max(value)) %>% group_by(key) %>% 
+    filter(d == min(d)) %>% getElement('d')
+  exemp <-
+    data_frame(name = get_topic_names(fit), top = ufo_text[exemplars])
+  pander::pandoc.table(exemp, style = 'rmarkdown', split.table = Inf, justify = 'll')
 }
 exemp_tab(fit)
 ```
@@ -511,8 +623,8 @@ exemp_tab(fit)
 ```{r echo=FALSE, results = 'asis'}
 K <- 5
 set.seed(1234)
-fit <- lda.collapsed.gibbs.sampler( lda_corp$documents, K, lda_corp$vocab, 500,.5,.1)
-exemp_tab(fit)
+fit <- lda.collapsed.gibbs.sampler(lda_corp$documents, K, lda_corp$vocab, 500, .5, .1)
+exemp_tab(fit) 
 ```
 
 ***
@@ -524,12 +636,18 @@ ufo_corp_with_stops_no_stemming <- Corpus(VectorSource(ufo_text)) %>%  # create 
   tm_map(content_transformer(tolower)) %>%      # lower case
   tm_map(removePunctuation) %>%                 # remove punctuation
   tm_map(stripWhitespace)                       # remove extra space 
-lda_corp_with_stops_no_stemming <- ufo_corp_with_stops_no_stemming %>% plyr::laply( as.character ) %>% str_replace('(^| )[0-9]( |$)', ' [number] ') %>% str_replace('^ ','') %>% lexicalize
+lda_corp_with_stops_no_stemming <- 
+  ufo_corp_with_stops_no_stemming %>% 
+  plyr::laply( as.character ) %>% 
+  str_replace('(^| )[0-9]( |$)', ' [number] ') %>% 
+  str_replace('^ ','') %>% 
+  lexicalize
 
 K <- 10
 set.seed(1234)
-fit <- lda.collapsed.gibbs.sampler( lda_corp_with_stops_no_stemming$documents, K, lda_corp_with_stops_no_stemming$vocab, 500,.5,.1)
-exemp_tab(fit)
+fit <- lda.collapsed.gibbs.sampler(lda_corp_with_stops_no_stemming$documents,
+    K, lda_corp_with_stops_no_stemming$vocab, 500, .5, .1)
+exemp_tab(fit) 
 ```
 
 ***
@@ -552,12 +670,13 @@ ufo_corp <- Corpus(VectorSource(ufo_text)) %>%
   tm_map(stemDocument) %>%
   tm_map(stripWhitespace) 
   
-lda_corp <- ufo_corp %>% plyr::laply( as.character ) %>% str_replace('(^| )[0-9]( |$)', ' [number] ') %>% str_replace('^ ','') %>% lexicalize
+lda_corp <- ufo_corp %>% plyr::laply( as.character ) %>% 
+  str_replace('(^| )[0-9]( |$)', ' [number] ') %>% str_replace('^ ','') %>% lexicalize
 
-K <- 10
+K <- 10 
 set.seed(1234)
-fit <- lda.collapsed.gibbs.sampler( lda_corp$documents, K, lda_corp$vocab, 500,.5,.1)
-exemp_tab(fit)
+fit <- lda.collapsed.gibbs.sampler(lda_corp$documents, K, lda_corp$vocab, 500, .5, .1)
+exemp_tab(fit) 
 ```
 
 
