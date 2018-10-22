@@ -25,7 +25,7 @@ library(rvest)
 The `rvest` package provides a set of simple tools for downloading and locating information inside HTML pages. Create a new `session` object using the search results as a starting point.
 
 ```{r}
-(session <- html_session( 'http://www.indeed.nl/vacatures?q=analytics&l=Rotterdam' ))
+(session <- html_session('http://www.indeed.nl/vacatures?q=analytics&l=Rotterdam'))
 ```
 
 Switch to your browser and use SelectorGadget to explore the structure of the page. Our goal is to identify a CSS selector that identifies each of the search results on this page. Identifying CSS selectors that point to the information you need is perhaps the most difficult part of scraping web pages, because it requires some knowledge of HTML and CSS, and a great deal of experimentation. 
@@ -65,7 +65,7 @@ len_jk <- results %>% html_nodes(xpath = paste0('//*[@*[contains(., "', jk, '")]
 The first job id (<code class="r">`r jk`</code>) is embedded in `r len_jk` different locations (note: depending on your search results, there might be a different number). But we get lucky: I recognize the first node as the top-level `div` associated with each job. In that `div`, the job id is stored as the value of the `data-jk` attribute. Let's see if we can extract the job id's by reading the values of the `data-jk` attribute.
 
 ```{r}
-(job_ids <- results %>% html_attr( 'data-jk' ))
+(job_ids <- results %>% html_attr('data-jk'))
 ```
 
 That looks like a list of 15 job ids! 
@@ -73,13 +73,13 @@ That looks like a list of 15 job ids!
 But which search results are sponsored and which ones are not? Going back to the browser, we can see that the sponsored links include the word 'Gesponsord', and using SelectorGadget, it appears the sponsored results are identified by the selector `..sponsoredGray`. The following query tests whether the results HTML includes a node matching the selector `..sponsoredGray`.
 
 ```{r}
-(sponsored <- results %>% plyr::laply( .fun = function(n)length(html_nodes( n,'.sponsoredGray'))>0 ))
+(sponsored <- map_lgl(results, ~length(html_nodes(., '.sponsoredGray')) > 0))
 ```
 
 We can now store some information about the first set of search results:
 
 ```{r message = FALSE}
-(jobs <- data_frame( id = job_ids, sponsored_result = sponsored ))
+(jobs <- data_frame(id = job_ids, sponsored_result = sponsored))
 ```
 
 Do it again
@@ -88,13 +88,13 @@ Do it again
 What about the next page of results? Using SelectorGadget, I determine that the "Next" ("Volgende") button can be found through the CSS selector `.pagination a:last-child`. Extracting that node yields the following.
 
 ```{r}
-session %>% html_nodes( '.pagination a:last-child' )
+session %>% html_nodes('.pagination a:last-child')
 ```
 
 Can we follow that link?
 
 ```{r}
-next_page_url <- session %>% html_nodes( '.pagination a:last-child' ) %>% html_attr('href')
+next_page_url <- session %>% html_nodes('.pagination a:last-child') %>% html_attr('href')
 (next_page <- session %>% jump_to( next_page_url ))
 ```
 
@@ -103,8 +103,8 @@ Does our earlier code work on the second page?
 ```{r}
 (results <- next_page %>% html_nodes( css = '.result' ))
 (job_ids <- results %>% html_attr( 'data-jk' ))
-(sponsored <- results %>% plyr::laply( .fun = function(n)length(html_nodes( n,'.sponsoredGray'))>0 ))
-(jobs <- bind_rows( jobs, data_frame( id = job_ids, sponsored_result = sponsored )) )
+(sponsored <- map_lgl(results, ~length(html_nodes(., '.sponsoredGray')) > 0))
+(jobs <- bind_rows(jobs, data_frame(id = job_ids, sponsored_result = sponsored)))
 ```
 
 It does! Let's try another page:
@@ -114,7 +114,7 @@ next_page_url <- next_page %>% html_nodes( '.pagination a:last-child' ) %>% html
 (next_page <- next_page %>% jump_to( next_page_url ))
 (results <- next_page %>% html_nodes( css = '.result' ))
 (job_ids <- results %>% html_attr( 'data-jk' ))
-(sponsored <- results %>% plyr::laply( .fun = function(n)length(html_nodes( n,'.sponsoredGray'))>0 ))
+(sponsored <- map_lgl(results, ~length(html_nodes(., '.sponsoredGray')) > 0))
 (jobs <- bind_rows( jobs, data_frame( id = job_ids, sponsored_result = sponsored )) )
 ```
 
@@ -123,19 +123,19 @@ Now we can see the outline of a data collection routine: visit a page, extract t
 I wrote the following function to carry out these steps based on the code we've already seen.
 
 ```{r}
-process_results_page <- function( page ) {
-  results <- page %>% html_nodes( css = '.result' )
-  job_ids <- results %>% html_attr( 'data-jk' )
-  sponsored <- results %>% plyr::laply( .fun = function(n)length(html_nodes( n,'.sponsoredGray'))>0 )
-  jobs <- data_frame( id = job_ids, sponsored_result = sponsored )
-  next_page_url <- page %>% html_nodes( '.pagination a:last-child' ) %>% html_attr('href')
+process_results_page <- function(page) {
+  results <- page %>% html_nodes(css = '.result')
+  job_ids <- results %>% html_attr('data-jk')
+  sponsored <- map_lgl(results, ~length(html_nodes(., '.sponsoredGray')) > 0)
+  jobs <- data_frame(id = job_ids, sponsored_result = sponsored)
+  next_page_url <- page %>% html_nodes('.pagination a:last-child') %>% html_attr('href')
     
   next_page <- NULL
   continue <- length(next_page_url) > 0
-  if( continue ) {
-    next_page <- jump_to( session, next_page_url )
+  if(continue) {
+    next_page <- jump_to(session, next_page_url)
   }
-  return( list( jobs = jobs, continue = continue, next_page = next_page ) )
+  return(list(jobs = jobs, continue = continue, next_page = next_page))
 }
 ```
 
@@ -146,10 +146,10 @@ Note: To automate this procedure, we need a test that tells us when we are done.
 ```{r}
 keep_going <- TRUE
 page <- session
-jobs <- data_frame( id = '', sponsored_result = TRUE )[NULL,]
-while( keep_going ) {
-  result <- process_results_page( page )
-  jobs <- bind_rows( jobs, result$jobs )
+jobs <- data_frame(id = '', sponsored_result = TRUE)[NULL, ]
+while(keep_going) {
+  result <- process_results_page(page)
+  jobs <- bind_rows(jobs, result$jobs)
   keep_going <- result$continue
   page <- result$next_page
 }
@@ -177,16 +177,16 @@ We know how to construct a URL to the job detail page, since we did this earlier
 job_detail_url <- function(job_id) {
   paste0('http://www.indeed.nl/viewjob?jk=',job_id) 
 }
-job_detail_url( jk )
+job_detail_url(jk)
 ```
 
 We will now look more closely at the contents of one of those pages, using `r paste0('http://www.indeed.nl/viewjob?jk=',jk)` as an example. 
 
 ```{r}
-(detail_page <- session %>% jump_to( job_detail_url(jk) ))
+(detail_page <- session %>% jump_to(job_detail_url(jk)))
 ```
 
-SelectorGadget was not much help in identifying where the data is stored. Instead, I used "Inspect Element" in my web browser to identify the relevant CSS selectors. In this case, I found `.jobtitle`, `#job_header > .company`, `#job_header > .location`, and `.summary`, which point to the job title, company name, job location, and summary text for the job listing.
+SelectorGadget was not much help in identifying where the data is stored. Instead, I used "Inspect Element" in my web browser to identify the relevant CSS selectors. In this case, I found `.jobtitle`, `td:first-child > div > .company`, `td:first-child > div > .location`, and `.summary`, which point to the job title, company name, job location, and summary text for the job listing.
 
 ```{r}
 detail_page %>% html_nodes('.jobtitle') %>% html_text
@@ -195,16 +195,20 @@ detail_page %>% html_node('td:first-child > div > .location') %>% html_text
 detail_page %>% html_nodes('.summary') %>% html_text
 ```
 
-We will now write a function to visit a page and extract the interesting data based on the code above.
+We will now write a function to visit a page and extract the interesting data based on the code above. The `if` statement in this function tests whether the web server has returned a status of `200` which indicates there were no problems processing the request (I added this code after observing that one of the job pages returns an error `Internal Server Error (HTTP 500)`).
 
 ```{r}
-process_detail_page <- function( job_id ) {
-  detail_page <- session %>% jump_to( job_detail_url(job_id) )
-  title <- detail_page %>% html_nodes('.jobtitle') %>% html_text
-  company <- detail_page %>% html_node('td:first-child > div > .company') %>% html_text
-  location <- detail_page %>% html_node('td:first-child > div > .location') %>% html_text
-  summary <- detail_page %>% html_nodes('.summary') %>% html_text
-  data_frame( id = job_id, title = title, company = company, location = location, summary = summary )
+process_detail_page <- function(job_id) {
+  detail_page <- session %>% jump_to(job_detail_url(job_id))
+  if (detail_page$response$status_code == 200) {
+    title <- detail_page %>% html_nodes('.jobtitle') %>% html_text
+    company <- detail_page %>% html_node('td:first-child > div > .company') %>% html_text
+    location <- detail_page %>% html_node('td:first-child > div > .location') %>% html_text
+    summary <- detail_page %>% html_nodes('.summary') %>% html_text
+    data_frame(id = job_id, title = title, company = company, location = location, summary = summary)
+  } else {
+    return(NULL)
+  }
 }
 ```
 
@@ -213,10 +217,10 @@ This function receives a job id, visits the relevant detail page, and returns a 
 Here is the code to loop over the distinct job id's and assemble the results.
 
 ```{r}
-job_details <- data_frame( id = '', title = '', company = '', location = '', summary = '' )[NULL,]
-for( job_id in distinct_job_ids ) {
+job_details <- data_frame(id = '', title = '', company = '', location = '', summary = '')[NULL,]
+for(job_id in distinct_job_ids) {
   current_job_detail <- process_detail_page(job_id)
-  job_details <- bind_rows( job_details, current_job_detail)
+  job_details <- bind_rows(job_details, current_job_detail)
 }
 job_details %>% glimpse
 ```
@@ -230,7 +234,7 @@ jobs <- jobs %>% group_by(id) %>% summarise(sponsored_result = any(sponsored_res
 Finally, we can join the two data frames:
 
 ```{r}
-(jobs_with_details <- jobs %>% inner_join( job_details )) %>% glimpse
+(jobs_with_details <- jobs %>% inner_join(job_details, by = 'id')) %>% glimpse
 ```
 
 Now what?
@@ -252,19 +256,25 @@ Using the code above, we will write a function to detect words inside the job su
 summary_has_word <- function( .summary, word ) {
   str_detect( .summary, paste0('[/ ]', word, '[/\\.?! ]') )
 }
-jobs_with_details_tagged <- jobs_with_details %>% mutate( 
-  Hadoop = summary_has_word(summary, 'Hadoop'),
-  SQL = summary_has_word(summary, 'SQL'),
-  R = summary_has_word(summary, 'R'),
-  Python = summary_has_word(summary,'Python'))
+jobs_with_details_tagged <- jobs_with_details %>% 
+  mutate(Hadoop = summary_has_word(summary, 'Hadoop'), 
+         SQL = summary_has_word(summary, 'SQL'),
+         R = summary_has_word(summary, 'R'),
+         Python = summary_has_word(summary,'Python'))
 ```
 
 Here are a few toy examples of what we might do with such data:
 
 ```{r}
-jobs_with_details_tagged %>% select( Hadoop, SQL, R, Python ) %>% cor
-jobs_with_details_tagged %>% group_by( location ) %>% summarise(n())
-jobs_with_details_tagged %>% mutate( None = !(Hadoop | SQL | R | Python) ) %>% gather( Language, value, Hadoop, SQL, R, Python, None ) %>% filter( value == TRUE ) %>% group_by( location, Language ) %>% summarise(n=n()) %>% arrange(desc(n))
+jobs_with_details_tagged %>% select(Hadoop, SQL, R, Python) %>% cor
+jobs_with_details_tagged %>% group_by(location) %>% summarise(n())
+jobs_with_details_tagged %>% 
+  mutate(None = !(Hadoop | SQL | R | Python)) %>% 
+  gather(Language, value, Hadoop, SQL, R, Python, None) %>% 
+  filter(value == TRUE) %>% 
+  group_by(location, Language) %>% 
+  summarise(n = n()) %>% 
+  arrange(desc(n))
 ```
 
 

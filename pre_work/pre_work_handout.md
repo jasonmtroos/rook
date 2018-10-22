@@ -1,7 +1,7 @@
 ---
-title: "`r rook::course_title()`: Pre-work"
+title: "Data visualisation, web scraping, and text analysis in R: Pre-work"
 author: "J.M.T. Roos"
-date: 'Last updated: `r lubridate::now()`'
+date: 'Last updated: 2018-05-14 10:52:49'
 output: 
   html_document: 
     theme: paper
@@ -11,12 +11,9 @@ editor_options:
   chunk_output_type: console
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-library(rook)
-```
 
-Welcome to the `r rook::course_title()` course offered by `r toupper(program())`. Because we have more material to cover than we have time together, you will need to do a few things before our first meeting.
+
+Welcome to the Data visualisation, web scraping, and text analysis in R course offered by EGSH. Because we have more material to cover than we have time together, you will need to do a few things before our first meeting.
 
 ## Familiarity with R
 
@@ -54,9 +51,10 @@ RStudio provides an integrated development environment (IDE) for writing and exe
 
 Install R on your computer if you do not already have it installed. You can download R from [https://cloud.r-project.org/](https://cloud.r-project.org/). If you are working on a Windows computer, you should also install [RTools](https://cran.r-project.org/bin/windows/Rtools/).
 
-If you have an older version of R on your computer, now is a good time to upgrade to the latest version. As of the time of writing, the current version of R is `r rversions::r_release()$version`. To see the version on your computer, execute the following code in the R Console (or R Studio if already installed):
+If you have an older version of R on your computer, now is a good time to upgrade to the latest version. As of the time of writing, the current version of R is 3.5.0. To see the version on your computer, execute the following code in the R Console (or R Studio if already installed):
 
-```{r eval = FALSE}
+
+```r
 version$version.string
 ```
 
@@ -64,14 +62,15 @@ version$version.string
 Install RStudio on your computer if you do not already have it. You can download RStudio from [https://www.rstudio.com/products/rstudio/download/](https://www.rstudio.com/products/rstudio/download/). Note that RStudio offers both commercial and free versions; you should install the free version.
 
 
-**Note:** Jason is running  `r paste(unlist(R.version[c('version.string', 'nickname')]), collapse = " ")` and RStudio `r rstudioapi::getVersion()` at the time of writing.
+**Note:** Jason is running  R version 3.5.0 (2018-04-23) Joy in Playing and RStudio 1.1.447 at the time of writing.
 
 
 
 #### R Packages
 
 Open an R console and execute the following:
-```{r eval = FALSE}
+
+```r
 install.packages('devtools', dependencies = TRUE)
 install.packages('tidyverse', dependencies = TRUE)
 install.packages('Hmisc', dependencies = TRUE)
@@ -82,13 +81,15 @@ install.packages('lda', dependencies = TRUE)
 
 Windows users will want to execute the following R code *after* they have installed the `devtools` package and installed RTools. Open RStudio and type the following into the R Console, then hit Enter.
 
-```{r eval = FALSE}
+
+```r
 devtools::setup_rtools()
 ```
 
 OS X users may need to install the XCode command-line tool chain, by opening a Terminal window and executing the following command:
 
-```{r engine = 'bash', eval = FALSE}
+
+```bash
 xcode-select --install
 ```
 
@@ -104,14 +105,16 @@ After you have created a GitHub account, you need to do a little bit of configur
 * Execute the following commands, substituting your information
 * **Note:** Use the email address associated with your **GitHub** account
 
-```{r engine='bash', eval=FALSE, highlight=TRUE}
+
+```bash
 git config --global user.name "Your Name"
 git config --global user.email "yourname@example.com"
 ```
 
 * OS X users might need to issue the following commands as well
 
-```{r engine='bash', eval=FALSE, highlight=TRUE}
+
+```bash
 git credential-osxkeychain
 git config --global credential.helper osxkeychain
 ```
@@ -129,7 +132,8 @@ The following needs to be done prior to Session 3. Given the short time frame fo
     3. Visit the [Twitter apps](https://apps.twitter.com) site and create a new app
     4. Create and record the four variables needed to access the Twitter API, and insert them into the code below to verify everything is working without error. You will need these four values for Session 3.
     
-```{r eval = FALSE}
+
+```r
 library(twitteR)
 setup_twitter_oauth("your_consumer_key", "your_consumer_secret", "your_access_token", "your_access_secret")
 searchTwitter(searchString = '#hashtag', n = 100,
@@ -148,7 +152,8 @@ searchTwitter(searchString = '#hashtag', n = 100,
 #### The `tm` package
 
 * Read and follow (type along with) this tutorial:
-```{r eval = FALSE}
+
+```r
 vignette('tm', package = 'tm')
 ```
 (or https://cran.r-project.org/web/packages/tm/vignettes/tm.pdf if that doesn't work...)

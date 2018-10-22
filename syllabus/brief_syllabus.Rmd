@@ -48,7 +48,7 @@ There are four sessions of 4 hours each taking place on two days. Sessions will 
 
 # Assignments
 
-Sessions are both iterative and cumulative, hence attendance for all four sessions is mandatory. During sessions, you will work on exercises allowing you to practice new skills. These exercises will not be graded, but their completion is mandatory. Between sessions, you will complete additional exercises based on your own research interests. Students will also review and replicate each other's code.
+Sessions are both iterative and cumulative, hence attendance for all four sessions is mandatory. During sessions, you will work on exercises allowing you to practice new skills. These exercises will not be graded, but their completion is mandatory. Between sessions 2 and 3, you will complete additional exercises based on your own research interests. Students will also review and replicate each other's code.
 
 
 

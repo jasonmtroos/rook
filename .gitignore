@@ -20,3 +20,4 @@ vignettes/*.pdf
 oauth_cache.RData
 packrat/lib*/
 packrat/src/
+.DS_Store

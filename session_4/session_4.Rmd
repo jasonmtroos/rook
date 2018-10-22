@@ -26,6 +26,8 @@ output:
       ]
 knitr:
   cache: 1
+editor_options: 
+  chunk_output_type: console
 ---
 
 
@@ -283,7 +285,7 @@ library(tidyverse)
 ```
 ```{r message = FALSE}
 ufos <- get_ufo_sightings('http://www.nuforc.org/webreports/ndxe201604.html') #see .Rmd file for source
-ufos <- ufos %>% bind_rows( get_ufo_sightings('http://www.nuforc.org/webreports/ndxe201603.html'))
+ufos <- ufos %>% bind_rows(get_ufo_sightings('http://www.nuforc.org/webreports/ndxe201603.html'))
 ufos %>% transmute(Date, City, Duration, Summary = str_trunc(Summary, 21)) 
 ```
 </div>
@@ -308,7 +310,6 @@ ufo_corp <- Corpus(VectorSource(ufo_text)) %>%  # create corpus
   tm_map(stripWhitespace)                       # remove extra space 
 ufo_corp
 ufo_text[4] %>% str_wrap %>% cat
-as.character(ufo_corp[[4]]) %>% str_wrap %>% cat
 ```
 
 ***
@@ -322,13 +323,13 @@ tdm_long
 ***
 
 ```{r}
-inspect(tdm[1:10,1:6])
+inspect(tdm[1:10, 1:6])
 ```
 
 ***
 
 ```{r}
-inspect(tdm[535:545,1:6])
+inspect(tdm[535:545, 1:6])
 ```
 
 
@@ -679,11 +680,77 @@ fit <- lda.collapsed.gibbs.sampler(lda_corp$documents, K, lda_corp$vocab, 500, .
 exemp_tab(fit) 
 ```
 
+***
+
+* Same thing, but without stemming
+
+```{r echo=FALSE, results = 'asis', message = FALSE}
+ufo_corp <- Corpus(VectorSource(ufo_text)) %>% 
+  tm_map(content_transformer(tolower)) %>% 
+  tm_map(removePunctuation) %>% 
+  tm_map(removeWords, stopwords('english')) %>%
+  # tm_map(stemDocument) %>%
+  tm_map(stripWhitespace) 
+  
+lda_corp <- ufo_corp %>% plyr::laply( as.character ) %>% 
+  str_replace('(^| )[0-9]( |$)', ' [number] ') %>% str_replace('^ ','') %>% lexicalize
+
+K <- 10 
+set.seed(1234)
+fit <- lda.collapsed.gibbs.sampler(lda_corp$documents, K, lda_corp$vocab, 500, .5, .1)
+exemp_tab(fit) 
+```
+
+
+The `topicmodels` package
+============================
+
+* Similar functionality, just a different implementation
+
+* Takes a `DocumentTermMatrix` object as input
+
+```{r}
+library(topicmodels)
+control <- list(seed = 1, iter = 1500, burnin = 500)
+dtm <- DocumentTermMatrix(ufo_corp)
+set.seed(1234)
+fit2 <- LDA(dtm, k = 10, method = 'Gibbs', control = control)
+```
+
+
+Output from `topicmodels`
+==========================
+
+```{r}
+post <- posterior(fit2)
+output <- 
+  post$terms %>% 
+  as_data_frame %>%
+  mutate(topic = row_number()) %>%
+  gather(term, value, -topic) %>%
+  group_by(topic) %>%
+  top_n(5, value) %>%
+  ungroup %>%
+  arrange(topic, desc(value), term) %>%
+  group_by(topic) %>%
+  summarise(terms = paste(term, collapse = ', '))
+```
+
+---
+
+```{r}
+output
+```
+
+
+
+
 
 Task
 ====
 
-* Visit [http://www.jasonmtroos.com/assets/media/teaching/
-rook/session_4_in_class.html](http://www.jasonmtroos.com/assets/media/teaching/rook/session_4_in_class.html) ...or...
-* [http://goo.gl/mxP4UT](http://goo.gl/mxP4UT)
+* Visit https://www.dropbox.com/s/adezcjlelf3puux/lovecraft_handout.html?dl=1 ...or...
+* https://goo.gl/vQ94za
+
+
 

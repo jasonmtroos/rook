@@ -5,20 +5,21 @@
 #'
 get_sessions <- function() {
   if(program() == 'egsh') {
-    frame_data(~Session, ~Date, ~Location,
-               1, '2017-05-08', 'Polak Y1--15',
-               2, NA, 'Polak Y3--08',
-               3, NA, 'Polak Y1--15',
-               4, NA, 'Polak Y1--15') %>%
-    mutate(Date = coalesce(ymd(Date), ymd(Date)[1] + weeks(0:3)),
-           Time = '13.30--16.30')
+    tibble::frame_data(~Session, ~Date, ~Location, ~Time,
+               1, '2018-05-17', 'TBA', '9:30--12:30',
+               2, '2018-05-17', 'TBA', '13:00--17:00',
+               3, '2018-05-24', 'TBA', '9:30--12:30',
+               4, '2018-05-24', 'TBA', '13:00--17:00') %>%
+      dplyr::mutate(Date = lubridate::ymd(Date))
+    # mutate(Date = coalesce(ymd(Date), ymd(Date)[1] + weeks(0:3)),
+           # Time = '13.30--16.30')
   } else if(program() == 'erim') {
-    frame_data(~Session, ~Date, ~Location, ~Time,
+    tibble::frame_data(~Session, ~Date, ~Location, ~Time,
                1, '2017-07-03', 'Polak Y1--07', '09:00--12:00',
                2, NA, 'Polak Y1--07', '13:30--16:30',
                3, '2017-07-06', 'Polak Y1--07', '09:00--12:00',
                4, NA, 'Polak Y1--07', '13:30--16:30') %>%
-      mutate(Date = coalesce(ymd(Date), lag(ymd(Date))))
+      dplyr::mutate(Date = coalesce(lubridate::ymd(Date), lag(lubridate::ymd(Date))))
   }
 }
 
@@ -40,7 +41,7 @@ print_session_info <- function(s) {
 #' @export
 course_title <- function() {
   if(program() == 'egsh')
-    "Big data analysis and visualisation"
+    "Data visualisation, web scraping, and text analysis in R"
   else if(program() == 'erim')
     "Introduction to data visualization, web scraping, and text analysis in R"
 }
@@ -52,5 +53,5 @@ course_title <- function() {
 #' @export
 #'
 program <- function() {
-  'erim' #'egsh'
+  'egsh' #'erim' 'egsh'
 }

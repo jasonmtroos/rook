@@ -9,6 +9,9 @@ output:
   html_document: 
     theme: paper
     highlight: pygments
+  pdf_document:
+    highlight: pygments
+    latex_engine: xelatex
   revealjs::revealjs_presentation:
     self_contained: true
     theme: simple

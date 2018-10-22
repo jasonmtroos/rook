@@ -68,7 +68,7 @@ Review
 * In class
     * git --- cloning, committing, pushing
     * R Markdown --- mixing text with R code using `` ```{r} `` blocks
-* During the `r if(program() == 'egsh') {asis_output('week')} else if(program() == 'erim') {asis_output('break')}`
+* This past week and/or during the break
     * Reviewing/learning the R programming language
     * Installing packages
 
@@ -556,7 +556,7 @@ Practice with layers (Tasks 1--4)
 * Discuss what you are doing as you write code
 * Write your code in an empty **File > New File... > R Script** and execute each line using `Cmd-Enter` (Mac) or `Control-Enter` (Windows)
 * Use the data set called `mpg` which is included in the `ggplot2` package
-* Exercises can be found at http://jasonmtroos.com/assets/media/teaching/rook/session_2_in_class.html or `http://goo.gl/Gx5LAK`
+* Exercises can be found at https://www.dropbox.com/s/469x7xhnwkzm2nw/in_class_work_handout.html?dl=1 or `https://goo.gl/W7m6CC`
 
 Data
 =======
@@ -634,8 +634,9 @@ Task 0 (Example)
 Basic exercises (Tasks 1--4)
 ============================
 
-* http://jasonmtroos.com/assets/media/teaching/rook/session_2_in_class.html
-* `http://goo.gl/Gx5LAK`
+* https://www.dropbox.com/s/469x7xhnwkzm2nw/in_class_work_handout.html?dl=1 
+
+* `https://goo.gl/W7m6CC`
 
 Facets and discrete groups
 ==========================
@@ -734,14 +735,14 @@ Relabelling
 ===========
 
 ```{r fig.height=3}
-ggplot(mpg, aes(x = displ, y = hwy, colour = plyr::revalue(drv, c("f" = "Fore", "r" = "Rear", "4" = "4WD")))) + geom_point() + labs(colour = "Drive train")
+ggplot(mpg, aes(x = displ, y = hwy, colour = plyr::revalue(drv, c("f" = "Front", "r" = "Rear", "4" = "4WD")))) + geom_point() + labs(colour = "Drive train")
 ```
 
 ***
 
 
 ```{r fig.height=3}
-ggplot(mpg, aes(x = displ, y = hwy ) )+ geom_point() + facet_wrap(~drv, labeller = as_labeller(c('f' = 'Fore', 'r' = 'Rear', '4' = '4WD')))
+ggplot(mpg, aes(x = displ, y = hwy ) )+ geom_point() + facet_wrap(~drv, labeller = as_labeller(c('f' = 'Front', 'r' = 'Rear', '4' = '4WD')))
 ```
 
 - Another alternative is to use the `forcats` package to relabel/reorder factors
@@ -1027,12 +1028,12 @@ d %>% summarise( hwy = mean(hwy), cty = mean(cty) )
 ```
 
 ```{r eval = FALSE}
-d %>% summarise_each(funs(mean))
+d %>% summarise_all(funs(mean))
 ```
 
 ```{r results='asis', echo=FALSE}
 format.table(d, 
-d %>% summarise_each(funs(mean))
+d %>% summarise_all(funs(mean))
              )
 ```
 
@@ -1042,12 +1043,12 @@ Grouping operations
 With `summarise`...
 
 ```{r eval = FALSE}
-d %>% group_by( cyl ) %>% summarise_each(funs(mean))
+d %>% group_by( cyl ) %>% summarise_all(funs(mean))
 ```
 
 ```{r results='asis', echo=FALSE}
 format.table(d, 
-d %>% group_by( cyl ) %>% summarise_each(funs(mean))
+d %>% group_by( cyl ) %>% summarise_all(funs(mean))
              )
 ```
 
@@ -1260,7 +1261,7 @@ students %>% full_join( grades )
 ***
 
 <div class="center">
-![](join-outer.png)
+![](join-outer.png){height=680px}
 </div>
 
 
@@ -1384,7 +1385,7 @@ This week: Want more practice?
 Visit these sites, read them, and write some code:
 
 * Visualization
-    - [ggplot2 Documentation](http://docs.ggplot2.org/current/)
+    - [ggplot2 Documentation](http://ggplot2.tidyverse.org/reference/index.html)
     - [Chapter 3 of R for Data Science](http://r4ds.had.co.nz/data-visualisation.html)
 * Functions
     - [DataCamp tutorial on functions](https://www.datacamp.com/community/tutorials/functions-in-r-a-tutorial)

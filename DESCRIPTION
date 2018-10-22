@@ -7,7 +7,7 @@ Depends:
     R (>= 3.3.2)
 Imports:
     rversions,
-    devtools, 
+    devtools,
     tidyverse,
     rmarkdown,
     knitr,
@@ -19,7 +19,8 @@ Imports:
     revealjs,
     nycflights13,
     pander,
-    here
+    here,
+    magrittr
 Suggests:
     roxygen2
 License: What license is it under?

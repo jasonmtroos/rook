@@ -26,6 +26,8 @@ output:
       ]
 knitr:
   cache: 1
+editor_options: 
+  chunk_output_type: console
 ---
 
 
@@ -235,7 +237,7 @@ A quote by a famous thinker
 </div>
 </div>
 ') %>% html_nodes('body')
-html_body %>% html_nodes( 'div.articleBody > div.mainBody > div.quotedBlock' )
+html_body %>% html_nodes('div.articleBody > div.mainBody > div.quotedBlock')
 ```
 
 CSS Selectors
@@ -324,7 +326,7 @@ A useful tool
 <div class="left">
 ~~~
 ```{r echo=FALSE, comment = ''}
-html_snippet <- read_html( '<html><body><div class="ads"><div class="dyn-ad"/><div class="dyn-ad"/></div><div class="headline"><h1>Bad yogurt</h1></div><div class="article"><p>It is everywhere these days.</p><p>Get some now.</p></div></body></html>' )
+html_snippet <- read_html('<html><body><div class="ads"><div class="dyn-ad"/><div class="dyn-ad"/></div><div class="headline"><h1>Bad yogurt</h1></div><div class="article"><p>It is everywhere these days.</p><p>Get some now.</p></div></body></html>')
 html_snippet %>% cat_break_html
 ```
 ~~~
@@ -368,7 +370,7 @@ Task 1
 ```{r message = FALSE, warning = FALSE}
 library(rvest)
 library(tidyverse)
-page <- html_session( 'https://www.eur.nl/english/education/phdp/' )
+page <- html_session('https://www.eur.nl/en/research/phd-programmes')
 ```
 
 * Complete this code:
@@ -382,7 +384,7 @@ in order to yield this result:
 ```{r echo = FALSE}
 ow <- options()$width
 options(width=200)
-links <- page %>% html_nodes( 'h3+ul>li>a' )
+links <- page %>% html_nodes('p > a')
 links
 options(width=ow)
 ```
@@ -413,7 +415,7 @@ schools
 Task 3: Job browsing demo
 =================
 
-See http://www.jasonmtroos.com/assets/media/teaching/rook/job_browsing.html or http://goo.gl/e5DnG7
+See https://www.dropbox.com/s/mqlmcqozb0bm8q0/job_browsing_handout.html?dl=1 or https://goo.gl/dD4Dhv
 
 
 Reading tabular data
@@ -422,7 +424,7 @@ Reading tabular data
 ```{r message=FALSE}
 doc <- read_html('https://en.wikipedia.org/wiki/List_of_countries_by_cigarette_consumption_per_capita')
 smoking <- doc %>% html_node('table.wikitable') %>% html_table
-smoking %>% rename(rank = Ranking, country = `Country/Territory`, num_per_adult = `Number of cigarettes\nper person aged ≥ 15 per year[7]`) %>% tbl_df
+smoking %>% rename(country = `Country`, num_per_adult = `Cigarette consumption[8]`) %>% tbl_df
 ```
 </div>
 
@@ -431,10 +433,10 @@ Task 4:
 
 ```{r echo=FALSE, eval = FALSE}
 doc <- read_html('https://en.wikipedia.org/wiki/Most_common_words_in_English')
-doc %>% html_nodes('table.wikitable') %>% plyr::llply(html_table) %>% plyr::ldply(bind_rows)
+doc %>% html_nodes('table.wikitable') %>% map(~html_table(.)) %>% bind_rows
 ```
 
-* Use `html_table()` to extract the first table at https://en.wikipedia.org/wiki/List_of_newspapers_in_the_Republic_of_Ireland 
+* Use `html_table()` to extract the first table (English language, daily) at https://en.wikipedia.org/wiki/List_of_newspapers_in_the_Republic_of_Ireland 
 
 ```{r echo = FALSE}
 doc <- read_html('https://en.wikipedia.org/wiki/List_of_newspapers_in_the_Republic_of_Ireland')
@@ -509,7 +511,7 @@ API calls
    "friends":{  
       "data":[  
          {  
-            "name":"Jim MacJimface",
+            "name":"Nancy MacNancyface",
             "id":"5278757"
          },
          {  
@@ -541,13 +543,13 @@ library(twitteR)
 library(purrr)
 load_cached_oath_credentials <- safely( function() {
   token_env <- new.env()
-  load("../oauth_cache.RData", token_env) 
+  load(here::here("oauth_cache.RData"), token_env) 
   assign("oauth_token", token_env$token, envir=twitteR:::oauth_cache)
   NULL
 } )
 load_result <- load_cached_oath_credentials()
 if(!is.null(load_result$error)){
-  stop('OAuth credentials need to be cached before this code can run. See "session_3.Rmd" at or near line 509 for instructions.')
+  stop('OAuth credentials need to be cached before this code can run. See "session_3.Rmd" at or near line 553 for instructions.')
   # Be sure the working directory is set to the root of the 'rook' project, 
   # then execute the following code, after substituting your consumer_key, 
   # consumer_secret, access_token, and access_secret into the call to setup_twitter_oauth.
@@ -570,7 +572,7 @@ Basic setup of twitteR calls
 =======================================
 ```{r eval = FALSE, tidy = FALSE}
 library(twitteR)
-options(httr_oauth_cache=TRUE)
+options(httr_oauth_cache = TRUE)
 setup_twitter_oauth(consumer_key='your key goes here',
                     consumer_secret='your secret goes here',
                     access_token='your token goes here',
@@ -584,14 +586,14 @@ getUser
 jmtroos <- getUser('jmtroos') 
 jmtroos$screenName
 jmtroos$name
-jmtroos$description
+jmtroos$description %>% cat
 jmtroos$lastStatus$created
 ```
 
 ***
 
 ```{r}
-botimeline <- userTimeline('barackobama', n=10)
+botimeline <- userTimeline('barackobama', n = 10)
 class(botimeline)
 length(botimeline)
 ```
@@ -630,29 +632,19 @@ searchTwitter( '[ your code goes here ]' ) %>% twListToDF
 
 * Try plotting the results with ggplot2
 
-This week 
+During the break
 ============
 ```{r eval = FALSE}
-install.packages('tm',dependencies=TRUE)
-install.packages('lda',dependencies=TRUE)
+install.packages('tm', dependencies = TRUE)
+install.packages('lda', dependencies = TRUE)
 ```
-* Read and follow (type along with) this tutorial:
+* Read and follow (type along with) this tutorial if you haven't already
 ```{r eval = FALSE}
-vignette('tm',package='tm')
+vignette('tm', package = 'tm')
 ```
 (or https://cran.r-project.org/web/packages/tm/vignettes/tm.pdf if that doesn't work...)
 * Skim pp 1--7 of [Gonçalves, et al. "A Benchmark Comparison of State-of-the-Practice Sentiment Analysis Methods." arXiv preprint arXiv:1512.01818 (2015). http://arxiv.org/pdf/1512.01818.pdf](http://arxiv.org/pdf/1512.01818.pdf)
 
-This week
-==========
-
-* Create a new repository on github
-* Create a new RStudio project using that repository
-* Create an R Markdown file
-    * Download some interesting data from the web using `rvest` or `twitteR`
-    * Clean up the data using `dplyr` and/or `tidyr`
-    * Visualize the data using `ggplot2`
-* Share the repository with somebody else (and CC: me)
 
 
 

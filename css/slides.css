@@ -28,7 +28,7 @@ html * {
 
 .reveal a {
     color: #857F03;
-    border-bottom: 1px #CFC842 dashed;
+    /*border-bottom: 1px #CFC842 dashed;*/
     text-decoration: none;
     -webkit-transition: color border 0.15s ease;
     -moz-transition: color border 0.15s ease;
@@ -37,7 +37,7 @@ html * {
 
 .reveal a:hover {
     color: #CFC842;
-    border-bottom: 1px #C4C4C4 dashed;
+    /*border-bottom: 1px #C4C4C4 dashed;*/
     text-shadow: none;
     text-decoration: none;
 }
