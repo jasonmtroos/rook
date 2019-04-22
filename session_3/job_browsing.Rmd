@@ -6,6 +6,8 @@ output: html_document
 knitr:
   cache: 
     false
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r setup, include=FALSE}
@@ -186,13 +188,14 @@ We will now look more closely at the contents of one of those pages, using `r pa
 (detail_page <- session %>% jump_to(job_detail_url(jk)))
 ```
 
-SelectorGadget was not much help in identifying where the data is stored. Instead, I used "Inspect Element" in my web browser to identify the relevant CSS selectors. In this case, I found `.jobtitle`, `td:first-child > div > .company`, `td:first-child > div > .location`, and `.summary`, which point to the job title, company name, job location, and summary text for the job listing.
+
+SelectorGadget was not much help in identifying where the data is stored. Instead, I used "Inspect Element" in my web browser to identify the relevant CSS selectors. In this case, I found `.jobsearch-JobInfoHeader-title`, `td:first-child > div > .company`, `td:first-child > div > .location`, and `.summary`, which point to the job title, company name, job location, and summary text for the job listing.
 
 ```{r}
-detail_page %>% html_nodes('.jobtitle') %>% html_text
-detail_page %>% html_node('td:first-child > div > .company') %>% html_text
-detail_page %>% html_node('td:first-child > div > .location') %>% html_text
-detail_page %>% html_nodes('.summary') %>% html_text
+detail_page %>% html_nodes('.jobsearch-JobInfoHeader-title') %>% html_text
+detail_page %>% html_node('.jobsearch-InlineCompanyRating > div:first-child') %>% html_text
+detail_page %>% html_node('.jobsearch-InlineCompanyRating > div:last-child') %>% html_text
+detail_page %>% html_nodes('.jobsearch-JobComponent-description') %>% html_text
 ```
 
 We will now write a function to visit a page and extract the interesting data based on the code above. The `if` statement in this function tests whether the web server has returned a status of `200` which indicates there were no problems processing the request (I added this code after observing that one of the job pages returns an error `Internal Server Error (HTTP 500)`).
@@ -201,10 +204,10 @@ We will now write a function to visit a page and extract the interesting data ba
 process_detail_page <- function(job_id) {
   detail_page <- session %>% jump_to(job_detail_url(job_id))
   if (detail_page$response$status_code == 200) {
-    title <- detail_page %>% html_nodes('.jobtitle') %>% html_text
-    company <- detail_page %>% html_node('td:first-child > div > .company') %>% html_text
-    location <- detail_page %>% html_node('td:first-child > div > .location') %>% html_text
-    summary <- detail_page %>% html_nodes('.summary') %>% html_text
+    title <- detail_page %>% html_nodes('.jobsearch-JobInfoHeader-title') %>% html_text
+    company <- detail_page %>% html_node('.jobsearch-InlineCompanyRating > div:first-child') %>% html_text
+    location <- detail_page %>% html_node('.jobsearch-InlineCompanyRating > div:last-child') %>% html_text
+    summary <- detail_page %>% html_nodes('.jobsearch-JobComponent-description') %>% html_text
     data_frame(id = job_id, title = title, company = company, location = location, summary = summary)
   } else {
     return(NULL)
