@@ -16,22 +16,20 @@ knitr::opts_chunk$set(echo = TRUE)
 library(rook)
 ```
 
-Welcome to the `r rook::course_title()` course offered by `r toupper(program())`. Because we have more material to cover than we have time together, you will need to do a few things before our first meeting.
+Welcome to the `r rook::course_title()` course offered by `r toupper(rook::program())`. Because we have more material to cover than we have time together, you will need to do a few things before our first meeting.
 
 ## Familiarity with R
 
-You should have prior experience with writing code in the [R programming language](https://www.r-project.org/). Although you do not need to be an expert in R, this course is not an introduction to programming, and I will assume you understand the basics of R, such as expressions, functions, conditional statements, loops, etc.
+You must have prior experience writing code in the [R programming language](https://www.r-project.org/).You do not need to be an expert in R. But this course is *not* an introduction to programming. I will assume you understand the basics of R, such as expressions, functions, conditional statements, loops, etc.
 
-If you are not particularly comfortable writing code in R, or perhaps just generally unsure about your level of preparedness, it is important that you practice writing code in R so that you can get the most out of the course. A few resources that might help:
- 
-* I created a series of R tutorials for my MSc course "Marketing Analytics." Please [download the tutorials](http://www.jasonmtroos.com/assets/media/teaching/course_assignments_and_data.zip), unzip them, and follow along (reading and coding as you go). You do not need to be familiar with all of the material in these tutorials---in fact, we will cover much of this material as part of the class---but at the same time, the material in these tutorials shouldn't be entirely alien to you. A good test is whether you already know everything in Assignment 1, plus how to write basic statements using the `if`, `for`, and `function` statements in R (which are not covered in Assignment 1, but are important for our course). If you know all of that, and can comprehend the material in the later assignments (even if it is unfamiliar), then you are probably in fine shape for the course.
-* Additional resources for learning R can be found at [this web page I put together](http://www.jasonmtroos.com/learning-r/).
+If you are not particularly comfortable writing code in R, or perhaps just generally unsure about your level of preparedness, it is important that you practice writing code in R so that you can get the most out of the course. I created a series of R tutorials for my MSc course "Marketing Analytics." Please [download the tutorials](http://www.jasonmtroos.com/assets/media/teaching/course_assignments_and_data.zip), unzip them, and follow along (reading and coding as you go). You do not need to be familiar with all of the material in these tutorials---in fact, we will cover much of this material as part of the class---but at the same time, the material in these tutorials shouldn't be entirely alien to you. A good test is whether you already know everything in Assignment 1, plus how to write basic statements using the `if`, `for`, and `function` statements in R (which are not covered in Assignment 1, but are important for our course). If you know all of that, and can comprehend the material in the later assignments (even if it is unfamiliar), then you are probably in fine shape for the course.
+
 
 
 
 ## Software
 
-You need to have the following programs installed on whichever laptop you will bring to the course sessions: 
+Prior to the first session, you must have the following programs installed on whichever laptop you will bring to the course sessions: 
 
 - [git](https://git-scm.com)
 - [R](https://cloud.r-project.org/)   
@@ -76,7 +74,7 @@ install.packages('devtools', dependencies = TRUE)
 install.packages('tidyverse', dependencies = TRUE)
 install.packages('Hmisc', dependencies = TRUE)
 install.packages('tm', dependencies = TRUE)
-install.packages('twitteR', dependencies = TRUE)
+install.packages('rtweet', dependencies = TRUE)
 install.packages('lda', dependencies = TRUE)
 ```
 
@@ -122,27 +120,19 @@ The following needs to be done prior to Session 3. Given the short time frame fo
 
 #### Twitter
 
-* Follow [this tutorial](http://bigcomputing.blogspot.nl/2016/02/the-twitter-r-package-by-jeff-gentry-is.html) which provides detailed instructions for setting up programmatic access to Twitter. 
+* Follow [this tutorial](https://rtweet.info/articles/auth.html) which provides detailed instructions for setting up programmatic access to Twitter using the `rtweet` package. I recommend using Authorization Method #2 (Access token/secret method).
 * Specifically, do the following (but follow the detailed instructions in the tutorial):
-    1. `install.packages('twitteR', dependencies = TRUE)`
+    1. `install.packages('rtweet', dependencies = TRUE)`
     2. [Create a Twitter account](http://twitter.com/signup) if you do not already have one
     3. Visit the [Twitter apps](https://apps.twitter.com) site and create a new app
-    4. Create and record the four variables needed to access the Twitter API, and insert them into the code below to verify everything is working without error. You will need these four values for Session 3.
-    
-```{r eval = FALSE}
-library(twitteR)
-setup_twitter_oauth("your_consumer_key", "your_consumer_secret", "your_access_token", "your_access_secret")
-searchTwitter(searchString = '#hashtag', n = 100,
-  lang = 'en', since = NULL, until = NULL, locale = NULL,
-  geocode = NULL, sinceID = NULL, maxID = NULL, 
-  resultType = 'recent', retryOnRateLimit = 120)
-```
+    4. Create and record the four keys and access tokens needed to access the Twitter API, then insert them into the code in the turorial (starting with `token <- create_token(...`) to ensure everything is working without error. If the code `identical(token, get_token())` works, then everything should be set up correctly.
+
 
 #### HTML
 
 * [Review or learn the basics of HTML](https://www.w3schools.com/html/html_intro.asp)
 * [Play this game](http://flukeout.github.io) to learn CSS
-* Install [SelectorGadget](https://chrome.google.com/webstore/detail/selectorgadget/mhjhnkcfbdhnjickkkdbjoemdmbfginb/related) for Chrome and try it, or else do a lot of playing around with "Inspect Element" in your favorite browser
+* Install [SelectorGadget](https://chrome.google.com/webstore/detail/selectorgadget/mhjhnkcfbdhnjickkkdbjoemdmbfginb/overview) for Chrome and try it, or else do a lot of playing around with "Inspect Element" in your favorite browser
 * Skim [this Wikipedia article about CGI query strings](https://en.wikipedia.org/wiki/Query_string) so that you have a sense of why I might infer that if this page generates page 1 of data: `http://some-site.com/show_data?page=1`, then this page: `http://some-site.com/show_data?page=2` will probably generate page 2.
 
 #### The `tm` package
