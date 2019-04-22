@@ -355,7 +355,7 @@ Download data
 * Add this code to your R Markdown file
 
 ```{r echo=FALSE, comment=''}
-cat( 'Download sleep study data\n```{r}\nlibrary(readr)\nsleep <- read_csv("https://vincentarelbundock.github.io/\n    Rdatasets/csv/lme4/sleepstudy.csv") # no spaces\nhead(sleep)\n```' )
+cat( 'Download sleep study data\n```{r}\nlibrary(readr)\nsleep <- read_csv("https://vincentarelbundock.github.io/\n    Rdatasets/csv/lme4/sleepstudy.csv") # ignore the spaces and line breaks\nhead(sleep)\n```' )
 ```
 
 * Click on **Knit**
@@ -518,7 +518,7 @@ if(program() == 'egsh') {
     * Assignment 4 -- more ggplot2 and dplyr (**mandatory**)
         * If you want more ggplot2 material, check out [Chapter 3 of R for Data Science](http://r4ds.had.co.nz/data-visualisation.html)
         * If you want more dplyr material, check out [Chapter 4 of R for Data Science](http://r4ds.had.co.nz/transform.html)
-4. Email me with questions: [roos@rsm.nl](mailto:roos@rsm.nl)
+4. Email me with questions: [jroos@rsm.nl](mailto:jroos@rsm.nl)
 
 
 
@@ -530,7 +530,7 @@ install.packages('devtools', dependencies = TRUE)
 install.packages('tidyverse', dependencies = TRUE)
 install.packages('Hmisc', dependencies = TRUE)
 install.packages('tm', dependencies = TRUE)
-install.packages('twitteR', dependencies = TRUE)
+install.packages('rtweet', dependencies = TRUE)
 install.packages('lda', dependencies = TRUE)
 ```
 
