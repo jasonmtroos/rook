@@ -1,6 +1,6 @@
 ---
 title: "`r rook::course_title()`"
-subtitle: "Session 1: Getting your development environment in order"
+subtitle: "Session 1b: Getting your development environment in order"
 author: "J.M.T. Roos"
 date: 'Last updated: `r lubridate::now()`'
 autosize: false
