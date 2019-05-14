@@ -13,7 +13,7 @@ Imports:
     knitr,
     Hmisc,
     tm,
-    twitteR,
+    rtweet,
     lda,
     formatR,
     revealjs,

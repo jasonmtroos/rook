@@ -1,5 +1,6 @@
 ---
-title: "`r rook::course_title()`: Course overview"
+title: "`r rook::course_title()`"
+subtitle: "Session 1a: Course Overview"
 author: "J.M.T. Roos"
 date: 'Last updated: `r lubridate::now()`'
 autosize: false
@@ -48,7 +49,7 @@ Objectives
 *	Automate data collection from web sites and social media
 *	Basic proficiency with tools for analyzing large quantities of text
 *	Monitor and manage the various steps of data collection and analysis for both integrity and replication purposes
-*	Become a more productive (taking less time to analyze your data) and careful (making fewer mistakes) scientist
+*	Become a more productive (taking less time to analyze your data) and careful (making fewer mistakes) scientist
 
 Course structure
 =================
@@ -56,7 +57,7 @@ Course structure
 ```{r}
 if(program() == 'egsh') {
   asis_output("
-* Four sessions, Tuesdays and Thursdays from 13.30--16.30
+* Four sessions, Tuesdays and Thursdays from 13.30--17.00
 * Rooms are not the same for every session ([see this page for details](https://www.egsh.eur.nl/doctoral-education/phd-course-guide/data-visualisation-web-scraping-and-text-analysis-in-r/))
 ")
   }
