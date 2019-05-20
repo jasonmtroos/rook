@@ -5,13 +5,13 @@ date: 'Last updated: `r lubridate::now()`'
 output: html_document
 knitr:
   cache: 
-    false
+    true
 editor_options: 
   chunk_output_type: console
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, tidy = TRUE, cache = FALSE)
+knitr::opts_chunk$set(echo = TRUE, tidy = TRUE, cache = TRUE)
 ```
 
 Open a web browser and visit [http://www.indeed.nl/vacatures?q=analytics&l=Rotterdam](http://www.indeed.nl/vacatures?q=analytics&l=Rotterdam). You should see a list of search results. Click on one of the linked jobs and view its detail page. In this brief tutorial, we will write code to programmatically extract information about each of the jobs in this set of search results.
@@ -26,15 +26,15 @@ library(rvest)
 
 The `rvest` package provides a set of simple tools for downloading and locating information inside HTML pages. Create a new `session` object using the search results as a starting point.
 
-```{r}
+```{r cache = FALSE}
 (session <- html_session('http://www.indeed.nl/vacatures?q=analytics&l=Rotterdam'))
 ```
 
 Switch to your browser and use SelectorGadget to explore the structure of the page. Our goal is to identify a CSS selector that identifies each of the search results on this page. Identifying CSS selectors that point to the information you need is perhaps the most difficult part of scraping web pages, because it requires some knowledge of HTML and CSS, and a great deal of experimentation. 
 
-Eventually, I identify a selector that corresponds with each of the search results on this page. The selector is `.result`. According to SelectorGadget, there are 15 items matching the selector `.result`. Strangely, the HTML page indicates you we looking at the first 10 search results. This discrepancy is due to some of these search results being *sponsored.* That is, each page has 10 *organic* search results and up to 5 *sponsored* search results. We will collect information about both.
+Eventually, I identify a selector that corresponds with each of the search results on this page. The selector is `.result`. According to SelectorGadget, there are `r length(html_nodes(session, css = '.result'))` items matching the selector `.result`. Strangely, the HTML page indicates you we looking at the first 10 search results. This discrepancy is due to some of these search results being *sponsored.* That is, each page has 10 *organic* search results and up to 6 *sponsored* search results. We will collect information about both.
 
-Now that we know the CSS selector `.results` points to each of the 15 jobs listed on this page, we will look at the contents of these nodes.
+Now that we know the CSS selector `.results` points to each of the jobs listed on this page, we will look at the contents of these nodes.
 
 ```{r}
 (results <- session %>% html_nodes( css = '.result' ))
@@ -54,7 +54,7 @@ We need to search for the string <code class="r">`r jk`</code> somewhere in the 
 
 <pre class="r"><code class="r"><span class="identifier">jk</span> <span class="operator">&lt;-</span> <span class="string">"`r jk`"</span></code></pre>
 
-The following XPATH query returns any nodes that contain the string `jk` in one of their attributes.
+The following XPATH query returns any nodes that contain the string `jk` in one of their *attributes* (for example, it would match ```r paste0('<div id="recJobLoc_', jk, '">')``` because the `id` attribute contains the string ```r jk```): 
 
 ```{r}
 results %>% html_nodes(xpath = paste0('//*[@*[contains(., "', jk, '")]]'))
@@ -64,15 +64,15 @@ results %>% html_nodes(xpath = paste0('//*[@*[contains(., "', jk, '")]]'))
 len_jk <- results %>% html_nodes(xpath = paste0('//*[@*[contains(., "', jk, '")]]')) %>% length
 ```
 
-The first job id (<code class="r">`r jk`</code>) is embedded in `r len_jk` different locations (note: depending on your search results, there might be a different number). But we get lucky: I recognize the first node as the top-level `div` associated with each job. In that `div`, the job id is stored as the value of the `data-jk` attribute. Let's see if we can extract the job id's by reading the values of the `data-jk` attribute.
+The first job id (<code class="r">`r jk`</code>) is embedded in `r len_jk` different locations (note: depending on your search results, there might be a different number). But we get lucky: I recognize the first node as the top-level `div` associated with each search result. In that `div`, the job id is stored as the value of the `data-jk` attribute. Let's see if we can extract the job id's by reading the values of the `data-jk` attribute.
 
 ```{r}
 (job_ids <- results %>% html_attr('data-jk'))
 ```
 
-That looks like a list of 15 job ids! 
+That looks like a list of job ids! 
 
-But which search results are sponsored and which ones are not? Going back to the browser, we can see that the sponsored links include the word 'Gesponsord', and using SelectorGadget, it appears the sponsored results are identified by the selector `..sponsoredGray`. The following query tests whether the results HTML includes a node matching the selector `..sponsoredGray`.
+But which search results are sponsored and which ones are not? Going back to the browser, we can see that the sponsored links include the word 'Gesponsord', and using SelectorGadget, it appears the sponsored results are identified by the selector `.sponsoredGray`. The following query tests whether the results HTML includes a node matching the selector `.sponsoredGray`.
 
 ```{r}
 (sponsored <- map_lgl(results, ~length(html_nodes(., '.sponsoredGray')) > 0))
@@ -81,7 +81,7 @@ But which search results are sponsored and which ones are not? Going back to the
 We can now store some information about the first set of search results:
 
 ```{r message = FALSE}
-(jobs <- data_frame(id = job_ids, sponsored_result = sponsored))
+(jobs <- tibble(id = job_ids, sponsored_result = sponsored))
 ```
 
 Do it again
@@ -106,7 +106,7 @@ Does our earlier code work on the second page?
 (results <- next_page %>% html_nodes( css = '.result' ))
 (job_ids <- results %>% html_attr( 'data-jk' ))
 (sponsored <- map_lgl(results, ~length(html_nodes(., '.sponsoredGray')) > 0))
-(jobs <- bind_rows(jobs, data_frame(id = job_ids, sponsored_result = sponsored)))
+(jobs <- bind_rows(jobs, tibble(id = job_ids, sponsored_result = sponsored)))
 ```
 
 It does! Let's try another page:
@@ -117,10 +117,10 @@ next_page_url <- next_page %>% html_nodes( '.pagination a:last-child' ) %>% html
 (results <- next_page %>% html_nodes( css = '.result' ))
 (job_ids <- results %>% html_attr( 'data-jk' ))
 (sponsored <- map_lgl(results, ~length(html_nodes(., '.sponsoredGray')) > 0))
-(jobs <- bind_rows( jobs, data_frame( id = job_ids, sponsored_result = sponsored )) )
+(jobs <- bind_rows( jobs, tibble( id = job_ids, sponsored_result = sponsored )) )
 ```
 
-Now we can see the outline of a data collection routine: visit a page, extract the job ids (we will construct links and visit the job detail pages later), identify which job lists are sponsored, and repeat for the next page in the search results. 
+Now we can see the outline of a data collection routine: visit a page of search  results, extract the job ids (we will construct links and visit the job detail pages later), identify which job lists are sponsored, and repeat for the next page in the search results. 
 
 I wrote the following function to carry out these steps based on the code we've already seen.
 
@@ -129,7 +129,7 @@ process_results_page <- function(page) {
   results <- page %>% html_nodes(css = '.result')
   job_ids <- results %>% html_attr('data-jk')
   sponsored <- map_lgl(results, ~length(html_nodes(., '.sponsoredGray')) > 0)
-  jobs <- data_frame(id = job_ids, sponsored_result = sponsored)
+  jobs <- tibble(id = job_ids, sponsored_result = sponsored)
   next_page_url <- page %>% html_nodes('.pagination a:last-child') %>% html_attr('href')
     
   next_page <- NULL
@@ -148,12 +148,14 @@ Note: To automate this procedure, we need a test that tells us when we are done.
 ```{r}
 keep_going <- TRUE
 page <- session
-jobs <- data_frame(id = '', sponsored_result = TRUE)[NULL, ]
+jobs <- tibble(id = '', sponsored_result = TRUE)[NULL, ]
 while(keep_going) {
   result <- process_results_page(page)
   jobs <- bind_rows(jobs, result$jobs)
   keep_going <- result$continue
   page <- result$next_page
+  Sys.sleep(.3) # Pause .3 seconds between requests to 
+                # ensure we don't overload the web server
 }
 ```
 
@@ -198,7 +200,7 @@ detail_page %>% html_node('.jobsearch-InlineCompanyRating > div:last-child') %>%
 detail_page %>% html_nodes('.jobsearch-JobComponent-description') %>% html_text
 ```
 
-We will now write a function to visit a page and extract the interesting data based on the code above. The `if` statement in this function tests whether the web server has returned a status of `200` which indicates there were no problems processing the request (I added this code after observing that one of the job pages returns an error `Internal Server Error (HTTP 500)`).
+We will now write a function to visit a page and extract the interesting data based on the code above. The `if` statement in this function tests whether the web server has returned a status of `200` which indicates there were no problems processing the request. 
 
 ```{r}
 process_detail_page <- function(job_id) {
@@ -208,7 +210,7 @@ process_detail_page <- function(job_id) {
     company <- detail_page %>% html_node('.jobsearch-InlineCompanyRating > div:first-child') %>% html_text
     location <- detail_page %>% html_node('.jobsearch-InlineCompanyRating > div:last-child') %>% html_text
     summary <- detail_page %>% html_nodes('.jobsearch-JobComponent-description') %>% html_text
-    data_frame(id = job_id, title = title, company = company, location = location, summary = summary)
+    tibble(id = job_id, title = title, company = company, location = location, summary = summary)
   } else {
     return(NULL)
   }
@@ -220,10 +222,11 @@ This function receives a job id, visits the relevant detail page, and returns a 
 Here is the code to loop over the distinct job id's and assemble the results.
 
 ```{r}
-job_details <- data_frame(id = '', title = '', company = '', location = '', summary = '')[NULL,]
+job_details <- tibble(id = '', title = '', company = '', location = '', summary = '')[NULL,]
 for(job_id in distinct_job_ids) {
   current_job_detail <- process_detail_page(job_id)
   job_details <- bind_rows(job_details, current_job_detail)
+  Sys.sleep(.3) # so we do not overload the web server
 }
 job_details %>% glimpse
 ```
@@ -246,7 +249,6 @@ Now what?
 This tutorial describes the process of collecting data about job listings from web pages, and presupposes there would have been a good reason to do so. Since we have the data now, let's do a little bit of processing on the data, just for fun.
 
 ```{r}
-library(stringr)
 jobs_with_details %>% filter( str_detect(summary,'[/ ]R[/ ]') ) 
 jobs_with_details %>% filter( str_detect(summary,'[/ ]SQL[/ ]') ) 
 jobs_with_details %>% filter( str_detect(summary,'[/ ]Python[/ ]') ) 
