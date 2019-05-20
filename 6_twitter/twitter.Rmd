@@ -1,0 +1,263 @@
+---
+title: "`r rook::course_title()`: Session 3b"
+subtitle: "Obtaining data from APIs (Twitter)"
+author: "J.M.T. Roos"
+date: 'Last updated: `r lubridate::now()`'
+autosize: false
+css: "../css/slides.css"
+output: 
+  html_document: 
+    theme: paper
+    highlight: pygments
+    self_contained: true
+  revealjs::revealjs_presentation:
+    self_contained: true
+    theme: simple
+    highlight: NULL
+    transition: fade
+    slide_level: 1
+    reveal_options:
+      controls: false
+      margin: .05
+    pandoc_args:
+      [
+      "--variable", "slideNumber='c/t'",
+      "--variable", "transitionSpeed=fast",
+      "--variable", "viewDistance=5"
+      ]
+knitr:
+  cache: 1
+editor_options: 
+  chunk_output_type: console
+---
+
+
+
+```{r echo=FALSE, include=FALSE}
+knitr::opts_chunk$set(tidy = TRUE, tidy.opts=list(blank=FALSE, width.cutoff=50), cache=TRUE)
+knitr::opts_chunk$set(
+  tidy = TRUE,
+  tidy.opts = list(blank = FALSE, width.cutoff = 50),
+  cache = 1
+)
+knitr::knit_hooks$set(
+  source = function(x, options) {
+    if (options$engine == 'R') {
+      # format R code
+      x = highr::hilight(x, format = 'html')
+    } else if (options$engine == 'bash') {
+      # format bash code
+      x = paste0('<span class="hl std">$</span> ',
+                 unlist(stringr::str_split(x, '\\n')),
+                 '\n',
+                 collapse = '')
+    }
+    x = paste(x, collapse = "\n")
+    sprintf(
+      "<div class=\"%s\"><pre class=\"%s %s\"><code class=\"%s %s\">%s</code></pre></div>\n",
+      'sourceCode',
+      'sourceCode',
+      tolower(options$engine),
+      'sourceCode',
+      tolower(options$engine),
+      x
+    )
+  }
+)
+```
+
+
+
+Today
+========================================
+
+1. Earlier: Scraping data from web sites
+    * HTML and CSS selectors
+    * `rvest`
+    
+2. Now: Social media
+    * JSON and OATH
+    * `rtweet`
+    
+  
+
+Platform APIs
+==============
+* You are Mark Zuckerberg and you run Facebook
+* I want to build a feature into my mobile app that posts content to my users' Facebook accounts
+* I ask you to set up a web page that my app will use to post content
+* I have 100,000 friends making similar requests, but each with slightly different needs
+* Rather than build a tool for each customer, you build a single tool that everybody can use
+    * API: Application programming interface
+        * Functions that return data or do things
+        * Security model
+    * Sets the rules for how you interact with platforms like Facebook and Twitter
+    
+OAuth
+================
+* Platforms care a lot about security and want to be sure the app trying to post to your wall
+    1. Actually has permission to do so
+    2. Is really the app it says it is
+* **Problem:** allow my app to access your account without allowing...
+    * ...my app to see your password
+    * ...malicious hackers to trick you into giving away your password
+* **Solution:** OAuth 2.0
+
+How OAuth works, at a very high level...
+===================
+1. App: asks platform for a `request token`
+2. Platform: here is a `request token` and a `secret`
+3. App: redirects user to web page hosted by platform
+4. User: logs in and confirms level of access to be given to app
+5. Platform: redirects user back to app
+6. Platform: sends app an `access token`
+7. App: uses `secret` and `access token` to encrypt and authenticate
+
+API calls
+===============
+* API calls always include the OAuth access token
+* API call is performed by making a request to a web page on platform's server
+* Response from the platform's web server is text, in a format called JSON (JavaScript Object Notation)
+* JSON is easy for humans to read; easy for computers to parse
+
+***
+
+```
+{  
+   "id":"23462029838",
+   "first_name":"Jason",
+   "last_name":"Roos",
+   "location":{  
+      "id":"10952412900",
+      "name":"Rotterdam, Netherlands"
+   },
+   "friends":{  
+      "data":[  
+         {  
+            "name":"Nancy MacNancyface",
+            "id":"5278757"
+         },
+         {  
+            "name":"Davy McDavyface",
+            "id":"72186234457"
+         }
+      ]
+   }
+}
+```
+
+
+API wrappers
+====================
+* Language-specific interfaces that interact with the platform behind-the-scenes
+    * Examples in R: `twitteR` and `Rfacebook`
+* Instead of writing code to send requests to https://api.twitter.com/1.1/search/tweets.json?q=uber we call the `rtweet` function `search_tweets`
+```{r eval = FALSE, tidy = FALSE}
+library(tidyverse)
+library(rtweet)
+statuses <- search_tweets(q = '#hashtag', 
+                          n = 10, lang = 'en', type = 'recent' )
+```
+
+* The API wrapper calls the API and converts the JSON response into a language-friendly format (e.g., `data_frame` in R)
+
+```{r echo = FALSE, message = FALSE}
+library(tidyverse)
+library(rtweet)
+```
+
+***
+
+Basic setup of twitteR calls
+=======================================
+```{r eval = FALSE, tidy = FALSE}
+library(rtweet)
+token <- create_token(
+  app = "my_twitter_research_app",
+  consumer_key = "XYznzPFOFZR2a39FwWKN1Jp41",
+  consumer_secret = "CtkGEWmSevZqJuKl6HHrBxbCybxI1xGLqrD5ynPd9jG0SoHZbD",
+  acess_token = "9551451262-wK2EmA942kxZYIwa5LMKZoQA4Xc2uyIiEwu2YXL",
+  access_secret = "9vpiSGKg1fIPQtxc5d5ESiFlZQpfbknEN1f1m2xe5byw7")
+```
+
+User information
+========
+
+```{r}
+jmtroos <- lookup_users('jmtroos') %>% users_data()
+jmtroos %>% select(screen_name, name, location, description, followers_count, friends_count, statuses_count) %>% glimpse()
+```
+
+Timelines
+==============
+
+<div class="font-70">
+```{r}
+djt <- get_timeline("realDonaldTrump", n = 3200)
+```
+
+```{r fig.height=4}
+djt %>% transmute(when = created_at - hours(6)) %>% 
+  mutate(time = hour(when)+minute(when)/60) %>%
+  ggplot(aes(x =  when, y = time, colour = as.numeric(when)))  +
+  geom_point(show.legend = FALSE) +
+  scale_colour_viridis_c(end = .8) +
+  theme_minimal()
+```
+</div>
+
+***
+
+<div class="font-70">
+```{r fig.height =  4}
+djt %>%
+  transmute(when = created_at - hours(6)) %>% 
+  mutate(time = hour(when)+minute(when)/60)  %>%
+  ggplot(aes(x = time)) +
+  stat_bin(binwidth = .5) +
+  theme_minimal()
+```
+</div>
+
+***
+
+```{r}
+djt %>% select(text) %>%
+  tidytext::unnest_tokens('word', 'text') %>%
+  count(word) %>% arrange(desc(n)) %>%
+  anti_join(bind_rows(tidytext::stop_words, tibble(word = c('https', 'amp', 't.co'))))
+```
+
+
+***
+
+Exercise
+==========
+* Write code to search for something interesting on Twitter
+
+```{r eval = FALSE, tidy = FALSE}
+library(tidyverse)
+library(rtweet)
+search_tweets( '[ your code goes here ]' )
+```
+
+* Try plotting the results with ggplot2
+
+Before the next session 
+============
+```{r eval = FALSE}
+install.packages('tm', dependencies = TRUE)
+install.packages('lda', dependencies = TRUE)
+```
+
+* Read and follow (type along with) this tutorial if you haven't already
+```{r eval = FALSE}
+vignette('tm', package = 'tm')
+```
+(or https://cran.r-project.org/web/packages/tm/vignettes/tm.pdf if that doesn't work...)
+
+* Skim pp 1--7 of [Gonçalves, et al. "A Benchmark Comparison of State-of-the-Practice Sentiment Analysis Methods." arXiv preprint arXiv:1512.01818 (2015). http://arxiv.org/pdf/1512.01818.pdf](http://arxiv.org/pdf/1512.01818.pdf)
+
+
+
+

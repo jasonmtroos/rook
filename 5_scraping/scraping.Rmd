@@ -1,6 +1,6 @@
 ---
-title: "`r rook::course_title()`: Session 3"
-subtitle: "Obtaining data from web sites and social media"
+title: "`r rook::course_title()`: Session 3a"
+subtitle: "Scraping data from web site HTML"
 author: "J.M.T. Roos"
 date: 'Last updated: `r lubridate::now()`'
 autosize: false
@@ -33,7 +33,7 @@ editor_options:
 
 
 ```{r echo=FALSE, include=FALSE}
-knitr::opts_chunk$set(tidy = TRUE, tidy.opts=list(blank=FALSE, width.cutoff=50), cache=FALSE)
+knitr::opts_chunk$set(tidy = TRUE, tidy.opts=list(blank=FALSE, width.cutoff=50), cache=TRUE)
 knitr::opts_chunk$set(
   tidy = TRUE,
   tidy.opts = list(blank = FALSE, width.cutoff = 50),
@@ -66,31 +66,33 @@ knitr::knit_hooks$set(
 ```
 
 
-Review
-==================================
-* In class
-    * `ggplot2`
-    * `dplyr`
-* During the week
-    * Reviewing/learning the R programming language
-    * Completing exercises
-    * `readr` and `git`
-    * Setting up `twitteR`
+<!-- Review -->
+<!-- ================================== -->
+<!-- * In class -->
+<!--     * `ggplot2` -->
+<!--     * `dplyr` and `tidyr` -->
+<!-- * During the week -->
+<!--     * Reviewing/learning the R programming language -->
+<!--     * Completing exercises -->
+<!--     * `readr` and `git` -->
+<!--     * Setting up `rtweet` -->
 
-```{r echo=FALSE, message=FALSE}
-
+```{r echo=FALSE, message=FALSE, include=FALSE}
+library(tidyverse)
+library(rvest)
 ```
 
 
 Today
 ========================================
 
-1. Scraping data from web sites
+1. Now: Scraping data from web sites
     * HTML and CSS selectors
     * `rvest`
-2. Social media
+    
+2. Later: Social media
     * JSON and OATH
-    * `twitteR`
+    * `rtweet`
     
     
     
@@ -122,7 +124,8 @@ html_doc <- xml2::read_html('<html>
 </html>')
 ```
 
-```{r}
+```{r message=FALSE}
+library(tidyverse)
 library(rvest)
 html_doc %>% html_nodes('head title') %>% html_text
 ```
@@ -370,13 +373,12 @@ Task 1
 ```{r message = FALSE, warning = FALSE}
 library(rvest)
 library(tidyverse)
-page <- html_session('https://www.eur.nl/en/research/phd-programmes')
+p <- read_html('https://www.eur.nl/en/about-eur/faculties-and-schools')
 ```
 
 * Complete this code:
 ```{r eval = FALSE, tidy=FALSE}
-links <- page %>% html_nodes('[your selector goes here]')
-links
+schools <- p %>% '[your code goes here]'
 ```
 in order to yield this result:
 
@@ -384,8 +386,7 @@ in order to yield this result:
 ```{r echo = FALSE}
 ow <- options()$width
 options(width=200)
-links <- page %>% html_nodes('p > a')
-links
+(schools <- p %>% html_nodes('div.field__item')  %>% html_text())
 options(width=ow)
 ```
 </div>
@@ -394,20 +395,18 @@ Task 2
 =======
 * Complete this code:
 ```{r eval = FALSE, tidy=FALSE}
-urls <- links %>% '[your code goes here]'
-schools <- links %>% '[your code goes here]'
+program_urls <- p %>% '[your code goes here]'
 ```
 in order to yield this result:
 
 
 <div class="font-90">
 ```{r echo = FALSE}
-urls <- links %>% html_attr('href')
-schools <- links %>% html_text
+program_urls <- p %>% html_nodes('.field + ul li:first-of-type a') %>%
+  html_attr('href')
 ```
 ```{r}
-urls
-schools
+program_urls
 ```
 </div>
 
@@ -415,16 +414,21 @@ schools
 Task 3: Job browsing demo
 =================
 
-See https://www.dropbox.com/s/mqlmcqozb0bm8q0/job_browsing_handout.html?dl=1 or https://goo.gl/dD4Dhv
+See https://www.dropbox.com/s/garkmh5hxlsxlmu/job_browsing_handout.html?dl=1 or http://bit.ly/2HrzRHf
 
 
-Reading tabular data
+Reading tabular data with `html_table()`
 =============
+
+https://www.imdb.com/title/tt0081777/fullcredits
+
 <div class="font-90">
 ```{r message=FALSE}
-doc <- read_html('https://en.wikipedia.org/wiki/List_of_countries_by_cigarette_consumption_per_capita')
-smoking <- doc %>% html_node('table.wikitable') %>% html_table
-smoking %>% rename(country = `Country`, num_per_adult = `Cigarette consumption[8]`) %>% tbl_df
+p <- read_html('https://www.imdb.com/title/tt0081777/fullcredits')
+p %>% html_node('.cast_list') %>% 
+  html_table() %>%
+  tbl_df() %>%
+  select(Actor = X2, Character = X4)
 ```
 </div>
 
@@ -432,15 +436,15 @@ Task 4:
 =========
 
 ```{r echo=FALSE, eval = FALSE}
-doc <- read_html('https://en.wikipedia.org/wiki/Most_common_words_in_English')
-doc %>% html_nodes('table.wikitable') %>% map(~html_table(.)) %>% bind_rows
+p <- read_html('https://en.wikipedia.org/wiki/Most_common_words_in_English')
+p %>% html_nodes('table.wikitable') %>% map(~html_table(.)) %>% bind_rows
 ```
 
 * Use `html_table()` to extract the first table (English language, daily) at https://en.wikipedia.org/wiki/List_of_newspapers_in_the_Republic_of_Ireland 
 
 ```{r echo = FALSE}
-doc <- read_html('https://en.wikipedia.org/wiki/List_of_newspapers_in_the_Republic_of_Ireland')
-doc %>% html_node('table.wikitable') %>% html_table 
+p <- read_html('https://en.wikipedia.org/wiki/List_of_newspapers_in_the_Republic_of_Ireland')
+p %>% html_node('table.wikitable') %>% html_table 
 ```
 
 
@@ -454,197 +458,5 @@ Use `html_node()`, the CSS selector `table.wikitable`, and `html_table()` to ext
 doc <- read_html('https://en.wikipedia.org/wiki/List_of_...etc.')
 doc %>% '[your code goes here]'
 ```
-
-
-
-
-Platform API's
-==============
-* You are Mark Zuckerberg and you run Facebook
-* I want to build a feature into my mobile app that posts content to my users' Facebook accounts
-* I ask you to set up a web page that my app will use to post content
-* I have 100,000 friends making similar requests, but each with slightly different needs
-* Rather than build a tool for each customer, you build a single tool that everybody can use
-    * API: Application programming interface
-        * Functions that return data or do things
-        * Security model
-    * Sets the rules for how you interact with platforms like Facebook and Twitter
-    
-OAuth
-================
-* Platforms care a lot about security and want to be sure the app trying to post to your wall
-    1. Actually has permission to do so
-    2. Is really the app it says it is
-* **Problem:** allow my app to access your account without allowing...
-    * ...my app to see your password
-    * ...malicious hackers to trick you into giving away your password
-* **Solution:** OAuth 2.0
-
-How OAuth works, at a very high level...
-===================
-1. App: asks platform for a `request token`
-2. Platform: here is a `request token` and a `secret`
-3. App: redirects user to web page hosted by platform
-4. User: logs in and confirms level of access to be given to app
-5. Platform: redirects user back to app
-6. Platform: sends app an `access token`
-7. App: uses `secret` and `access token` to encrypt and authenticate
-
-API calls
-===============
-* API calls always include the OAuth access token
-* API call is performed by making a request to a web page on platform's server
-* Response from the platform's web server is text, in a format called JSON (JavaScript Object Notation)
-* JSON is easy for humans to read; easy for computers to parse
-
-***
-
-```
-{  
-   "id":"23462029838",
-   "first_name":"Jason",
-   "last_name":"Roos",
-   "location":{  
-      "id":"10952412900",
-      "name":"Rotterdam, Netherlands"
-   },
-   "friends":{  
-      "data":[  
-         {  
-            "name":"Nancy MacNancyface",
-            "id":"5278757"
-         },
-         {  
-            "name":"Davy McDavyface",
-            "id":"72186234457"
-         }
-      ]
-   }
-}
-```
-
-
-API wrappers
-====================
-* Language-specific interfaces that interact with the platform behind-the-scenes
-    * Examples in R: `twitteR` and `Rfacebook`
-* Instead of writing code to send requests to https://api.twitter.com/1.1/search/tweets.json?q=uber we call the `twitteR` function `searchTwitter`
-```{r eval = FALSE, tidy = FALSE}
-library(twitteR)
-setup_twitter_oauth( '[credentials go here]' )
-statuses <- searchTwitter(searchString='#hashtag', 
-                          n=10, lang='en', resultType='recent' )
-```
-
-* The API wrapper calls the API and converts the JSON response into a language-friendly format (e.g., `data.frame` in R)
-
-```{r echo = FALSE, message = FALSE}
-library(twitteR)
-library(purrr)
-load_cached_oath_credentials <- safely( function() {
-  token_env <- new.env()
-  load(here::here("oauth_cache.RData"), token_env) 
-  assign("oauth_token", token_env$token, envir=twitteR:::oauth_cache)
-  NULL
-} )
-load_result <- load_cached_oath_credentials()
-if(!is.null(load_result$error)){
-  stop('OAuth credentials need to be cached before this code can run. See "session_3.Rmd" at or near line 553 for instructions.')
-  # Be sure the working directory is set to the root of the 'rook' project, 
-  # then execute the following code, after substituting your consumer_key, 
-  # consumer_secret, access_token, and access_secret into the call to setup_twitter_oauth.
-  #
-  # library(twitteR)
-  # options(httr_oauth_cache=TRUE)
-  # setup_twitter_oauth( consumer_key='asdf',
-  #                    consumer_secret='asdfasdf',
-  #                    access_token='asdf-asdfasdfasdf',
-  #                    access_secret='asdfasdfasdf'
-  # )
-  # token <- get("oauth_token", twitteR:::oauth_cache)
-  # save(token,file="oauth_cache.RData")
-}
-```
-
-***
-
-Basic setup of twitteR calls
-=======================================
-```{r eval = FALSE, tidy = FALSE}
-library(twitteR)
-options(httr_oauth_cache = TRUE)
-setup_twitter_oauth(consumer_key='your key goes here',
-                    consumer_secret='your secret goes here',
-                    access_token='your token goes here',
-                    access_secret='a different secret goes here')
-```
-
-getUser
-========
-
-```{r}
-jmtroos <- getUser('jmtroos') 
-jmtroos$screenName
-jmtroos$name
-jmtroos$description %>% cat
-jmtroos$lastStatus$created
-```
-
-***
-
-```{r}
-botimeline <- userTimeline('barackobama', n = 10)
-class(botimeline)
-length(botimeline)
-```
-
-***
-
-<div class="font-70">
-```{r echo=FALSE}
-ow <- options()$width
-options(width=210)
-```
-```{r message=FALSE}
-library(stringr)
-library(dplyr)
-botimeline %>% twListToDF %>% mutate(text = str_trunc(text, 32) ) %>% select( text, favoriteCount, retweetCount, created, id )
-```
-```{r echo=FALSE}
-options(width=ow)
-```
-</div>
-
-Exercise
-==========
-* Write code to search for something interesting on Twitter
-
-```{r eval = FALSE, tidy = FALSE}
-library(dplyr)
-library(twitteR)
-options(httr_oauth_cache=TRUE)
-setup_twitter_oauth(consumer_key='your key goes here',
-                    consumer_secret='your secret goes here',
-                    access_token='your token goes here',
-                    access_secret='a different secret goes here')
-searchTwitter( '[ your code goes here ]' ) %>% twListToDF
-```
-
-* Try plotting the results with ggplot2
-
-During the break
-============
-```{r eval = FALSE}
-install.packages('tm', dependencies = TRUE)
-install.packages('lda', dependencies = TRUE)
-```
-* Read and follow (type along with) this tutorial if you haven't already
-```{r eval = FALSE}
-vignette('tm', package = 'tm')
-```
-(or https://cran.r-project.org/web/packages/tm/vignettes/tm.pdf if that doesn't work...)
-* Skim pp 1--7 of [Gonçalves, et al. "A Benchmark Comparison of State-of-the-Practice Sentiment Analysis Methods." arXiv preprint arXiv:1512.01818 (2015). http://arxiv.org/pdf/1512.01818.pdf](http://arxiv.org/pdf/1512.01818.pdf)
-
-
 
 
