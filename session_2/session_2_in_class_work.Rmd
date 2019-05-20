@@ -328,7 +328,7 @@ weather2 %>%
 * The data frame `good_weather_delays` should look like this:
 
 ```{r echo = FALSE}
-(good_weather_delays <- flights2 %>% inner_join(weather2) %>% filter( precip == 0 & wind_speed == 0 & visib == 10 ) )
+(good_weather_delays <- flights2 %>% inner_join(weather2, by = c("origin", "year", "month", "day", "hour")) %>% filter( precip == 0 & wind_speed == 0 & visib == 10 ) )
 ```
 
 * To answer the question, "Which airlines have the worst departure delays when conditions are ideal?" write code to: 
@@ -340,7 +340,7 @@ weather2 %>%
 * Your output should look like this:
 
 ```{r echo = FALSE}
-(avg_good_weather_delays <- good_weather_delays %>% group_by(carrier) %>% summarise( dep_delay = mean(dep_delay,na.rm=TRUE) ) %>% arrange(desc(dep_delay)) %>% inner_join(airlines))
+(avg_good_weather_delays <- good_weather_delays %>% group_by(carrier) %>% summarise( dep_delay = mean(dep_delay,na.rm=TRUE) ) %>% arrange(desc(dep_delay)) %>% inner_join(airlines, by = "carrier"))
 ```
 
 * Create a new data frame using the output from Task 13. Call this data frame `avg_good_weather_delays`
@@ -356,7 +356,9 @@ Task 14
 * This is mine:
 
 ```{r echo = FALSE, warning = FALSE, message = FALSE}
-ranked_airline_labels <- avg_good_weather_delays %>% transmute( carrier, name = factor(-row_number(),labels=name) )
+ranked_airline_labels <- 
+  avg_good_weather_delays %>% 
+  transmute(carrier, name = factor(-row_number(), labels = name))
 good_weather_delays %>% inner_join(ranked_airline_labels) %>% ggplot( aes( x = name, y = dep_delay ) ) + stat_summary() + coord_flip() + labs(x='', y = 'Average departure delay', title = 'Departure delays under ideal weather conditions\nNYC airports, 2013' )
 ```
 
@@ -364,7 +366,9 @@ good_weather_delays %>% inner_join(ranked_airline_labels) %>% ggplot( aes( x = n
 * I used `avg_good_weather_delays` to create an ordered factor based on the name of the airlines. The ordered factor causes ggplot to arrange the airlines in descending order based on their average values. This is the code I wrote to do this:
     
 ```{r}
-ranked_airline_labels <- avg_good_weather_delays %>% transmute( carrier, name = factor(-row_number(),labels=name) )
+ranked_airline_labels <- 
+  avg_good_weather_delays %>% 
+  transmute(carrier, name = factor(-row_number(), labels = name))
 ```
 
 * I joined this new data frame (`ranked_airline_labels`) with the `good_weather_delays` data frame, then passed the result into ggplot2
