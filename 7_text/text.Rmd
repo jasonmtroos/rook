@@ -36,7 +36,7 @@ editor_options:
 knitr::opts_chunk$set(
   tidy = TRUE,
   tidy.opts = list(blank = FALSE, width.cutoff = 70),
-  cache = 1
+  cache = FALSE
 )
 # knitr::knit_hooks$set(
 # source = function(x,options){
@@ -57,16 +57,16 @@ knitr::opts_chunk$set(
 ```
 
 
-Review
-==================================
-* In class
-    * HTML, CSS, and `rvest`
-    * OAUTH2.0, JSON, `twitteR`
-* During the week
-    * Reviewing/learning the R programming language
-    * Completing exercises (building a project, downloading data, etc.)
-    * Installing `tm`, `lda`, and `topicmodels`
-    * Completing the `tm` introductory tutorial
+<!-- Review -->
+<!-- ================================== -->
+<!-- * In class -->
+<!--     * HTML, CSS, and `rvest` -->
+<!--     * OAUTH2.0, JSON, `twitteR` -->
+<!-- * During the week -->
+<!--     * Reviewing/learning the R programming language -->
+<!--     * Completing exercises (building a project, downloading data, etc.) -->
+<!--     * Installing `tm`, `lda`, and `topicmodels` -->
+<!--     * Completing the `tm` introductory tutorial -->
 
 
 
@@ -79,6 +79,7 @@ Today
     * `stringr`
 2. Dictionary-based approach to text analysis
     * `tm`
+    * `tidytext`
 3. Topic-based approach to text analysis
     * `lda`
 
@@ -152,7 +153,7 @@ cat('\\n')
 stringr
 ===================
 * The `stringr` package includes tools for detecting whether a string matches a REGEX pattern
-    * The work is done by the `stringi` package, which is more flexible but harder to work with
+    * The real work is performed by the `stringi` package, which is more flexible, but harder to work with
 * `stringr::str_detect(s, r)` returns `TRUE` if `s` can be matched by `r`
 
 ```{r cache = FALSE}
@@ -233,6 +234,8 @@ Text mining tools
 * `tm` --- for applying the same extraction or transformation operations to large collections of text
     * For example, a set of documents, each of which is represented as a large character vector
     * Quickly generate and work with term-document matrices
+    * `tidytext` provides a somewhat more `%>%`-friendly approach and has a free book that goes with it: http://tidytextmining.com
+
 * `lda` --- topical analysis of an already-cleaned collection of documents (e.g., previously prepared via `tm`)
 
 Text mining with `tm`
@@ -275,7 +278,7 @@ get_ufo_sightings <- function(url) {
   xml2::read_html(table) %>% 
     rvest::html_node('table') %>% 
     rvest::html_table(.) %>% 
-    dplyr::as_data_frame(.) %>% 
+    dplyr::as_tibble(.) %>% 
     dplyr::rename(., Date = `Date / Time`)
 }
 ```
@@ -284,8 +287,8 @@ get_ufo_sightings <- function(url) {
 library(tidyverse)
 ```
 ```{r message = FALSE}
-ufos <- get_ufo_sightings('http://www.nuforc.org/webreports/ndxe201604.html') #see .Rmd file for source
-ufos <- ufos %>% bind_rows(get_ufo_sightings('http://www.nuforc.org/webreports/ndxe201603.html'))
+ufos <- get_ufo_sightings('http://www.nuforc.org/webreports/ndxp190509.html') #see .Rmd file for source
+ufos <- ufos %>% bind_rows(get_ufo_sightings('http://www.nuforc.org/webreports/ndxp190425.html'))
 ufos %>% transmute(Date, City, Duration, Summary = str_trunc(Summary, 21)) 
 ```
 </div>
@@ -301,7 +304,7 @@ ufo_text <- ufos$Summary
 library(tm)
 ```
 
-```{r tidy=FALSE, message = FALSE}
+```{r tidy=FALSE, message = FALSE, warning = FALSE}
 ufo_corp <- Corpus(VectorSource(ufo_text)) %>%  # create corpus
   tm_map(content_transformer(tolower)) %>%      # lower case
   tm_map(removePunctuation) %>%                 # remove punctuation
@@ -316,7 +319,7 @@ ufo_text[4] %>% str_wrap %>% cat
 
 ```{r}
 tdm <- ufo_corp %>% TermDocumentMatrix
-tdm_long <- with(tdm, data_frame(term = i, document = j, count = v)) 
+tdm_long <- with(tdm, tibble(term = i, document = j, count = v)) 
 tdm_long
 ```
 
@@ -362,12 +365,37 @@ tdm %>% findFreqTerms(40)
 * Find terms that correlate with some other term
 
 ```{r}
-tdm %>% findAssocs("shape", .2) # cor(x,y) >= .2
-tdm %>% findAssocs("sky", .13)
-tdm %>% findAssocs("hover", .14)
+tdm %>% findAssocs("shape", .25) # cor(x,y) >= .25
+tdm %>% findAssocs("sky", .25)
+tdm %>% findAssocs("hover", .25)
 ```
 
 ***
+
+More about `tidytext`
+============================
+
+```{r}
+library(tidytext)
+tidy_reports <- tibble(report = ufo_text) %>% 
+  mutate(id = row_number()) %>%
+  unnest_tokens(word, report)
+tidy_reports
+```
+
+Removing stop words
+====================
+
+```{r}
+cleaned_reports <- 
+  tidy_reports %>%
+  anti_join(get_stopwords(), by = 'word')
+```
+
+```{r}
+cleaned_reports %>%
+  count(word, sort = TRUE)
+```
 
 
 
@@ -399,14 +427,14 @@ stem_and_split <- function(x) {
     .[[1]]
 }
 ```
-```{r}
+```{r warning = FALSE, message = FALSE}
 words <- c('moving light night midnight minute white red pink orange yellow color star moon erratic flight slow wobble rotate hover pendulum speed eject shot climb dive') %>% stem_and_split() # see .Rmd for source
 ```
 
 * Sums occurrances of terms within each document (very quickly)
 
 ```{r}
-tdm %>% tm_term_score(words) %>% data_frame(document = names(.), score = .)
+tdm %>% tm_term_score(., words) %>% tibble(document = names(.), score = .)
 ```
 </div>
 
@@ -508,12 +536,72 @@ ufo_text[d] %>%
 ```
 
 
-A New Approach
+`tidytext` approach (without stemming)
 ==============================
 
-* If you use text mining, you might want to look at the `tidytext` package and its accompanying (free) text http://tidytextmining.com/ 
 
-* The concepts are the same as we have already seen with `tm`, but the approach looks more like `dplyr`
+```{r}
+cleaned_reports
+scored_reports <- 
+  words %>% select(word = Word, arousal) %>%
+  inner_join(cleaned_reports) %>%
+  group_by(id) %>%
+  summarise(arousal = sum(arousal))
+```
+
+Top 5 based on sum of arousal score
+=======================================
+
+```{r echo = FALSE}
+scored_reports %>% top_n(5, arousal) %>% getElement('id') %>% ufo_text[.] %>% .[1:5] %>% 
+  str_wrap(width = 70, exdent = 2) %>% 
+  str_c("* ", .) %>% 
+  cat(sep = "\n")
+```
+
+
+Bottom 5 based on sum of arousal score
+=======================================
+
+```{r echo = FALSE}
+scored_reports %>% top_n(5, -arousal) %>% getElement('id') %>% ufo_text[.] %>% .[1:5] %>% 
+  str_wrap(width = 70, exdent = 2) %>% 
+  str_c("* ", .) %>% 
+  cat(sep = "\n")
+```
+
+Sentences instead of words
+=========================
+
+```{r}
+d1 <- tibble(report = ufo_text) %>% mutate(id = row_number()) %>%
+  unnest_tokens(sentence, report, token = "sentences")
+d1
+```
+
+
+***
+
+```{r}
+d2 <- 
+  d1 %>% group_by(id) %>% mutate(sentence_id = row_number()) %>%
+  unnest_tokens(word, sentence, token = "words") %>% ungroup()
+d2
+```
+
+***
+
+```{r}
+anti_surp <- get_sentiments('nrc') %>% filter(sentiment %in% c('anticipation', 'surprise'))
+d2 %>%
+  inner_join(anti_surp, by = 'word') %>%
+  group_by(id, sentence_id) %>%
+  summarise(score = n()) %>% ungroup() %>%
+  inner_join(d1) %>% top_n(5, score) %>%
+  arrange(desc(score))
+```
+
+
 
 
 
@@ -610,7 +698,7 @@ exemp_tab <- function(fit) {
     filter(value == max(value)) %>% group_by(key) %>% 
     filter(d == min(d)) %>% getElement('d')
   exemp <-
-    data_frame(name = get_topic_names(fit), top = ufo_text[exemplars])
+    tibble(name = get_topic_names(fit), top = ufo_text[exemplars])
   pander::pandoc.table(exemp, style = 'rmarkdown', split.table = Inf, justify = 'll')
 }
 exemp_tab(fit)
@@ -632,7 +720,7 @@ exemp_tab(fit)
 
 * No word stemming or stopword removal, and assuming 10 topics
 
-```{r echo=FALSE, results = 'asis'}
+```{r echo=FALSE, results = 'asis', message = FALSE, warning = FALSE}
 ufo_corp_with_stops_no_stemming <- Corpus(VectorSource(ufo_text)) %>%  # create corpus
   tm_map(content_transformer(tolower)) %>%      # lower case
   tm_map(removePunctuation) %>%                 # remove punctuation
@@ -653,14 +741,23 @@ exemp_tab(fit)
 
 ***
 
-* Four months of data, stemming and stopword removal
+* Three months of data, stemming and stopword removal
 
-```{r echo=FALSE, results = 'asis', message = FALSE}
+```{r echo=FALSE, results = 'asis', message = FALSE, warning = FALSE}
 ufos <- bind_rows( 
-  get_ufo_sightings('http://www.nuforc.org/webreports/ndxe201604.html'),
-  get_ufo_sightings('http://www.nuforc.org/webreports/ndxe201603.html'),
-  get_ufo_sightings('http://www.nuforc.org/webreports/ndxe201602.html'),
-  get_ufo_sightings('http://www.nuforc.org/webreports/ndxe201601.html')
+  get_ufo_sightings('http://www.nuforc.org/webreports/ndxp190509.html'),
+  get_ufo_sightings('http://www.nuforc.org/webreports/ndxp190425.html'),
+  get_ufo_sightings('http://www.nuforc.org/webreports/ndxp190418.html'),
+  get_ufo_sightings('http://www.nuforc.org/webreports/ndxp190412.html'),
+  get_ufo_sightings('http://www.nuforc.org/webreports/ndxp190408.html'),
+  get_ufo_sightings('http://www.nuforc.org/webreports/ndxp190329.html'),
+  get_ufo_sightings('http://www.nuforc.org/webreports/ndxp190321.html'),
+  get_ufo_sightings('http://www.nuforc.org/webreports/ndxp190315.html'),
+  get_ufo_sightings('http://www.nuforc.org/webreports/ndxp190314.html'),
+  get_ufo_sightings('http://www.nuforc.org/webreports/ndxp190227.html'),
+  get_ufo_sightings('http://www.nuforc.org/webreports/ndxp190222.html'),
+  get_ufo_sightings('http://www.nuforc.org/webreports/ndxp190214.html'),
+  get_ufo_sightings('http://www.nuforc.org/webreports/ndxp190207.html')
   )
 ufo_text <- ufos$Summary
 
@@ -684,7 +781,7 @@ exemp_tab(fit)
 
 * Same thing, but without stemming
 
-```{r echo=FALSE, results = 'asis', message = FALSE}
+```{r echo=FALSE, results = 'asis', message = FALSE, warning = FALSE}
 ufo_corp <- Corpus(VectorSource(ufo_text)) %>% 
   tm_map(content_transformer(tolower)) %>% 
   tm_map(removePunctuation) %>% 
@@ -725,7 +822,7 @@ Output from `topicmodels`
 post <- posterior(fit2)
 output <- 
   post$terms %>% 
-  as_data_frame %>%
+  as_tibble %>%
   mutate(topic = row_number()) %>%
   gather(term, value, -topic) %>%
   group_by(topic) %>%
@@ -749,8 +846,8 @@ output
 Task
 ====
 
-* Visit https://www.dropbox.com/s/adezcjlelf3puux/lovecraft_handout.html?dl=1 ...or...
-* https://goo.gl/vQ94za
+* Visit https://www.dropbox.com/s/h1nvnt56hblxpgc/lovecraft_handout.html?dl=1 ...or...
+* http://bit.ly/30y9gQs
 
 
 

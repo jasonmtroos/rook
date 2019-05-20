@@ -1,5 +1,5 @@
 ---
-title: "Sentiment analysis"
+title: "Sentiment analysis of a novel"
 author: "J.M.T. Roos"
 date: 'Last updated: `r lubridate::now()`'
 output: html_document
@@ -11,7 +11,7 @@ editor_options:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, tidy = TRUE, cache = FALSE)
+knitr::opts_chunk$set(echo = TRUE, tidy = TRUE, cache = FALSE, message = FALSE, warning = FALSE)
 ```
 
 Install package `gutenbergr`
@@ -77,7 +77,7 @@ library(tm)
 Create a vector corpus
 
 ```{r}
-dunwich_corpus <- dunwich_3 %>% VectorSource %>% Corpus
+dunwich_corpus <- dunwich_3 %>% VectorSource() %>% Corpus()
 dunwich_corpus
 ```
 
