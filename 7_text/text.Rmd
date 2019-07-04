@@ -36,7 +36,7 @@ editor_options:
 knitr::opts_chunk$set(
   tidy = TRUE,
   tidy.opts = list(blank = FALSE, width.cutoff = 70),
-  cache = FALSE
+  cache = TRUE
 )
 # knitr::knit_hooks$set(
 # source = function(x,options){
@@ -57,21 +57,9 @@ knitr::opts_chunk$set(
 ```
 
 
-<!-- Review -->
-<!-- ================================== -->
-<!-- * In class -->
-<!--     * HTML, CSS, and `rvest` -->
-<!--     * OAUTH2.0, JSON, `twitteR` -->
-<!-- * During the week -->
-<!--     * Reviewing/learning the R programming language -->
-<!--     * Completing exercises (building a project, downloading data, etc.) -->
-<!--     * Installing `tm`, `lda`, and `topicmodels` -->
-<!--     * Completing the `tm` introductory tutorial -->
 
 
-
-
-Today
+This session
 ========================================
 
 1. Basic text manipulation tools
@@ -262,7 +250,7 @@ The `tm` package
 ***
 
 <div class="font-80">
-```{r echo = FALSE}
+```{r echo = FALSE, eval = FALSE}
 # the html returned by this page is badly mangled, so I had to write this code to clean it up.
 get_ufo_sightings <- function(url) {
   html <- httr::GET(url)
@@ -285,22 +273,27 @@ get_ufo_sightings <- function(url) {
 
 ```{r message=FALSE, cache = FALSE}
 library(tidyverse)
+library(nuforc)
+reports %>% select(reported, location, shape, report)
 ```
-```{r message = FALSE}
+```{r message = FALSE, echo = FALSE, eval = FALSE}
 ufos <- get_ufo_sightings('http://www.nuforc.org/webreports/ndxp190509.html') #see .Rmd file for source
 ufos <- ufos %>% bind_rows(get_ufo_sightings('http://www.nuforc.org/webreports/ndxp190425.html'))
 ufos %>% transmute(Date, City, Duration, Summary = str_trunc(Summary, 21)) 
 ```
 </div>
 
-* For this example, we will focus on `Summary`
+* For this example, we will focus on the full text report
 
-```{r}
-ufo_text <- ufos$Summary
+```{r echo = FALSE}
+ufo_text <- 
+  reports %>%
+  filter(!str_detect(report, '^MADAR')) %>%
+  .$report
 ```
 
 ***
-```{r cache = FALSE}
+```{r cache = FALSE, message = FALSE, warning = FALSE}
 library(tm)
 ```
 
@@ -312,7 +305,7 @@ ufo_corp <- Corpus(VectorSource(ufo_text)) %>%  # create corpus
   tm_map(stemDocument) %>%                      # reduce to word stems
   tm_map(stripWhitespace)                       # remove extra space 
 ufo_corp
-ufo_text[4] %>% str_wrap %>% cat
+ufo_text[1557] %>% str_wrap %>% cat
 ```
 
 ***
@@ -355,9 +348,9 @@ tdm %>% tidytext::tidy()
 
 ***
 
-* Find terms that appear 40 times or more:
+* Find terms that appear 400 times or more:
 ```{r}
-tdm %>% findFreqTerms(40)
+tdm %>% findFreqTerms(400)
 ```
 
 ***
@@ -367,7 +360,6 @@ tdm %>% findFreqTerms(40)
 ```{r}
 tdm %>% findAssocs("shape", .25) # cor(x,y) >= .25
 tdm %>% findAssocs("sky", .25)
-tdm %>% findAssocs("hover", .25)
 ```
 
 ***
@@ -383,7 +375,7 @@ tidy_reports <- tibble(report = ufo_text) %>%
 tidy_reports
 ```
 
-Removing stop words
+Removing stop words with `tidytext`
 ====================
 
 ```{r}
@@ -469,17 +461,14 @@ words %>% gather(variable, value, -Word) %>%
   arrange(Word)
 ```
 
-High arousal words
+Arousal scores for word stems
 =====================
 
 * Get the scores for words scoring highest on arousal
 * Then "stem" the words so they match with our UFO data
 
-```{r warning = FALSE}
-(arousal_words <- 
-   words %>% 
-   select(Word, arousal) %>% 
-   filter(percent_rank(arousal) > .9) %>% 
+```{r warning = FALSE, tidy=FALSE}
+(arousal_stems <- words %>% select(Word, arousal) %>% 
    mutate(term = stemDocument(Word)))
 ```
 
@@ -488,51 +477,45 @@ Merge scores and TDM
 * Join scores with the term-document matrix (in long data frame form)
 
 ```{r message=FALSE, warning=FALSE}
-tdm_long %>% inner_join(arousal_words)
+tdm_long %>% inner_join(arousal_stems)
 ```
 
-UFO reports with highest arousal
+UFO report with highest arousal
 ==================================
 
-* For each document, sum the arousal scores for any words it has in our list of high arousal words
-* Arrange by score then print out the top 5 reports
+* For each document, sum the arousal scores for any words in our list
+* Arrange by score then print out the highest scoring report
 
 ```{r warning=FALSE, message = FALSE, comment = ""}
 d <-
   tdm_long %>% 
-  inner_join(arousal_words) %>% 
+  inner_join(arousal_stems) %>% 
   group_by(document) %>% 
   summarise(score = sum(arousal)) %>% 
   arrange(desc(score)) %>% 
-  top_n(5) %>% 
+  top_n(1) %>% 
   getElement('document')
 ufo_text[d] %>% 
-  str_wrap(width = 70, exdent = 2) %>% 
-  str_c("* ", .) %>% 
-  cat(sep = "\n")
+  str_wrap(width = 70) %>%
+  cat()
 ```
 
-UFO reports with least arousal
+UFO reports with "lowest" arousal
 ====================================
 
-```{r warning=FALSE, message = FALSE, comment = ""}
-low_arousal_words <-
-  words %>% 
-  select(Word, arousal) %>% 
-  filter(percent_rank(arousal) < .1) %>% 
-  mutate(term = stemDocument(Word))
+```{r warning=FALSE, message = FALSE, comment = "", echo = FALSE}
 d <-
   tdm_long %>% 
-  inner_join(low_arousal_words) %>% 
+  inner_join(arousal_stems) %>% 
   group_by(document) %>% 
-  summarise(score = sum(arousal)) %>% 
-  arrange(score) %>% 
+  summarise(score = -sum(arousal)) %>% 
+  arrange(desc(score)) %>% 
   top_n(5) %>% 
   getElement('document')
-ufo_text[d] %>% 
-  str_wrap(width = 70, exdent = 2) %>% 
-  str_c("* ", .) %>% 
-  cat(sep = "\n")
+ufo_text[d] %>%
+  str_wrap(width = 70, exdent = 2) %>%
+  str_c('* ', ., collapse = '\n') %>%
+  cat()
 ```
 
 
@@ -549,32 +532,35 @@ scored_reports <-
   summarise(arousal = sum(arousal))
 ```
 
+Bottom 5 based on sum of arousal score
+=======================================
+
+```{r}
+scored_reports %>% top_n(5, -arousal) %>% getElement('id') %>% ufo_text[.] %>% .[1:5] %>% 
+  str_trunc(width = 250) %>%
+  str_wrap(width = 70, exdent = 2) %>% 
+  str_c("* ", .) %>% 
+  cat(sep = "\n")
+```
+
 Top 5 based on sum of arousal score
 =======================================
 
 ```{r echo = FALSE}
 scored_reports %>% top_n(5, arousal) %>% getElement('id') %>% ufo_text[.] %>% .[1:5] %>% 
+  str_trunc(width = 250) %>%
   str_wrap(width = 70, exdent = 2) %>% 
   str_c("* ", .) %>% 
   cat(sep = "\n")
 ```
 
-
-Bottom 5 based on sum of arousal score
-=======================================
-
-```{r echo = FALSE}
-scored_reports %>% top_n(5, -arousal) %>% getElement('id') %>% ufo_text[.] %>% .[1:5] %>% 
-  str_wrap(width = 70, exdent = 2) %>% 
-  str_c("* ", .) %>% 
-  cat(sep = "\n")
-```
 
 Sentences instead of words
 =========================
 
 ```{r}
-d1 <- tibble(report = ufo_text) %>% mutate(id = row_number()) %>%
+d0 <- tibble(report = ufo_text) %>% mutate(id = row_number())
+d1 <- d0 %>%
   unnest_tokens(sentence, report, token = "sentences")
 d1
 ```
@@ -589,20 +575,48 @@ d2 <-
 d2
 ```
 
-***
 
-```{r}
-anti_surp <- get_sentiments('nrc') %>% filter(sentiment %in% c('anticipation', 'surprise'))
-d2 %>%
-  inner_join(anti_surp, by = 'word') %>%
-  group_by(id, sentence_id) %>%
-  summarise(score = n()) %>% ungroup() %>%
-  inner_join(d1) %>% top_n(5, score) %>%
-  arrange(desc(score))
+
+
+NRC sentiments
+==================
+
+http://sentiment.nrc.ca/lexicons-for-research/
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+surprise <- 
+  readr::read_tsv('~/Dropbox_RSM/Datasets/NRC-Sentiment-Emotion-Lexicons/NRC-Sentiment-Emotion-Lexicons/NRC-Emotion-Lexicon-v0.92/NRC-Emotion-Lexicon-Wordlevel-v0.92.txt', col_names = c('word', 'affect', 'association')) %>%
+  filter(affect %in% c('surprise') & association == 1) %>%
+  transmute(word, surprise = 1L)
 ```
 
 
+```{r message=FALSE}
+head(surprise)
+top_5_surprise <- 
+  d2 %>%
+  left_join(surprise, by = 'word') %>%
+  mutate(surprise = coalesce(surprise, 0L)) %>%
+  group_by(id, sentence_id) %>%
+  summarise(score = mean(surprise)) %>% ungroup() %>%
+  group_by(id) %>%
+  summarise(score = median(score)) %>%
+  inner_join(d0, by = 'id') %>%
+  top_n(5, score) %>%
+  arrange(desc(score))
+```
 
+Top 5 based on surprise
+======================
+
+```{r}
+top_5_surprise %>%
+  getElement('report') %>%
+  # str_trunc(width = 250) %>%
+  str_wrap(width = 70, exdent = 2) %>% 
+  str_c("* ", .) %>% 
+  cat(sep = "\n")
+```
 
 
 Latent Dirichlet allocation
@@ -690,6 +704,7 @@ get_topic_names(fit)
 
 <div class="font-90">
 ```{r echo = FALSE, results="asis"}
+ufo_text_no_cr <- str_replace_all(ufo_text, '[\n\r]', ' ')
 exemp_tab <- function(fit) {
   exemplars <-
     fit$document_sums %>% apply(1, function(x)
@@ -698,7 +713,7 @@ exemp_tab <- function(fit) {
     filter(value == max(value)) %>% group_by(key) %>% 
     filter(d == min(d)) %>% getElement('d')
   exemp <-
-    tibble(name = get_topic_names(fit), top = ufo_text[exemplars])
+    tibble(name = get_topic_names(fit), top = str_trunc(ufo_text_no_cr[exemplars], 75))
   pander::pandoc.table(exemp, style = 'rmarkdown', split.table = Inf, justify = 'll')
 }
 exemp_tab(fit)
@@ -741,45 +756,7 @@ exemp_tab(fit)
 
 ***
 
-* Three months of data, stemming and stopword removal
-
-```{r echo=FALSE, results = 'asis', message = FALSE, warning = FALSE}
-ufos <- bind_rows( 
-  get_ufo_sightings('http://www.nuforc.org/webreports/ndxp190509.html'),
-  get_ufo_sightings('http://www.nuforc.org/webreports/ndxp190425.html'),
-  get_ufo_sightings('http://www.nuforc.org/webreports/ndxp190418.html'),
-  get_ufo_sightings('http://www.nuforc.org/webreports/ndxp190412.html'),
-  get_ufo_sightings('http://www.nuforc.org/webreports/ndxp190408.html'),
-  get_ufo_sightings('http://www.nuforc.org/webreports/ndxp190329.html'),
-  get_ufo_sightings('http://www.nuforc.org/webreports/ndxp190321.html'),
-  get_ufo_sightings('http://www.nuforc.org/webreports/ndxp190315.html'),
-  get_ufo_sightings('http://www.nuforc.org/webreports/ndxp190314.html'),
-  get_ufo_sightings('http://www.nuforc.org/webreports/ndxp190227.html'),
-  get_ufo_sightings('http://www.nuforc.org/webreports/ndxp190222.html'),
-  get_ufo_sightings('http://www.nuforc.org/webreports/ndxp190214.html'),
-  get_ufo_sightings('http://www.nuforc.org/webreports/ndxp190207.html')
-  )
-ufo_text <- ufos$Summary
-
-ufo_corp <- Corpus(VectorSource(ufo_text)) %>% 
-  tm_map(content_transformer(tolower)) %>% 
-  tm_map(removePunctuation) %>% 
-  tm_map(removeWords, stopwords('english')) %>% 
-  tm_map(stemDocument) %>%
-  tm_map(stripWhitespace) 
-  
-lda_corp <- ufo_corp %>% plyr::laply( as.character ) %>% 
-  str_replace('(^| )[0-9]( |$)', ' [number] ') %>% str_replace('^ ','') %>% lexicalize
-
-K <- 10 
-set.seed(1234)
-fit <- lda.collapsed.gibbs.sampler(lda_corp$documents, K, lda_corp$vocab, 500, .5, .1)
-exemp_tab(fit) 
-```
-
-***
-
-* Same thing, but without stemming
+* No stemming, but stopword removal
 
 ```{r echo=FALSE, results = 'asis', message = FALSE, warning = FALSE}
 ufo_corp <- Corpus(VectorSource(ufo_text)) %>% 

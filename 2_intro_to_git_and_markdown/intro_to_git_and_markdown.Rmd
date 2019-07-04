@@ -27,6 +27,8 @@ output:
       "--variable", "transitionSpeed=normal",
       "--variable", "viewDistance=5"
       ]
+editor_options: 
+  chunk_output_type: console
 ---
 
 
@@ -355,7 +357,7 @@ Download data
 * Add this code to your R Markdown file
 
 ```{r echo=FALSE, comment=''}
-cat( 'Download sleep study data\n```{r}\nlibrary(readr)\nsleep <- read_csv("https://vincentarelbundock.github.io/\n    Rdatasets/csv/lme4/sleepstudy.csv") # ignore the spaces and line breaks\nhead(sleep)\n```' )
+cat( 'Download sleep study data\n```{r}\nlibrary(readr)\nsleep <- read_csv(\n    "https://vincentarelbundock.github.io/Rdatasets/csv/lme4/sleepstudy.csv")\nhead(sleep)\n```' )
 ```
 
 * Click on **Knit**
@@ -505,11 +507,11 @@ More about R Markdown
 if(program() == 'egsh') {
   asis_output('What you need to do this week')
 } else if(program() == 'erim') {
-  asis_output('What you need to do during the break and/or this week') 
+  asis_output('What you can do during the lunch break') 
 }
 ```
 =============================
-1. Ensure your R environment is in order (see next slide)
+1. Ensure your R environment is in order (see pre-work assignment on Canvas)
 2. Get familiar with R Markdown (**mandatory**) and git (*optional*) -- see previous slides for links
 3. Follow the [R tutorials](http://www.jasonmtroos.com/assets/media/teaching/course_assignments_and_data.zip) I developed for my Marketing Analytics MSc course
     * Assignment 1 -- learning R (**mandatory** if you are lost right now, otherwise optional)
@@ -518,56 +520,57 @@ if(program() == 'egsh') {
     * Assignment 4 -- more ggplot2 and dplyr (**mandatory**)
         * If you want more ggplot2 material, check out [Chapter 3 of R for Data Science](http://r4ds.had.co.nz/data-visualisation.html)
         * If you want more dplyr material, check out [Chapter 4 of R for Data Science](http://r4ds.had.co.nz/transform.html)
-4. Email me with questions: [jroos@rsm.nl](mailto:jroos@rsm.nl)
+<!-- 4. Email me with questions: [jroos@rsm.nl](mailto:jroos@rsm.nl) -->
 
 
 
-Get your R environment in order
-===============================
+<!-- Get your R environment in order -->
+<!-- =============================== -->
 
-```{r eval = FALSE}
-install.packages('devtools', dependencies = TRUE)
-install.packages('tidyverse', dependencies = TRUE)
-install.packages('Hmisc', dependencies = TRUE)
-install.packages('tm', dependencies = TRUE)
-install.packages('rtweet', dependencies = TRUE)
-install.packages('lda', dependencies = TRUE)
-```
+<!-- ```{r eval = FALSE} -->
+<!-- install.packages('devtools', dependencies = TRUE) -->
+<!-- install.packages('pkgbuild', dependencies = TRUE) -->
+<!-- install.packages('tidyverse', dependencies = TRUE) -->
+<!-- install.packages('Hmisc', dependencies = TRUE) -->
+<!-- install.packages('tm', dependencies = TRUE) -->
+<!-- install.packages('rtweet', dependencies = TRUE) -->
+<!-- install.packages('lda', dependencies = TRUE) -->
+<!-- ``` -->
 
-* Windows users will need to install **RTools**, which provides the necessary toolchain for compiling R packages from source code
-    * See (https://CRAN.R-project.org/bin/windows/Rtools/) choosing the default "Package authoring installation" during installation
-    
-```{r eval = FALSE}
-devtools::setup_rtools()
-```
+<!-- * Windows users will need to install **RTools**, which provides the necessary toolchain for compiling R packages from source code -->
+<!--     * See (https://CRAN.R-project.org/bin/windows/Rtools/) choosing the default "Package authoring installation" during installation -->
+
+<!-- ```{r eval = FALSE} -->
+<!-- pkgbuild::setup_rtools() -->
+<!-- ``` -->
 
 
 
-A few things in R you should know
-=================================
-* Not covered in my tutorials, so let me know if you need resources covering these concepts
+<!-- A few things in R you should know -->
+<!-- ================================= -->
+<!-- * Not covered in my tutorials, so let me know if you need resources covering these concepts -->
 
-<div style="font-size:70%;">
-```{r}
-for (i in 1:10) {
-  if( i == 8 ) {
-    print(paste('i =',i))
-  }
-}
-i <- 1
-while (TRUE) {
-  i <- i + 1
-  if( i == 8 ) {
-    print(paste('i =',i))
-    break;
-  }
-}
-my_func <- function(x,y) {
-  x+y
-}
-my_func(2,3)
-```
-</div>
+<!-- <div style="font-size:70%;"> -->
+<!-- ```{r} -->
+<!-- for (i in 1:10) { -->
+<!--   if( i == 8 ) { -->
+<!--     print(paste('i =',i)) -->
+<!--   } -->
+<!-- } -->
+<!-- i <- 1 -->
+<!-- while (TRUE) { -->
+<!--   i <- i + 1 -->
+<!--   if( i == 8 ) { -->
+<!--     print(paste('i =',i)) -->
+<!--     break; -->
+<!--   } -->
+<!-- } -->
+<!-- my_func <- function(x,y) { -->
+<!--   x+y -->
+<!-- } -->
+<!-- my_func(2,3) -->
+<!-- ``` -->
+<!-- </div> -->
 
 <!--
 

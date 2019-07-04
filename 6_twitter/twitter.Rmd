@@ -26,7 +26,7 @@ output:
       "--variable", "viewDistance=5"
       ]
 knitr:
-  cache: 1
+  cache: 0
 editor_options: 
   chunk_output_type: console
 ---
@@ -34,7 +34,7 @@ editor_options:
 
 
 ```{r echo=FALSE, include=FALSE}
-knitr::opts_chunk$set(tidy = TRUE, tidy.opts=list(blank=FALSE, width.cutoff=50), cache=TRUE)
+knitr::opts_chunk$set(tidy = TRUE, tidy.opts=list(blank=FALSE, width.cutoff=50), cache=FALSE)
 knitr::opts_chunk$set(
   tidy = TRUE,
   tidy.opts = list(blank = FALSE, width.cutoff = 50),
@@ -150,7 +150,7 @@ API calls
 API wrappers
 ====================
 * Language-specific interfaces that interact with the platform behind-the-scenes
-    * Examples in R: `twitteR` and `Rfacebook`
+    * Examples in R: `rtweet` and `Rfacebook`
 * Instead of writing code to send requests to https://api.twitter.com/1.1/search/tweets.json?q=uber we call the `rtweet` function `search_tweets`
 ```{r eval = FALSE, tidy = FALSE}
 library(tidyverse)
@@ -164,11 +164,12 @@ statuses <- search_tweets(q = '#hashtag',
 ```{r echo = FALSE, message = FALSE}
 library(tidyverse)
 library(rtweet)
+library(lubridate)
 ```
 
 ***
 
-Basic setup of twitteR calls
+Basic setup of rtweet calls
 =======================================
 ```{r eval = FALSE, tidy = FALSE}
 library(rtweet)
@@ -185,7 +186,7 @@ User information
 
 ```{r}
 jmtroos <- lookup_users('jmtroos') %>% users_data()
-jmtroos %>% select(screen_name, name, location, description, followers_count, friends_count, statuses_count) %>% glimpse()
+jmtroos %>% select(screen_name, name, location, description, followers_count, friends_count, statuses_count)
 ```
 
 Timelines
@@ -193,7 +194,7 @@ Timelines
 
 <div class="font-70">
 ```{r}
-djt <- get_timeline("realDonaldTrump", n = 3200)
+djt <- get_timeline("realDonaldTrump", n = 4800)
 ```
 
 ```{r fig.height=4}
@@ -243,11 +244,16 @@ search_tweets( '[ your code goes here ]' )
 
 * Try plotting the results with ggplot2
 
+* Suggestions:
+  - Number of tweets about an unusual news item over time
+  - Occurrences of `#hashtag` by time of day
+  - Be creative, or don't --- just get some practice
+
 Before the next session 
 ============
 ```{r eval = FALSE}
 install.packages('tm', dependencies = TRUE)
-install.packages('lda', dependencies = TRUE)
+install.packages('topicmodels', dependencies = TRUE)
 ```
 
 * Read and follow (type along with) this tutorial if you haven't already

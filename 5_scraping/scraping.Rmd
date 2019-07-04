@@ -66,25 +66,16 @@ knitr::knit_hooks$set(
 ```
 
 
-<!-- Review -->
-<!-- ================================== -->
-<!-- * In class -->
-<!--     * `ggplot2` -->
-<!--     * `dplyr` and `tidyr` -->
-<!-- * During the week -->
-<!--     * Reviewing/learning the R programming language -->
-<!--     * Completing exercises -->
-<!--     * `readr` and `git` -->
-<!--     * Setting up `rtweet` -->
 
 ```{r echo=FALSE, message=FALSE, include=FALSE}
 library(tidyverse)
 library(rvest)
 ```
 
-
 Today
 ========================================
+
+
 
 1. Now: Scraping data from web sites
     * HTML and CSS selectors

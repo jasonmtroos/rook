@@ -15,9 +15,9 @@ get_sessions <- function() {
            # Time = '13.30--16.30')
   } else if(program() == 'erim') {
     tibble::frame_data(~Session, ~Date, ~Location, ~Time,
-               1, '2017-07-03', 'Polak Y1--07', '09:00--12:00',
+               1, '2019-07-01', 'Polak Y1--07', '09:00--12:00',
                2, NA, 'Polak Y1--07', '13:30--16:30',
-               3, '2017-07-06', 'Polak Y1--07', '09:00--12:00',
+               3, '2019-07-02', 'Polak Y1--07', '09:00--12:00',
                4, NA, 'Polak Y1--07', '13:30--16:30') %>%
       dplyr::mutate(Date = coalesce(lubridate::ymd(Date), lag(lubridate::ymd(Date))))
   }
@@ -53,5 +53,5 @@ course_title <- function() {
 #' @export
 #'
 program <- function() {
-  'egsh' #'erim' 'egsh'
+  'erim' #'egsh' #'erim' 'egsh'
 }

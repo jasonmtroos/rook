@@ -1,13 +1,14 @@
 ---
-title: "`r rook::course_title()`: Pre-work"
+title: '`r rook::course_title()`: Pre-work'
 author: "J.M.T. Roos"
 date: 'Last updated: `r lubridate::now()`'
-output: 
-  html_document: 
-    theme: paper
+output:
+  html_document:
     highlight: pygments
     keep_md: yes
-editor_options: 
+    theme: paper
+  pdf_document: default
+editor_options:
   chunk_output_type: console
 ---
 
@@ -17,6 +18,8 @@ library(rook)
 ```
 
 Welcome to the `r rook::course_title()` course offered by `r toupper(rook::program())`. Because we have more material to cover than we have time together, you will need to do a few things before our first meeting.
+
+**WARNING:** Do not skim this document. Read it in full. 
 
 ## Familiarity with R
 
@@ -71,6 +74,7 @@ Install RStudio on your computer if you do not already have it. You can download
 Open an R console and execute the following:
 ```{r eval = FALSE}
 install.packages('devtools', dependencies = TRUE)
+install.packages('pkgbuild', dependencies = TRUE)
 install.packages('tidyverse', dependencies = TRUE)
 install.packages('Hmisc', dependencies = TRUE)
 install.packages('tm', dependencies = TRUE)
@@ -81,7 +85,7 @@ install.packages('lda', dependencies = TRUE)
 Windows users will want to execute the following R code *after* they have installed the `devtools` package and installed RTools. Open RStudio and type the following into the R Console, then hit Enter.
 
 ```{r eval = FALSE}
-devtools::setup_rtools()
+pkgbuild::setup_rtools()
 ```
 
 OS X users may need to install the XCode command-line tool chain, by opening a Terminal window and executing the following command:
@@ -114,18 +118,25 @@ git credential-osxkeychain
 git config --global credential.helper osxkeychain
 ```
 
+## Twitter accounts
+
+In order to access the Twitter API (Session 3), you need to have the appropriate accounts and security credentials:
+
+* Create a Twitter account if you do not have one already
+* Visit https://developer.twitter.com/ and apply for a Developer Account. It takes a few  days for the account to be approved, so do this as soon as possible. Do not delay. Do not wait until just before Session 3. Do it now.
+* Follow [this tutorial](https://rtweet.info/articles/auth.html) which provides detailed instructions for setting up programmatic access to Twitter using the `rtweet` package. I recommend using Authorization Method #2 (Access token/secret method).
+
+<!-- * Specifically, do the following (but follow the detailed instructions in the tutorial): -->
+<!--     1. `install.packages('rtweet', dependencies = TRUE)` -->
+<!--     2. [Create a Twitter account](http://twitter.com/signup) if you do not already have one -->
+<!--     3. Visit the [Twitter apps](https://apps.twitter.com) site and create a new app -->
+<!--     4. Create and record the four keys and access tokens needed to access the Twitter API, then insert them into the code in the turorial (starting with `token <- create_token(...`) to ensure everything is working without error. If the code `identical(token, get_token())` works, then everything should be set up correctly. -->
+
+
+
 ## Even more things you can do!
 
 The following needs to be done prior to Session 3. Given the short time frame for this course, it is advised that you complete as much of this now as you can (be sure to review the technical material just prior to Session 3, though). 
-
-#### Twitter
-
-* Follow [this tutorial](https://rtweet.info/articles/auth.html) which provides detailed instructions for setting up programmatic access to Twitter using the `rtweet` package. I recommend using Authorization Method #2 (Access token/secret method).
-* Specifically, do the following (but follow the detailed instructions in the tutorial):
-    1. `install.packages('rtweet', dependencies = TRUE)`
-    2. [Create a Twitter account](http://twitter.com/signup) if you do not already have one
-    3. Visit the [Twitter apps](https://apps.twitter.com) site and create a new app
-    4. Create and record the four keys and access tokens needed to access the Twitter API, then insert them into the code in the turorial (starting with `token <- create_token(...`) to ensure everything is working without error. If the code `identical(token, get_token())` works, then everything should be set up correctly.
 
 
 #### HTML

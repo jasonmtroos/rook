@@ -1,0 +1,270 @@
+---
+title: "Sentiment analysis of a novel"
+author: "J.M.T. Roos"
+date: 'Last updated: `r lubridate::now()`'
+output: html_document
+knitr:
+  cache: 
+    false
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, tidy = TRUE, cache = FALSE, message = FALSE, warning = FALSE)
+```
+
+Install package `gutenbergr`
+
+```{r eval = FALSE}
+install.packages("gutenbergr", dependencies = TRUE)
+```
+
+Load the library and the tidyverse
+
+```{r}
+library(gutenbergr)
+library(tidyverse)
+```
+
+Get a list of H.P. Lovecraft books
+
+```{r}
+gutenberg_works(gutenberg_author_id == 34724, distinct = FALSE)
+```
+
+Download a book
+
+```{r}
+dunwich <- gutenberg_download(50133)
+```
+
+Take a look
+
+```{r}
+dunwich$text %>% head(10)
+```
+
+Remove the first 5 lines, and any line that is blank or has a single (page) number
+
+```{r}
+dunwich_2 <- dunwich %>% filter(text != "" & !str_detect(text, "^[0-9]+$"))
+dunwich_2 %>% select(text) %>% as.data.frame %>% head(30)
+```
+
+Fix encoding problems
+
+```{r}
+dunwich_3 <- dunwich_2$text %>% stringi::stri_encode(., from = "ISO-8859-1", to = "UTF-8")
+```
+
+Download the VAD data used to score words based on their emotional content
+
+```{r}
+VAD_scores_url <- "http://crr.ugent.be/papers/Ratings_Warriner_et_al.csv"
+VAD <- readr::read_csv(VAD_scores_url) %>% select(Word, valence = V.Mean.Sum, 
+    arousal = A.Mean.Sum, dominance = D.Mean.Sum)
+```
+
+## Line-by-line analysis using `tm`
+
+Load the `tm` package
+
+```{r}
+library(tm)
+```
+
+Create a vector corpus
+
+```{r}
+dunwich_corpus <- dunwich_3 %>% VectorSource() %>% Corpus()
+dunwich_corpus
+```
+
+Clean things up (note: we are not stemming words)
+
+```{r}
+dunwich_corpus_cleaned <- dunwich_corpus %>%
+  tm_map(content_transformer(tolower)) %>%      # lower case
+  tm_map(removePunctuation) %>%                 # remove punctuation
+  tm_map(removeWords, stopwords('english')) %>% # remove common words
+  tm_map(stripWhitespace)                       # remove white space
+```
+
+Generate a term-document matrix
+
+```{r}
+tdm <- dunwich_corpus_cleaned %>% TermDocumentMatrix
+tdm %>% findFreqTerms(lowfreq = 30)
+```
+
+Join with the VAD scores
+
+```{r}
+tdm_long <- with(tdm, data_frame(term = i, document = j, count = v)) %>% mutate(term = factor(term, 
+    labels = Terms(tdm)) %>% as.character)
+tdm_scored <- tdm_long %>% inner_join(VAD, by = c(term = "Word"))
+tdm_scored
+```
+
+Summarize the book line by line by averaging scores
+
+```{r}
+line_scores <- tdm_scored %>% 
+  transmute(line = document, 
+            valence = valence * count, 
+            arousal = arousal * count, 
+            dominance = dominance * count) %>% 
+  group_by(line) %>% 
+  summarise_all(funs(sum))
+```
+
+Tidy and visualize
+
+```{r}
+line_scores_2 <- line_scores %>% gather(dimension, score, -line)
+g <- ggplot(line_scores_2, aes(x = line, y = score, colour = dimension))
+g + geom_point()
+```
+
+Smooth
+
+```{r}
+g + geom_smooth()
+```
+
+## Sentence- and paragraph-level analysis using `tidytext`
+
+Load the `tidytext` library (installing it if necessary)
+```{r}
+# install.packages('tidytext', dependencies = TRUE)
+library(tidytext)
+```
+
+Create a data frame with each word, and counters for the paragraph and sentence number. Paragraphs are delimited by a single blank line, but to identify sentences, we use the `unnest_tokens` function with `token = 'sentences'`. 
+
+```{r}
+dunwich_tokens <- 
+  dunwich %>% 
+  select(-gutenberg_id) %>%
+  mutate(para_num = cumsum(text == ''),
+         text = stringi::stri_encode(text, from = "ISO-8859-1", to = "UTF-8")) %>%
+  unnest_tokens(sentence, text, token = 'sentences') %>%
+  mutate(sent_num = row_number()) %>%
+  unnest_tokens(word, sentence, token = 'words') %>%
+  mutate(word = removePunctuation(word)) 
+dunwich_tokens
+```
+
+For a paragraph level analysis, we remove stop words, then count the number of times each remaining word appears in each paragraph.
+
+```{r}
+word_counts <- 
+  dunwich_tokens %>%
+  anti_join(get_stopwords()) %>%
+  count(para_num, word, sort = TRUE) %>%
+  ungroup
+word_counts
+```
+
+Create a DTM from the word counts
+
+```{r}
+dtm <- 
+  word_counts %>%
+  cast_dtm(document = para_num, term = word, valu = n)
+dtm
+```
+
+There are about 160 paragraphs. Try fitting a model with 8 topics to see what falls out...
+
+```{r}
+library(topicmodels)
+paragraph_lda <- LDA(dtm, k = 8, control = list(seed = 1234))
+```
+
+Visualize the top 5 terms for each topic
+
+```{r}
+tidy(paragraph_lda, matrix = 'beta') %>%
+  group_by(topic) %>%
+  top_n(n = 5, wt = beta) %>%
+  filter(row_number() <= 5) %>%
+  arrange(topic, -beta) %>%
+  ungroup %>%
+  ggplot(aes(x = term, y = beta)) + 
+  geom_point() + 
+  facet_wrap(~topic, drop = TRUE, scale = 'free_x', ncol = 4) +
+  theme(axis.text.x = element_text(angle = -45, hjust = 0))
+```
+
+Visualize the prevalence of topics over the course of the novel
+
+```{r}
+tidy(paragraph_lda, matrix = 'gamma') %>%
+  mutate(para_num = as.integer(document)) %>%
+  ggplot(aes(x = para_num, y = topic, alpha = gamma)) +
+  geom_point() +
+  theme_minimal()
+```
+
+## Paragraph- and sentence-level emotional analysis
+
+```{r}
+scored_tokens <- 
+  dunwich_tokens %>%
+  inner_join(VAD, by = c('word' = 'Word'))
+scored_tokens
+```
+
+Score by sentence using max scoring word in each sentence
+
+```{r}
+scored_tokens %>%
+  group_by(sent_num) %>%
+  summarise_at(vars(valence, arousal, dominance), funs(max)) %>%
+  gather(measure, value, -sent_num) %>%
+  ggplot(aes(x = sent_num, y = value, colour = measure)) + 
+  stat_smooth()
+```
+
+Same thing, but score each paragraph as the median score for its sentences
+
+```{r}
+scored_tokens %>%
+  group_by(para_num, sent_num) %>%
+  summarise_at(vars(valence, arousal, dominance), funs(max)) %>%
+  group_by(para_num) %>%
+  summarise_at(vars(valence, arousal, dominance), funs(median)) %>%
+  gather(measure, value, -para_num) %>%
+  ggplot(aes(x = para_num, y = value, colour = measure)) + 
+  stat_smooth()
+```
+
+Simple positive-negative sentiment analysis
+
+```{r}
+dunwich_tokens %>%
+  inner_join(get_sentiments('bing')) %>%
+  count(para_num, sent_num, sentiment) %>%
+  spread(sentiment, n, fill = 0) %>%
+  mutate(sentiment = positive - negative) %>%
+  ggplot(aes(x = sent_num, y = sentiment)) +
+  geom_smooth()
+```
+
+Same thing, but aggregating up to the paragraph level by averaging across sentences
+
+```{r}
+dunwich_tokens %>%
+  inner_join(get_sentiments('bing')) %>%
+  count(para_num, sent_num, sentiment) %>%
+  spread(sentiment, n, fill = 0) %>%
+  mutate(sentiment = positive - negative) %>%
+  group_by(para_num) %>%
+  summarise(sentiment = mean(sentiment)) %>%
+  ggplot(aes(x = para_num, y = sentiment)) +
+  geom_smooth()
+```
+
+

@@ -631,32 +631,34 @@ library(haven)
 
 
 
-This week: Preliminary work for the session on Twitter
+Preliminary work for the session on Twitter
 =============================================================
 
-<div style="font-size: 80%;">
+<!-- <div style="font-size: 80%;"> -->
 
-* Follow [this tutorial](https://rtweet.info/articles/auth.html) which provides detailed instructions for setting up programmatic access to Twitter using the `rtweet` package. I recommend using Authorization Method #2 (Access token/secret method).
-* Specifically, do the following (but follow the detailed instructions in the tutorial):
-    1. `install.packages('rtweet', dependencies = TRUE)`
-    2. [Create a Twitter account](http://twitter.com/signup) if you do not already have one
-    3. Visit the [Twitter apps](https://apps.twitter.com) site and create a new app
-    4. Create and record the four keys and access tokens needed to access the Twitter API, then insert them into the code in the turorial (starting with `token <- create_token(...`) to ensure everything is working without error. If the code `identical(token, get_token())` works, then everything should be set up correctly.
+* Follow [this tutorial](https://rtweet.info/articles/auth.html) which provides detailed instructions for setting up programmatic access to Twitter using the `rtweet` package
+
+* I recommend using Authorization Method #2 (Access token/secret method).
+<!-- * Specifically, do the following (but follow the detailed instructions in the tutorial): -->
+<!--     1. `install.packages('rtweet', dependencies = TRUE)` -->
+<!--     2. [Create a Twitter account](http://twitter.com/signup) if you do not already have one -->
+<!--     3. Visit the [Twitter apps](https://apps.twitter.com) site and create a new app -->
+<!--     4. Create and record the four keys and access tokens needed to access the Twitter API, then insert them into the code in the turorial (starting with `token <- create_token(...`) to ensure everything is working without error. If the code `identical(token, get_token())` works, then everything should be set up correctly. -->
 
 
 
-</div>
+<!-- </div> -->
 
-This week: Preliminary work for the session on web scraping
+Preliminary work for the session on web scraping
 ===============================================================
-* Do all of the following **before our next meeting**
+* Do all of the following **before the next session**
 
 * [Review or learn the basics of HTML](https://www.w3schools.com/html/html_intro.asp)
 * [Play this game](http://flukeout.github.io) to learn CSS
 * Install [SelectorGadget](https://chrome.google.com/webstore/detail/selectorgadget/mhjhnkcfbdhnjickkkdbjoemdmbfginb/related) for Chrome and try it, or else do a lot of playing around with "Inspect Element" in your favorite browser
 * Skim [this Wikipedia article about CGI query strings](https://en.wikipedia.org/wiki/Query_string) so that you have a sense of why I might infer that if this page generates page 1 of data: `http://some-site.com/show_data?page=1`, then this page: `http://some-site.com/show_data?page=2` will probably generate page 2.
 
-This week: Preliminary work for the sesion on text analysis
+Preliminary work for the sesion on text analysis
 ===========================================================
 * Read and follow (type along with) this tutorial:
 ```{r eval = FALSE}
@@ -667,15 +669,15 @@ vignette('tm', package='tm')
 * Skim pp 1--7 of [Gonçalves, et al. "A Benchmark Comparison of State-of-the-Practice Sentiment Analysis Methods." arXiv preprint arXiv:1512.01818 (2015). http://arxiv.org/pdf/1512.01818.pdf](http://arxiv.org/pdf/1512.01818.pdf)
 
 
-This week: Write some code and share it
+Write some code and share it
 =======================================
 
 * Create a new repository on github and then create a corresponding project in R (follow instructions from Session 1 slides)
 * Create an R Markdown file, and in that file, download, clean up, and visualize some data. Download data that would be relevant to your research --- if you need inspiration, visit this list of [awesome public datasets](https://github.com/caesar0301/awesome-public-datasets)
 * Email the URL of your repository (e.g., [https://github.com/jasonmtroos/rook](https://github.com/jasonmtroos/rook)) to another student 
-* Also email the URL of your repository to me
+<!-- * Also email the URL of your repository to me -->
 
-This week: Run somebody else's code and send them feedback
+Run somebody else's code and send them feedback
 ============================================================
 * After you receive an email from another student, clone their repository
 
@@ -694,7 +696,7 @@ git clone "url to your colleague's github repository"
 
 
 
-This week: Need more practice in R?
+Need more practice in R?
 =================================
 
 Visit these sites, read them, and write some code:

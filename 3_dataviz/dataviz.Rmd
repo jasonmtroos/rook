@@ -223,6 +223,15 @@ if (str_detect(opts_current$get()$fig.path, 'handout'))
 ```
 
 
+---
+
+<div class="center">
+<img src="datasaurus.gif">
+</div>
+<div class="center">
+**ALWAYS. LOOK. AT. THE. DATA.**
+</div>
+
 Today
 ==================================
 * This session: Data visualization with `ggplot2`
@@ -257,18 +266,21 @@ It depends on the goal:
 
 At a minimum...
 ================
-* Graphs are for comparing quantities
-    * Always ask yourself: "Comparing what?"
-    * Insist on this comparison being obvious to the viewer (and yourself)
-* Each graph should answer a central question
+* A graph is for **comparing quantities**
+    * Always ask yourself: "What is main comparison?"
+    
+* A graph should **answer a central question**
     * Both the question and answer should be clear
-    * Use the title, caption, and other labels to highlight both
-        * For manuscripts, these text elements are excluded from your word count, and you should take advantage of that
+
+* Both should be **obvious** to you and the viewer
 
 Psychological principles (Kosslyn, 2006)
 ========================================
+
 * I will briefly cover some of what we know about human cognition of data visualizations
+
 * If you want to know more, the book by Kosslyn (see quote earlier) is a good reference
+
 * Book divides what we know into 8 principles, which I think fall into 3 buckets:
     * Get their attention
     * Hold and direct their attention 
@@ -559,7 +571,7 @@ Practice with layers (Tasks 1--4)
 * Discuss what you are doing as you write code
 * Write your code in an empty **File > New File... > R Script** and execute each line using `Cmd-Enter` (Mac) or `Control-Enter` (Windows)
 * Use the data set called `mpg` which is included in the `ggplot2` package
-* Exercises can be found at `http://bit.ly/2Hnz22f`
+* Exercises are on **Canvas**
 
 Data
 =======
@@ -634,10 +646,12 @@ Task 0 (Example)
     * `identity` position
 
 
-Basic exercises (Tasks 1--4)
-============================
 
-`http://bit.ly/2Hnz22f`
+---
+
+Do Tasks 1--4
+
+
 
 Facets and discrete groups
 ==========================
@@ -735,15 +749,23 @@ paste0('![](', file.path(opts_current$get()$fig.path, paste0('annotated_fig_ex-1
 Relabelling
 ===========
 
-```{r fig.height=3}
-ggplot(mpg, aes(x = displ, y = hwy, colour = plyr::revalue(drv, c("f" = "Front", "r" = "Rear", "4" = "4WD")))) + geom_point() + labs(colour = "Drive train")
+```{r fig.height=3, tidy=FALSE}
+mpg2 <- mpg %>%
+  mutate(drv2 = case_when(drv == 'f' ~ 'Front',
+                          drv == '4' ~ '4WD',
+                          drv == 'r' ~ 'Rear'))
+ggplot(mpg2, aes(x = displ, y = hwy, colour = drv2)) + geom_point() + 
+  labs(colour = "Drive train")
 ```
 
 ***
 
 
-```{r fig.height=3}
-ggplot(mpg, aes(x = displ, y = hwy ) )+ geom_point() + facet_wrap(~drv, labeller = as_labeller(c('f' = 'Front', 'r' = 'Rear', '4' = '4WD')))
+```{r fig.height=3, tidy=FALSE}
+ggplot(mpg, aes(x = displ, y = hwy)) + geom_point() + 
+  facet_wrap(~ drv, labeller = as_labeller(c('f' = 'Front', 
+                                             'r' = 'Rear', 
+                                             '4' = '4WD')))
 ```
 
 - Another alternative is to use the `forcats` package to relabel/reorder factors
