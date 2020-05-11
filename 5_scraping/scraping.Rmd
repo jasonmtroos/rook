@@ -377,7 +377,7 @@ in order to yield this result:
 ```{r echo = FALSE}
 ow <- options()$width
 options(width=200)
-(schools <- p %>% html_nodes('div.field__item')  %>% html_text())
+(schools <- p %>% html_nodes('h2.block-title')  %>% html_text())
 options(width=ow)
 ```
 </div>
@@ -393,7 +393,7 @@ in order to yield this result:
 
 <div class="font-90">
 ```{r echo = FALSE}
-program_urls <- p %>% html_nodes('.field + ul li:first-of-type a') %>%
+p %>% html_nodes('h2.block-title a') %>%
   html_attr('href')
 ```
 ```{r}
@@ -426,28 +426,24 @@ p %>% html_node('.cast_list') %>%
 Task 4:
 =========
 
+
 ```{r echo=FALSE, eval = FALSE}
 p <- read_html('https://en.wikipedia.org/wiki/Most_common_words_in_English')
 p %>% html_nodes('table.wikitable') %>% map(~html_table(.)) %>% bind_rows
 ```
 
-* Use `html_table()` to extract the first table (English language, daily) at https://en.wikipedia.org/wiki/List_of_newspapers_in_the_Republic_of_Ireland 
+* Use `html_table()` to extract the first table at https://en.wikipedia.org/wiki/Most_common_words_in_English
 
 ```{r echo = FALSE}
-p <- read_html('https://en.wikipedia.org/wiki/List_of_newspapers_in_the_Republic_of_Ireland')
-p %>% html_node('table.wikitable') %>% html_table 
+p <- read_html('https://en.wikipedia.org/wiki/Most_common_words_in_English')
+p %>% 
+  html_node('table.wikitable') %>% 
+  html_table() %>%
+  as_tibble()
 ```
 
+* Hint: Use `html_node()` to select a `table` node with class `wikitable`---the CSS selector is therefore `table.wikitable`
+* Hint: Then use `html_table()` to extract the table
 
-***
-
-Use `html_node()`, the CSS selector `table.wikitable`, and `html_table()` to extract the first table
-
-`https://en.wikipedia.org/wiki/List_of_newspapers_in_the_Republic_of_Ireland`
-
-```{r eval = FALSE}
-doc <- read_html('https://en.wikipedia.org/wiki/List_of_...etc.')
-doc %>% '[your code goes here]'
-```
 
 

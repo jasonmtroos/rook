@@ -51,14 +51,13 @@ Objectives
 *	Monitor and manage the various steps of data collection and analysis for both integrity and replication purposes
 *	Become a more productive (taking less time to analyze your data) and careful (making fewer mistakes) scientist
 
-Course structure
+Course structure (pre-covid)
 =================
 
 ```{r}
 if(program() == 'egsh') {
   asis_output("
-* Four sessions, Tuesdays and Thursdays from 13.30--17.00
-* Rooms are not the same for every session ([see this page for details](https://www.egsh.eur.nl/doctoral-education/phd-course-guide/data-visualisation-web-scraping-and-text-analysis-in-r/))
+* Four sessions, Tuesdays and Fridays from 13.30--17.00
 ")
   }
 ```
@@ -69,21 +68,15 @@ if(program() == 'egsh') {
     + Experiments, surveys, time series, panels, whatever...
     + I will supply data sets as well
 
+Course structure (post-covid)
+=====================
 
-```{r}
-if(program() == 'egsh') {
-  asis_output("
-Unlocking achievements
-======================
-* Attend every session (there will be a sign-in sheet)
-* According to the Dutch government, each ECTS credit requires 28 hours of work
-* At 2.5 ECTS, that's 70 hours total for the course
-    + 35 hours per week, including time in class
-    + With 3.5 hours in class each week, 2.5 ECTS implies **28 hours per week of work on your own**
-* Learning new programming skills takes time, so if you want to get something from this course, 28 hours per week represents the **minimum level of effort**
-  ")
-}
-```
+* Same idea in principle
+* I won't be able to do as much debugging of your code, but we will try via screen sharing
+* Zoom sessions are slower than in-person, so I will probably skip over some material
+* This is my first time teaching via Zoom
+
+
 
 Session 1: Course overview and first steps
 ===================================================
