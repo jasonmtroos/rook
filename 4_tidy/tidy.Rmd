@@ -26,6 +26,8 @@ output:
       ]
 knitr:
   cache: 1
+editor_options: 
+  chunk_output_type: console
 ---
 
 
@@ -502,8 +504,8 @@ data(mpg, package = 'ggplot2')
 Joins
 =====
 ```{r echo=FALSE}
-students <- data_frame( student_id = c(100,101,102,103,104), name = c('Ann','Bob','Cam','Dee','Els') )
-grades <- bind_rows( data_frame( student_id = c(100,101,103), grade = c(8.0,6.5,7.0), course = 'A94' ), data_frame( student_id = c(100,103), grade = c(9.0, 5.5), course = 'B90' ), data_frame( student_id = c(102,90), grade =c(7.5,7.0), course = 'C14' ) )
+students <- tibble( student_id = c(100,101,102,103,104), name = c('Ann','Bob','Cam','Dee','Els') )
+grades <- bind_rows(tibble(student_id = c(100,101,103), grade = c(8.0,6.5,7.0), course = 'A94' ), tibble( student_id = c(100,103), grade = c(9.0, 5.5), course = 'B90' ), tibble( student_id = c(102,90), grade =c(7.5,7.0), course = 'C14' ) )
 ```
 
 <div class="left">
@@ -703,9 +705,9 @@ Visit these sites, read them, and write some code:
 
 * Functions
     - [DataCamp tutorial on functions](https://www.datacamp.com/community/tutorials/functions-in-r-a-tutorial)
-    - [Chapter 14 of R for Data Science](http://r4ds.had.co.nz/functions.html)
+    - [Chapter 19 of R for Data Science](http://r4ds.had.co.nz/functions.html)
         - A more advanced treatment
 * Loops
     - [DataCamp tutorial on loops](https://www.datacamp.com/community/tutorials/tutorial-on-loops-in-r)
         - If you get to the last section about the `apply` family of functions, skim it then learn about the replacement tools implemented in the `plyr` and `purrr` packages instead
-    - [Chapter 16 of R for Data Science](http://r4ds.had.co.nz/iteration.html)
+    - [Chapter 21 of R for Data Science](http://r4ds.had.co.nz/iteration.html)

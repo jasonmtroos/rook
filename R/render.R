@@ -78,25 +78,25 @@ render_all <- function() {
 #'
 #' @export
 publish <- function() {
-  dirs <- c('syllabus', 'pre_work', 'overview', 'session_1', 'session_2', 'session_3', 'session_4')
+  dirs <- c('0_pre_work', '1_overview', '2_intro_to_git_and_markdown', '3_dataviz', '4_tidy', '5_scraping', '6_twitter',  '7_text', 'session_2', 'session_3', 'session_4')
   plyr::a_ply(dirs, 1, function(x) {
     compiled <- list.files(paste0(here::here(x),'/'), pattern = '\\.html')
     compiled <- normalizePath(file.path(paste0(here::here(x),'/'), compiled))
-    dest <- normalizePath(file.path(here::here('compiled'), x))
+    dest <- normalizePath(file.path(here::here('docs'), x))
     if (!dir.exists(dest))
       dir.create(dest)
     file.copy(from = compiled, to = dest, overwrite = TRUE)
     invisible(NULL)
     })
-  system('zip -q compiled.zip -r compiled')
-  system('zip -q compiled.zip -d *.DS_Store')
-  special_destinations() %>%
-    transmute(from = here::here(file),
-              to = normalizePath(destination)) %>%
-    plyr::d_ply(.variables = 'from', .fun = function(row) {
-      with(row, file.copy(from = from, to = to, overwrite = TRUE))
-      invisible(NULL)
-    })
-  if(menu(choices = c('No', 'Yes'), title = 'Compile web site and push to S3?') == 2)
-    system('bash -l -c "(cd /Users/Jason/git_workspace/site && ruhoh compile && s3_website push --site /Users/Jason/git_workspace/site/compiled)"')
+  # system('zip -q compiled.zip -r compiled')
+  # system('zip -q compiled.zip -d *.DS_Store')
+  # special_destinations() %>%
+  #   transmute(from = here::here(file),
+  #             to = normalizePath(destination)) %>%
+  #   plyr::d_ply(.variables = 'from', .fun = function(row) {
+  #     with(row, file.copy(from = from, to = to, overwrite = TRUE))
+  #     invisible(NULL)
+  #   })
+  # if(menu(choices = c('No', 'Yes'), title = 'Compile web site and push to S3?') == 2)
+  #   system('bash -l -c "(cd /Users/Jason/git_workspace/site && ruhoh compile && s3_website push --site /Users/Jason/git_workspace/site/compiled)"')
 }

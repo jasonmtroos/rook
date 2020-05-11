@@ -101,7 +101,7 @@ tdm %>% findFreqTerms(lowfreq = 30)
 Join with the VAD scores
 
 ```{r}
-tdm_long <- with(tdm, data_frame(term = i, document = j, count = v)) %>% mutate(term = factor(term, 
+tdm_long <- with(tdm, tibble(term = i, document = j, count = v)) %>% mutate(term = factor(term, 
     labels = Terms(tdm)) %>% as.character)
 tdm_scored <- tdm_long %>% inner_join(VAD, by = c(term = "Word"))
 tdm_scored
@@ -116,7 +116,7 @@ line_scores <- tdm_scored %>%
             arousal = arousal * count, 
             dominance = dominance * count) %>% 
   group_by(line) %>% 
-  summarise_all(funs(sum))
+  summarise_all(~sum(.x))
 ```
 
 Tidy and visualize
@@ -130,7 +130,7 @@ g + geom_point()
 Smooth
 
 ```{r}
-g + geom_smooth()
+g + stat_smooth(method = 'loess')
 ```
 
 ## Sentence- and paragraph-level analysis using `tidytext`

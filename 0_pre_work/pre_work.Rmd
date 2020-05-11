@@ -7,7 +7,6 @@ output:
     highlight: pygments
     keep_md: yes
     theme: paper
-  pdf_document: default
 editor_options:
   chunk_output_type: console
 ---
@@ -55,12 +54,13 @@ RStudio provides an integrated development environment (IDE) for writing and exe
 
 Install R on your computer if you do not already have it installed. You can download R from [https://cloud.r-project.org/](https://cloud.r-project.org/). If you are working on a Windows computer, you should also install [RTools](https://cran.r-project.org/bin/windows/Rtools/).
 
-If you have an older version of R on your computer, now is a good time to upgrade to the latest version. As of the time of writing, the current version of R is `r rversions::r_release()$version`. To see the version on your computer, execute the following code in the R Console (or R Studio if already installed):
+If you have an older version of R on your computer, now might be a good time to upgrade to the latest version. As of the time of writing, the current version of R is `r rversions::r_release()$version`. To see the version on your computer, execute the following code in the R Console (or R Studio if already installed):
 
 ```{r eval = FALSE}
 version$version.string
 ```
 
+**Note:** Because R has just released a major version, you *might* want to keep using an older version. I have decided to upgrade to 4.0. But there may be problems for those of us who upgrade, and problems for those of us who do not. Sorry, bad timing... 
 
 Install RStudio on your computer if you do not already have it. You can download RStudio from [https://www.rstudio.com/products/rstudio/download/](https://www.rstudio.com/products/rstudio/download/). Note that RStudio offers both commercial and free versions; you should install the free version.
 
@@ -77,7 +77,7 @@ install.packages('devtools', dependencies = TRUE)
 install.packages('pkgbuild', dependencies = TRUE)
 install.packages('tidyverse', dependencies = TRUE)
 install.packages('Hmisc', dependencies = TRUE)
-install.packages('tm', dependencies = TRUE)
+install.packages('tm', dependencies = NA)   # <-- this one is NA instead of TRUE
 install.packages('rtweet', dependencies = TRUE)
 install.packages('lda', dependencies = TRUE)
 ```
@@ -123,7 +123,7 @@ git config --global credential.helper osxkeychain
 In order to access the Twitter API (Session 3), you need to have the appropriate accounts and security credentials:
 
 * Create a Twitter account if you do not have one already
-* Visit https://developer.twitter.com/ and apply for a Developer Account. It takes a few  days for the account to be approved, so do this as soon as possible. Do not delay. Do not wait until just before Session 3. Do it now.
+* Visit https://developer.twitter.com/ and apply for a Developer Account. It takes a few  days for the account to be approved, so do this as soon as possible. Do not delay. Do not wait until just before Session 3. **Do it now.**
 * Follow [this tutorial](https://rtweet.info/articles/auth.html) which provides detailed instructions for setting up programmatic access to Twitter using the `rtweet` package. I recommend using Authorization Method #2 (Access token/secret method).
 
 <!-- * Specifically, do the following (but follow the detailed instructions in the tutorial): -->

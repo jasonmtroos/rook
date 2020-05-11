@@ -1,0 +1,60 @@
+---
+title: "Data visualisation, web scraping, and text analysis in R"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+```
+
+```{r}
+library(tidyverse)
+```
+
+```{r}
+dirs <- list.dirs(here::here('docs'), full.names = FALSE) %>%
+  .[2:length(.)]
+files_by_dir <- 
+  map(dirs, ~list.files(here::here('docs', .x), pattern = '*.html'))
+list_session <- function(session_dirs) {
+  files_in_dirs <- map(seq_along(dirs), ~paste0(dirs[.x], '/', files_by_dir[[.x]]))
+  which_files <- dirs %in% session_dirs
+  files_names <- unlist(files_by_dir[which_files]) %>%
+    str_remove('\\.html')
+  files_hrefs <- unlist(files_in_dirs[which_files])
+  files_html <- map2_chr(files_names, files_hrefs, ~paste0("<li><a href=\"", .y, "\">", .x, "</a></li>")) %>%
+    str_c(collapse = "\n")
+  out <- str_c("<ul>", files_html, "</ul>", collapse = "\n")
+  cat(out)
+}
+```
+
+### Session 1
+
+```{r results='asis'}
+list_session(c('0_pre_work', '1_overview', '2_intro_to_git_and_markdown')) 
+```
+
+### Session 2
+
+```{r results='asis'}
+list_session(c('3_dataviz', '4_tidy', 'session_2')) 
+```
+
+### Session 3
+
+```{r results='asis'}
+list_session(c('5_scraping', '6_twitter', 'session_3')) 
+```
+
+### Session 4
+
+```{r results='asis'}
+list_session(c('7_text', 'session_4')) 
+```
+
+
+
+

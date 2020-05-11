@@ -159,7 +159,7 @@ statuses <- search_tweets(q = '#hashtag',
                           n = 10, lang = 'en', type = 'recent' )
 ```
 
-* The API wrapper calls the API and converts the JSON response into a language-friendly format (e.g., `data_frame` in R)
+* The API wrapper calls the API and converts the JSON response into a language-friendly format (e.g., data frame in R)
 
 ```{r echo = FALSE, message = FALSE}
 library(tidyverse)
@@ -199,9 +199,10 @@ djt <- get_timeline("realDonaldTrump", n = 4800)
 
 ```{r fig.height=4}
 djt %>% transmute(when = created_at - hours(6)) %>% 
-  mutate(time = hour(when)+minute(when)/60) %>%
-  ggplot(aes(x =  when, y = time, colour = as.numeric(when)))  +
-  geom_point(show.legend = FALSE) +
+  mutate(time = hour(when)+minute(when)/60,
+         day = floor_date(when, 'day')) %>%
+  ggplot(aes(x = time, y = day, colour = as.numeric(day)))  +
+  geom_jitter(show.legend = FALSE, width = 0, height = 1e4) +
   scale_colour_viridis_c(end = .8) +
   theme_minimal()
 ```
@@ -215,7 +216,7 @@ djt %>%
   transmute(when = created_at - hours(6)) %>% 
   mutate(time = hour(when)+minute(when)/60)  %>%
   ggplot(aes(x = time)) +
-  stat_bin(binwidth = .5) +
+  stat_bin(binwidth = 1) +
   theme_minimal()
 ```
 </div>

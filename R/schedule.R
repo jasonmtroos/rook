@@ -6,10 +6,10 @@
 get_sessions <- function() {
   if(program() == 'egsh') {
     tibble::frame_data(~Session, ~Date, ~Location, ~Time,
-               1, '2019-05-14', 'S0-09', '13:30--17:00',
-               2, '2019-05-16', 'S0-08', '13:30--17:00',
-               3, '2019-05-21', 'S0-08', '13:30--17:00',
-               4, '2019-05-23', 'S0-08', '13:00--17:00') %>%
+               1, '2020-05-12', 'Online', '13:30--17:00',
+               2, '2020-05-15', 'Online', '13:30--17:00',
+               3, '2020-05-19', 'Online', '13:30--17:00',
+               4, '2020-05-22', 'Online', '13:00--17:00') %>%
       dplyr::mutate(Date = lubridate::ymd(Date))
     # mutate(Date = coalesce(ymd(Date), ymd(Date)[1] + weeks(0:3)),
            # Time = '13.30--16.30')
@@ -53,5 +53,5 @@ course_title <- function() {
 #' @export
 #'
 program <- function() {
-  'erim' #'egsh' #'erim' 'egsh'
+  'egsh' #'erim' 'egsh'
 }

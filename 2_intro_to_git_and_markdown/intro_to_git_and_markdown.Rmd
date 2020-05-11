@@ -79,7 +79,7 @@ Doing before understanding
     + Make edits, commit changed, push changes to the online repository, etc.
 * Ask questions as we go, and I will explain what all this means
 
-Sticky notes
+Sticky notes (pre-covid)
 ============
 * Place a sticky note on your computer to signal:
 
@@ -94,6 +94,13 @@ Sticky notes
 > 
 > <div class="input-color"><div class="color-box" style="background-color: #FF1288;"></div>Something that we covered too quickly, too slowly, or that you think is irrelevant</div>
 
+Sticky notes (post-covid)
+====================================
+
+* Click on the participants buttom
+* At the bottom of the participants list, there are buttons for "yes" and "no"
+* Use the "yes" button if you're done and ready to move
+* Use the "no" button if you're stuck and need help
 
 Setup your local working directory
 ==================================
