@@ -88,6 +88,8 @@ publish <- function() {
     file.copy(from = compiled, to = dest, overwrite = TRUE)
     invisible(NULL)
     })
+  file.copy(from = here::here('_index', 'index.html'),
+            to = here::here('docs'))
   # system('zip -q compiled.zip -r compiled')
   # system('zip -q compiled.zip -d *.DS_Store')
   # special_destinations() %>%
