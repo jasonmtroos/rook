@@ -479,6 +479,21 @@ format.table(dw,dl %>% trunc.dots(14)
              )
 ```
 
+Wide to long (new syntax)
+==================================
+
+`pivot_longer` is the new replacement for `gather`
+
+```{r eval=FALSE}
+dw %>% gather(type, mpg, cty, hwy)
+dw %>% pivot_longer(
+  cols = c(cty, hwy), 
+  names_to = "type", 
+  values_to  = "mpg"
+  )
+```
+
+
 
 Long to wide
 =======================
@@ -492,6 +507,18 @@ format.table(dl %>% trunc.dots(14),
              dl %>% spread( type, mpg )
              )
 ```
+
+Long to wide (new syntax)
+==============================
+
+`pivot_wider` is the new replacement for `spread`
+
+```{r eval = FALSE}
+dl %>% spread(type, mpg)
+dl %>% pivot_wider(names_from = type, 
+                   values_from = mpg)
+```
+
 
 
 Single table exercises (Tasks 6--11)

@@ -25,7 +25,7 @@ output:
       "--variable", "viewDistance=5"
       ]
 knitr:
-  cache: 1
+  cache: 2
 editor_options: 
   chunk_output_type: console
 ---
@@ -201,7 +201,7 @@ test_data %>%
 ***
 
 <div class='center'>
-```{r echo=FALSE}
+```{r echo=FALSE, message=FALSE}
 test_data %>%
   ggplot(aes(x = duration, y = num.correct)) +
   geom_point() +
@@ -264,41 +264,55 @@ It depends on the goal:
 * A tool for discovery --- gain an overview of, convey the scale and complexity of, or facilitate an exploration of **data** (*dataviz*)
 * A tool for communication --- help you to help others understand, tell a story about, or stimulate interest in a **problem or solution** (*infographics*)
 
-At a minimum...
-================
-* A graph is for **comparing quantities**
-    * Always ask yourself: "What is main comparison?"
-    
-* A graph should **answer a central question**
-    * Both the question and answer should be clear
+Communicating with graphs
+========================================
 
-* Both should be **obvious** to you and the viewer
+A graph intended for others to look must have at least these two properties
+
+1. It should **ask and answer a central question**
+    - Only one question can be the most important
+    - Both the question and its answer should be evident
+
+2. It should **compare quantities**
+    - One comparison is both the most important and the easiest to see
+    - Other, secondary comparisons should not distract from the main one
+
+Both the question and main comparison should be **obvious** to you and the viewer
+
 
 Psychological principles (Kosslyn, 2006)
 ========================================
 
-* I will briefly cover some of what we know about human cognition of data visualizations
+- Get their attention
+    1. Relevance
+    2. Appropriate knowledge
 
-* If you want to know more, the book by Kosslyn (see quote earlier) is a good reference
+- Hold and direct their attention
+    3. Salience
+    4. Discriminability
+    5. Organization
 
-* Book divides what we know into 8 principles, which I think fall into 3 buckets:
-    * Get their attention
-    * Hold and direct their attention 
-    * Help them remember
+- Help them remember
+    6. Compatability
+    7. Informative changes
+    8. Capacity limitations
+
 
 
 Get their attention
 ==========================
+
 1. **Relevance**
     * Not too much or too little information
     * Present information that reflects the message you want to convey
     * Don’t present extraneous information 
+    
 2. **Appropriate knowledge**
     * Prior knowledge must be sufficient to understand the graph
     * If you assume too much prior knowledge, viewers will be confused
     * If you violate norms, viewers will be confused
 
-If they are confused, they won't try to understand your graph
+If they are confused, they won’t try to understand your graph
 
 Hold and direct their attention
 ================================
@@ -306,13 +320,16 @@ Hold and direct their attention
     * Attention is drawn to large perceptible differences
     * The most visually striking aspect receives the most attention
     * Annotations help direct viewers' attention
+    
 4. **Discriminability**
     * Properties must differ enough to be noticed
     * Defaults in `ggplot2` do much of this work for you
+
 5. **Organization**
     * Groups of elements are seen and remembered as a whole
     
 Try to anticipate the process the audience will go through while looking at your graph
+
 
 Help them remember
 =========================
@@ -320,9 +337,11 @@ Help them remember
     * Form should be aligned with meaning
     * Lines express continuous change, bars discrete quantities
     * More = more (higher, better, bigger, etc.)
+    
 7. **Informative changes**
     * Changes in properties should carry information
     * ...and vice versa
+
 8. **Capacity limitations**
     * If too much information is presented, none is remembered
     * Four chunks in working memory
@@ -347,9 +366,10 @@ ggplot2's grammar
     * **Geometry** specifying what to draw
     * **Statistic** specifying how to transform the data before drawing
     * **Position** specifying how to arrange items
-* **Facet** specification for generating subplots
 * **Scales** specifying how to translate the data to lengths, colors, sizes, etc. in the graph
-* **Coordinates** which is the default (Cartesian) 99% of the time, so ignore for now
+* **Coordinates** which is Cartesian (the default) 99% of the time, so ignore this for now
+* **Facet** specification for generating subplots
+
 
 Layers
 ======
@@ -369,7 +389,7 @@ ggplot( data=anscombe, aes( x=x1, y = y1 ) ) +
 ***
 
 <div class="center">
-```{r echo=FALSE}
+```{r echo=FALSE, message = FALSE}
 ggplot( data=anscombe, aes( x=x1, y = y1 ) ) + geom_smooth(method="lm") + labs(title = 'Layer 2: regression line', x = 'x', y = 'y' ) + lims(y = c(3.0, 11.99))
 ```
 </div>
@@ -377,7 +397,7 @@ ggplot( data=anscombe, aes( x=x1, y = y1 ) ) + geom_smooth(method="lm") + labs(t
 ***
 
 <div class="center">
-```{r echo=FALSE}
+```{r echo=FALSE, message=FALSE}
 ggplot( data=anscombe, aes( x=x1, y = y1 ) ) + geom_point() + geom_smooth(method="lm") + labs(title = 'Layer 1 and 2', x = 'x', y = 'y' ) + lims(y = c(3.0, 11.99))
 ```
 </div>
@@ -571,13 +591,13 @@ Practice with layers (Tasks 1--4)
 * Discuss what you are doing as you write code
 * Write your code in an empty **File > New File... > R Script** and execute each line using `Cmd-Enter` (Mac) or `Control-Enter` (Windows)
 * Use the data set called `mpg` which is included in the `ggplot2` package
-* Exercises are on **Canvas**
+
 
 Data
 =======
 <div style="font-size:60%;">
 ```{r tidy = FALSE, eval = FALSE}
-library(ggplot2) # or: library(tidyverse)
+library(tidyverse)
 ?mpg
 ```
 
@@ -648,6 +668,8 @@ Task 0 (Example)
 
 
 ---
+
+Go to http://jasonmtroos.github.io/rook/ and click on `session_2_in_class_work_handout`
 
 Do Tasks 1--4
 
@@ -773,7 +795,7 @@ ggplot(mpg, aes(x = displ, y = hwy)) + geom_point() +
 Task 5
 =======================
 
-```{r echo = FALSE}
+```{r echo = FALSE, message=FALSE}
 ggplot(mpg, aes( x = displ, y = hwy, colour = factor(cyl))) + geom_point() + geom_smooth(method="lm",se=FALSE) + scale_x_log10(breaks=2:7) + scale_y_log10(breaks=c(20,30,40)) + facet_wrap(~year, labeller = as_labeller(c('1999' = 'Model year 1999', '2008' = 'Model year 2008'))) + labs( x = 'Displacement', y = 'MPG, highway', colour = 'Cylinders', title = 'Fuel economy and engine size' )
 ```
 
@@ -781,6 +803,6 @@ ggplot(mpg, aes( x = displ, y = hwy, colour = factor(cyl))) + geom_point() + geo
 More reading
 ============
 * See the [ggplot2 documentation](http://docs.ggplot2.org/current/) for a visual summary of the available geometries, list of stats, and more; as well as detailed documentation
-* [STAT 545 @ UBC](http://stat545.com/topics.html) is an in-depth course covering a lot of the same material we cover here, including ggplot2 and dplyr
+* [All the Graph Things at the UBC STAT 545 site](https://stat545.com/graphics-overview.html) is  part of  an in-depth course covering a lot of the same material we cover here
 * [Chapter 3 of R for Data Science](http://r4ds.had.co.nz/data-visualisation.html) has a very nice introduction to ggplot2 that follows a similar flow to what we covered today
 * [39 studies about human perception in 30 minutes](https://medium.com/@kennelliott/39-studies-about-human-perception-in-30-minutes-4728f9e31a73) is a nice review of what we know about perception of data visualizations

@@ -1978,7 +1978,7 @@ document.getElementsByTagName('head')[0].appendChild(style);
     <h1 class="title">Data visualisation, web scraping, and text analysis in R: Session 2b</h1>
   <h1 class="subtitle">Tidying data</h1>
     <h2 class="author">J.M.T. Roos</h2>
-    <h3 class="date">Last updated: 2020-05-11 11:38:10</h3>
+    <h3 class="date">Last updated: 2020-05-15 09:23:40</h3>
 </section>
 
 <section id="this-session" class="slide level1">
@@ -5902,6 +5902,15 @@ hwy
 </table>
 </div>
 </section>
+<section id="wide-to-long-new-syntax" class="slide level1">
+<h1>Wide to long (new syntax)</h1>
+<p><code>pivot_longer</code> is the new replacement for <code>gather</code></p>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class="hl std">dw</span> <span class="hl opt">%&gt;%</span> <span class="hl kwd">gather</span><span class="hl std">(type, mpg, cty, hwy)</span>
+<span class="hl std">dw</span> <span class="hl opt">%&gt;%</span> <span class="hl kwd">pivot_longer</span><span class="hl std">(</span><span class="hl kwc">cols</span> <span class="hl std">=</span> <span class="hl kwd">c</span><span class="hl std">(cty, hwy),</span> <span class="hl kwc">names_to</span> <span class="hl std">=</span> <span class="hl str">&quot;type&quot;</span><span class="hl std">,</span>
+    <span class="hl kwc">values_to</span> <span class="hl std">=</span> <span class="hl str">&quot;mpg&quot;</span><span class="hl std">)</span></code></pre>
+</div>
+</section>
 <section id="long-to-wide" class="slide level1">
 <h1>Long to wide</h1>
 <div class="sourceCode">
@@ -6350,6 +6359,14 @@ s6
 </tr>
 </tbody>
 </table>
+</div>
+</section>
+<section id="long-to-wide-new-syntax" class="slide level1">
+<h1>Long to wide (new syntax)</h1>
+<p><code>pivot_wider</code> is the new replacement for <code>spread</code></p>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class="hl std">dl</span> <span class="hl opt">%&gt;%</span> <span class="hl kwd">spread</span><span class="hl std">(type, mpg)</span>
+<span class="hl std">dl</span> <span class="hl opt">%&gt;%</span> <span class="hl kwd">pivot_wider</span><span class="hl std">(</span><span class="hl kwc">names_from</span> <span class="hl std">= type,</span> <span class="hl kwc">values_from</span> <span class="hl std">= mpg)</span></code></pre>
 </div>
 </section>
 <section id="single-table-exercises-tasks-611" class="slide level1">
